@@ -1,0 +1,305 @@
+package geos
+
+// #include "geos.h"
+import "C"
+
+import (
+	"runtime"
+	"sync"
+	"unsafe"
+)
+
+// A Context is a context.
+type Context struct {
+	sync.Mutex
+	handle    C.GEOSContextHandle_t
+	wkbReader *C.struct_GEOSWKBReader_t
+	wkbWriter *C.struct_GEOSWKBWriter_t
+	wktReader *C.struct_GEOSWKTReader_t
+	wktWriter *C.struct_GEOSWKTWriter_t
+	err       error
+}
+
+// NewContext returns a new Context.
+func NewContext() *Context {
+	c := &Context{
+		handle: C.GEOS_init_r(),
+	}
+	runtime.SetFinalizer(c, (*Context).finish)
+	C.GEOSContext_setErrorMessageHandler_r(c.handle, (C.GEOSMessageHandler_r)(C.c_errorMessageHandler), unsafe.Pointer(c))
+	return c
+}
+
+// Clone clones g into c.
+func (c *Context) Clone(g *Geom) *Geom {
+	if g.context == c {
+		return g.Clone()
+	}
+	// FIXME use a more intelligent method than a WKB roundtrip (although a WKB
+	// roundtrip might actually be quite fast if the cgo overhead is
+	// significant)
+	clone, err := c.NewGeomFromWKB(g.ToWKB())
+	if err != nil {
+		panic(err)
+	}
+	return clone
+}
+
+// NewCollection returns a new collection.
+func (c *Context) NewCollection(typeID GeometryTypeID, geoms []*Geom) *Geom {
+	if len(geoms) == 0 {
+		return c.NewEmptyCollection(typeID)
+	}
+	c.Lock()
+	defer c.Unlock()
+	cGeoms := make([]*C.GEOSGeometry, len(geoms))
+	for i, geom := range geoms {
+		cGeoms[i] = geom.geom
+	}
+	g := c.newNonNilGeom(C.GEOSGeom_createCollection_r(c.handle, C.int(typeID), &cGeoms[0], C.uint(len(geoms))), nil)
+	for _, geom := range geoms {
+		geom.parent = g
+	}
+	return g
+}
+
+// NewCoordSeq returns a new CoordSeq.
+func (c *Context) NewCoordSeq(size, dims int) *CoordSeq {
+	c.Lock()
+	defer c.Unlock()
+	return c.newNonNilCoordSeq(C.GEOSCoordSeq_create_r(c.handle, C.uint(size), C.uint(dims)))
+}
+
+// NewCoordSeqFromCoords returns a new CoordSeq populated with coords.
+func (c *Context) NewCoordSeqFromCoords(coords [][]float64) *CoordSeq {
+	c.Lock()
+	defer c.Unlock()
+	return c.newNonNilCoordSeq(c.newGEOSCoordSeqFromCoords(coords))
+}
+
+// NewEmptyCollection returns a new empty collection.
+func (c *Context) NewEmptyCollection(typeID GeometryTypeID) *Geom {
+	c.Lock()
+	defer c.Unlock()
+	return c.newNonNilGeom(C.GEOSGeom_createEmptyCollection_r(c.handle, C.int(typeID)), nil)
+}
+
+// NewEmptyLineString returns a new empty line string.
+func (c *Context) NewEmptyLineString() *Geom {
+	c.Lock()
+	defer c.Unlock()
+	return c.newNonNilGeom(C.GEOSGeom_createEmptyLineString_r(c.handle), nil)
+}
+
+// NewEmptyPoint returns a new empty point.
+func (c *Context) NewEmptyPoint() *Geom {
+	c.Lock()
+	defer c.Unlock()
+	return c.newNonNilGeom(C.GEOSGeom_createEmptyPoint_r(c.handle), nil)
+}
+
+// NewEmptyPolygon returns a new empty polygon.
+func (c *Context) NewEmptyPolygon() *Geom {
+	c.Lock()
+	defer c.Unlock()
+	return c.newNonNilGeom(C.GEOSGeom_createEmptyPolygon_r(c.handle), nil)
+}
+
+// NewGeomFromBounds returns a new polygon constructed from bounds.
+func (c *Context) NewGeomFromBounds(bounds *Bounds) *Geom {
+	var typeID C.int
+	geom := C.c_newGEOSGeomFromBounds_r(c.handle, &typeID, (C.double)(bounds.MinX), (C.double)(bounds.MinY), (C.double)(bounds.MaxX), (C.double)(bounds.MaxY))
+	if geom == nil {
+		panic(c.err)
+	}
+	g := &Geom{
+		context:       c,
+		geom:          geom,
+		typeID:        GeometryTypeID(typeID),
+		numGeometries: 1,
+	}
+	runtime.SetFinalizer(g, (*Geom).finalize)
+	return g
+}
+
+// NewGeomFromWKB parses a geometry in WKB format from wkb.
+func (c *Context) NewGeomFromWKB(wkb []byte) (*Geom, error) {
+	c.Lock()
+	defer c.Unlock()
+	c.err = nil
+	if c.wkbReader == nil {
+		c.wkbReader = C.GEOSWKBReader_create_r(c.handle)
+	}
+	wkbCBuf := C.CBytes(wkb)
+	defer C.GEOSFree_r(c.handle, wkbCBuf)
+	return c.newGeom(C.GEOSWKBReader_read_r(c.handle, c.wkbReader, (*C.uchar)(wkbCBuf), C.ulong(len(wkb))), nil), c.err
+}
+
+// NewGeomFromWKT parses a geometry in WKT format from wkt.
+func (c *Context) NewGeomFromWKT(wkt string) (*Geom, error) {
+	c.Lock()
+	defer c.Unlock()
+	c.err = nil
+	if c.wktReader == nil {
+		c.wktReader = C.GEOSWKTReader_create_r(c.handle)
+	}
+	wktCStr := C.CString(wkt)
+	defer C.GEOSFree_r(c.handle, unsafe.Pointer(wktCStr))
+	return c.newGeom(C.GEOSWKTReader_read_r(c.handle, c.wktReader, wktCStr), nil), c.err
+}
+
+// NewLinearRing returns a new linear ring populated with coords.
+func (c *Context) NewLinearRing(coords [][]float64) *Geom {
+	c.Lock()
+	defer c.Unlock()
+	s := c.newGEOSCoordSeqFromCoords(coords)
+	return c.newNonNilGeom(C.GEOSGeom_createLinearRing_r(c.handle, s), nil)
+}
+
+// NewLineString returns a new line string populated with coords.
+func (c *Context) NewLineString(coords [][]float64) *Geom {
+	c.Lock()
+	defer c.Unlock()
+	s := c.newGEOSCoordSeqFromCoords(coords)
+	return c.newNonNilGeom(C.GEOSGeom_createLineString_r(c.handle, s), nil)
+}
+
+// NewPoint returns a new point populated with coord.
+func (c *Context) NewPoint(coord []float64) *Geom {
+	s := c.newGEOSCoordSeqFromCoords([][]float64{coord})
+	return c.newNonNilGeom(C.GEOSGeom_createPoint_r(c.handle, s), nil)
+}
+
+// NewPolygon returns a new point populated with coordss.
+func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
+	if len(coordss) == 0 {
+		return c.NewEmptyPolygon()
+	}
+	var (
+		shell      *C.struct_GEOSGeom_t
+		holesSlice []*C.struct_GEOSGeom_t
+	)
+	defer func() {
+		if v := recover(); v != nil {
+			C.GEOSGeom_destroy_r(c.handle, shell)
+			for _, hole := range holesSlice {
+				C.GEOSGeom_destroy_r(c.handle, hole)
+			}
+			panic(v)
+		}
+	}()
+	shell = C.GEOSGeom_createLinearRing_r(c.handle, c.newGEOSCoordSeqFromCoords(coordss[0]))
+	if shell == nil {
+		panic(c.err)
+	}
+	var holes **C.struct_GEOSGeom_t
+	nholes := len(coordss) - 1
+	if nholes > 0 {
+		holesSlice = make([]*C.struct_GEOSGeom_t, 0, nholes)
+		for i := 0; i < nholes; i++ {
+			hole := C.GEOSGeom_createLinearRing_r(c.handle, c.newGEOSCoordSeqFromCoords(coordss[i+1]))
+			if hole == nil {
+				panic(c.err)
+			}
+			holesSlice = append(holesSlice, hole)
+		}
+		holes = (**C.struct_GEOSGeom_t)(unsafe.Pointer(&holesSlice[0]))
+	}
+	return c.newNonNilGeom(C.GEOSGeom_createPolygon_r(c.handle, shell, holes, C.uint(nholes)), nil)
+}
+
+func (c *Context) finish() {
+	c.Lock()
+	defer c.Unlock()
+	if c.wkbReader != nil {
+		C.GEOSWKBReader_destroy_r(c.handle, c.wkbReader)
+	}
+	if c.wkbWriter != nil {
+		C.GEOSWKBWriter_destroy_r(c.handle, c.wkbWriter)
+	}
+	if c.wktReader != nil {
+		C.GEOSWKTReader_destroy_r(c.handle, c.wktReader)
+	}
+	if c.wktWriter != nil {
+		C.GEOSWKTWriter_destroy_r(c.handle, c.wktWriter)
+	}
+	C.finishGEOS_r(c.handle)
+}
+
+func (c *Context) newCoordSeq(gs *C.struct_GEOSCoordSeq_t) *CoordSeq {
+	if gs == nil {
+		return nil
+	}
+	var (
+		dimensions C.uint
+		size       C.uint
+	)
+	if C.GEOSCoordSeq_getDimensions_r(c.handle, gs, &dimensions) == 0 {
+		panic(c.err)
+	}
+	if C.GEOSCoordSeq_getSize_r(c.handle, gs, &size) == 0 {
+		panic(c.err)
+	}
+	s := &CoordSeq{
+		context:    c,
+		s:          gs,
+		dimensions: int(dimensions),
+		size:       int(size),
+	}
+	runtime.SetFinalizer(s, (*CoordSeq).destroy)
+	return s
+}
+
+func (c *Context) newGEOSCoordSeqFromCoords(coords [][]float64) *C.struct_GEOSCoordSeq_t {
+	flatCoords := make([]float64, 0, len(coords)*len(coords[0]))
+	for _, coord := range coords {
+		flatCoords = append(flatCoords, coord...)
+	}
+	return C.c_newGEOSCoordSeqFromFlatCoords_r(c.handle, C.uint(len(coords)), C.uint(len(coords[0])), (*C.double)(unsafe.Pointer(&flatCoords[0])))
+}
+
+func (c *Context) newGeom(geom *C.struct_GEOSGeom_t, parent *Geom) *Geom {
+	if geom == nil {
+		return nil
+	}
+	var (
+		typeID           C.int
+		numGeometries    C.int
+		numPoints        C.int
+		numInteriorRings C.int
+	)
+	if C.c_GEOSGeomGetInfo_r(c.handle, geom, &typeID, &numGeometries, &numPoints, &numInteriorRings) == 0 {
+		panic(c.err)
+	}
+	g := &Geom{
+		context:          c,
+		geom:             geom,
+		parent:           parent,
+		typeID:           GeometryTypeID(typeID),
+		numGeometries:    int(numGeometries),
+		numInteriorRings: int(numInteriorRings),
+		numPoints:        int(numPoints),
+	}
+	runtime.SetFinalizer(g, (*Geom).finalize)
+	return g
+}
+
+func (c *Context) newNonNilCoordSeq(s *C.struct_GEOSCoordSeq_t) *CoordSeq {
+	if s == nil {
+		panic(c.err)
+	}
+	return c.newCoordSeq(s)
+}
+
+func (c *Context) newNonNilGeom(geom *C.struct_GEOSGeom_t, parent *Geom) *Geom {
+	if geom == nil {
+		panic(c.err)
+	}
+	return c.newGeom(geom, parent)
+}
+
+//export go_errorMessageHandler
+func go_errorMessageHandler(message *C.char, userdata unsafe.Pointer) {
+	c := (*Context)(userdata)
+	c.err = Error(C.GoString(message))
+}

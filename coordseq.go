@@ -1,0 +1,185 @@
+package geos
+
+// #include "geos.h"
+import "C"
+
+// A CoordSeq is a coordinate sequence.
+type CoordSeq struct {
+	context    *Context
+	s          *C.struct_GEOSCoordSeq_t
+	parent     *Geom
+	dimensions int
+	size       int
+}
+
+// Clone returns a clone of s.
+func (s *CoordSeq) Clone() *CoordSeq {
+	s.context.Lock()
+	defer s.context.Unlock()
+	return s.context.newNonNilCoordSeq(C.GEOSCoordSeq_clone_r(s.context.handle, s.s))
+}
+
+// Dimensions returns the dimensions of s.
+func (s *CoordSeq) Dimensions() int {
+	return s.dimensions
+}
+
+// Ordinate returns the idx-th dim coordinate of s.
+func (s *CoordSeq) Ordinate(idx, dim int) float64 {
+	s.context.Lock()
+	defer s.context.Unlock()
+	if idx < 0 || s.size <= idx {
+		panic(errIndexOutOfRange)
+	}
+	if dim < 0 || s.dimensions <= dim {
+		panic(errDimensionOutOfRange)
+	}
+	var value float64
+	if C.GEOSCoordSeq_getOrdinate_r(s.context.handle, s.s, C.uint(idx), C.uint(dim), (*C.double)(&value)) == 0 {
+		panic(s.context.err)
+	}
+	return value
+}
+
+// SetOrdinate sets the idx-th dim coordinate of s to val.
+func (s *CoordSeq) SetOrdinate(idx, dim int, val float64) {
+	s.context.Lock()
+	defer s.context.Unlock()
+	if idx < 0 || s.size <= idx {
+		panic(errIndexOutOfRange)
+	}
+	if dim < 0 || s.dimensions <= dim {
+		panic(errDimensionOutOfRange)
+	}
+	if C.GEOSCoordSeq_setOrdinate_r(s.context.handle, s.s, C.uint(idx), C.uint(dim), C.double(val)) == 0 {
+		panic(s.context.err)
+	}
+}
+
+// SetX sets the idx-th X coordinate of s to val.
+func (s *CoordSeq) SetX(idx int, val float64) {
+	s.context.Lock()
+	defer s.context.Unlock()
+	if idx < 0 || s.size <= idx {
+		panic(errIndexOutOfRange)
+	}
+	if s.dimensions == 0 {
+		panic(errDimensionOutOfRange)
+	}
+	if C.GEOSCoordSeq_setX_r(s.context.handle, s.s, C.uint(idx), C.double(val)) == 0 {
+		panic(s.context.err)
+	}
+}
+
+// SetY sets the idx-th Y coordinate of s to val.
+func (s *CoordSeq) SetY(idx int, val float64) {
+	s.context.Lock()
+	defer s.context.Unlock()
+	if idx < 0 || s.size <= idx {
+		panic(errIndexOutOfRange)
+	}
+	if s.dimensions < 2 {
+		panic(errDimensionOutOfRange)
+	}
+	if C.GEOSCoordSeq_setY_r(s.context.handle, s.s, C.uint(idx), C.double(val)) == 0 {
+		panic(s.context.err)
+	}
+}
+
+// SetZ sets the idx-th Z coordinate of s to val.
+func (s *CoordSeq) SetZ(idx int, val float64) {
+	s.context.Lock()
+	defer s.context.Unlock()
+	if idx < 0 || s.size <= idx {
+		panic(errIndexOutOfRange)
+	}
+	if s.dimensions < 3 {
+		panic(errDimensionOutOfRange)
+	}
+	if C.GEOSCoordSeq_setZ_r(s.context.handle, s.s, C.uint(idx), C.double(val)) == 0 {
+		panic(s.context.err)
+	}
+}
+
+// Size returns the size of s.
+func (s *CoordSeq) Size() int {
+	return s.size
+}
+
+// ToCoords returns s as a [][]float64.
+func (s *CoordSeq) ToCoords() [][]float64 {
+	s.context.Lock()
+	defer s.context.Unlock()
+	if s.size == 0 || s.dimensions == 0 {
+		return nil
+	}
+	flatCoords := make([]float64, s.size*s.dimensions)
+	if C.c_GEOSCoordSeq_getFlatCoords_r(s.context.handle, s.s, C.uint(s.size), C.uint(s.dimensions), (*C.double)(&flatCoords[0])) == 0 {
+		panic(s.context.err)
+	}
+	coords := make([][]float64, s.size)
+	j := 0
+	for i := 0; i < s.size; i++ {
+		coords[i] = flatCoords[j : j+s.dimensions]
+		j += s.dimensions
+	}
+	return coords
+}
+
+// X returns the idx-th X coordinate of s.
+func (s *CoordSeq) X(idx int) float64 {
+	s.context.Lock()
+	defer s.context.Unlock()
+	if idx < 0 || s.size <= idx {
+		panic(errIndexOutOfRange)
+	}
+	if s.dimensions == 0 {
+		panic(errDimensionOutOfRange)
+	}
+	var val float64
+	if C.GEOSCoordSeq_getX_r(s.context.handle, s.s, C.uint(idx), (*C.double)(&val)) == 0 {
+		panic(s.context.err)
+	}
+	return val
+}
+
+// Y returns the idx-th Y coordinate of s.
+func (s *CoordSeq) Y(idx int) float64 {
+	s.context.Lock()
+	defer s.context.Unlock()
+	if idx < 0 || s.size <= idx {
+		panic(errIndexOutOfRange)
+	}
+	if s.dimensions < 2 {
+		panic(errDimensionOutOfRange)
+	}
+	var val float64
+	if C.GEOSCoordSeq_getY_r(s.context.handle, s.s, C.uint(idx), (*C.double)(&val)) == 0 {
+		panic(s.context.err)
+	}
+	return val
+}
+
+// Z returns the idx-th Z coordinate of s.
+func (s *CoordSeq) Z(idx int) float64 {
+	s.context.Lock()
+	defer s.context.Unlock()
+	if idx < 0 || s.size <= idx {
+		panic(errIndexOutOfRange)
+	}
+	if s.dimensions < 3 {
+		panic(errDimensionOutOfRange)
+	}
+	var val float64
+	if C.GEOSCoordSeq_getZ_r(s.context.handle, s.s, C.uint(idx), (*C.double)(&val)) == 0 {
+		panic(s.context.err)
+	}
+	return val
+}
+
+func (s *CoordSeq) destroy() {
+	s.context.Lock()
+	defer s.context.Unlock()
+	C.GEOSCoordSeq_destroy_r(s.context.handle, s.s)
+	*s = CoordSeq{} // Clear all references.
+}
