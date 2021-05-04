@@ -9,6 +9,7 @@ import (
 )
 
 func mustNewGeometryFromWKT(t *testing.T, wkt string) *Geometry {
+	t.Helper()
 	geom, err := geos.NewGeomFromWKT(wkt)
 	require.NoError(t, err)
 	return &Geometry{Geom: geom}

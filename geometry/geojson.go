@@ -169,6 +169,7 @@ func geojsonWriteGeom(sb *strings.Builder, geom *geos.Geom) error {
 	if _, err := sb.WriteString(`{"type":"` + typ + `"`); err != nil {
 		return err
 	}
+	//nolint:exhaustive
 	switch geom.TypeID() {
 	case geos.PointTypeID:
 		if geom.IsEmpty() {
