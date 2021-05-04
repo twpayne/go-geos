@@ -79,7 +79,8 @@ func TestGeometry(t *testing.T) {
 		{
 			name:     "polygon_interior_rings",
 			geometry: mustNewGeometryFromWKT(t, "POLYGON ((0 0, 3 0, 3 3, 0 3, 0 0), (1 1, 1 2, 2 2, 2 1, 1 1))"),
-			expectedKML: "<Polygon>" +
+			expectedKML: "" +
+				"<Polygon>" +
 				"<outerBoundaryIs><LinearRing><coordinates>0,0 3,0 3,3 0,3 0,0</coordinates></LinearRing></outerBoundaryIs>" +
 				"<innerBoundaryIs><LinearRing><coordinates>1,1 1,2 2,2 2,1 1,1</coordinates></LinearRing></innerBoundaryIs>" +
 				"</Polygon>",
@@ -93,7 +94,8 @@ func TestGeometry(t *testing.T) {
 		{
 			name:     "multipoint",
 			geometry: mustNewGeometryFromWKT(t, "MULTIPOINT (0 1, 2 3)"),
-			expectedKML: "<MultiGeometry>" +
+			expectedKML: "" +
+				"<MultiGeometry>" +
 				"<Point><coordinates>0,1</coordinates></Point>" +
 				"<Point><coordinates>2,3</coordinates></Point>" +
 				"</MultiGeometry>",
@@ -106,7 +108,8 @@ func TestGeometry(t *testing.T) {
 		{
 			name:     "multilinestring",
 			geometry: mustNewGeometryFromWKT(t, "MULTILINESTRING ((0 1, 2 3), (4 5, 6 7))"),
-			expectedKML: "<MultiGeometry>" +
+			expectedKML: "" +
+				"<MultiGeometry>" +
 				"<LineString><coordinates>0,1 2,3</coordinates></LineString>" +
 				"<LineString><coordinates>4,5 6,7</coordinates></LineString>" +
 				"</MultiGeometry>",
@@ -119,7 +122,8 @@ func TestGeometry(t *testing.T) {
 		{
 			name:     "multipolygon",
 			geometry: mustNewGeometryFromWKT(t, "MULTIPOLYGON (((-1 -1, 0 -1, 0 0, -1 -1)), ((0 0, 3 0, 3 3, 0 3, 0 0), (1 1, 1 2, 2 2, 2 1, 1 1)))"),
-			expectedKML: "<MultiGeometry>" +
+			expectedKML: "" +
+				"<MultiGeometry>" +
 				"<Polygon>" +
 				"<outerBoundaryIs><LinearRing><coordinates>-1,-1 0,-1 0,0 -1,-1</coordinates></LinearRing></outerBoundaryIs>" +
 				"</Polygon>" +
