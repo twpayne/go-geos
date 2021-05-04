@@ -1,5 +1,7 @@
 # geos
 
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/twpayne/go-geos)](https://pkg.go.dev/github.com/twpayne/go-geos)
+
 Package `geos` provides an interface to [GEOS](https://trac.osgeo.org/geos).
 
 ## Features
