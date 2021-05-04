@@ -2,6 +2,10 @@ package geometry
 
 import "github.com/twpayne/go-geos"
 
+// initialStringBufferSize is the initial size of strings.Buffers used for
+// building GeoJSON and KML representations.
+const initialStringBufferSize = 1024
+
 // A Geometry is a geometry.
 type Geometry struct {
 	*geos.Geom

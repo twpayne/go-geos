@@ -1,11 +1,11 @@
 package geometry
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/twpayne/go-geos"
 )
@@ -40,11 +40,12 @@ func (g *Geometry) AsGeoJSON() ([]byte, error) {
 
 // MarshalJSON implements json.Marshaler.
 func (g *Geometry) MarshalJSON() ([]byte, error) {
-	b := &bytes.Buffer{}
-	if err := geojsonWriteGeom(b, g.Geom); err != nil {
+	sb := &strings.Builder{}
+	sb.Grow(initialStringBufferSize)
+	if err := geojsonWriteGeom(sb, g.Geom); err != nil {
 		return nil, err
 	}
-	return b.Bytes(), nil
+	return []byte(sb.String()), nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.
@@ -119,53 +120,53 @@ func (g *Geometry) UnmarshalJSON(data []byte) error {
 	}
 }
 
-func geojsonWriteCoordinates(b *bytes.Buffer, geom *geos.Geom) error {
+func geojsonWriteCoordinates(sb *strings.Builder, geom *geos.Geom) error {
 	for i, coord := range geom.CoordSeq().ToCoords() {
 		if i != 0 {
-			if err := b.WriteByte(','); err != nil {
+			if err := sb.WriteByte(','); err != nil {
 				return err
 			}
 		}
-		if err := b.WriteByte('['); err != nil {
+		if err := sb.WriteByte('['); err != nil {
 			return err
 		}
 		for j, ord := range coord {
 			if j != 0 {
-				if err := b.WriteByte(','); err != nil {
+				if err := sb.WriteByte(','); err != nil {
 					return err
 				}
 			}
-			if _, err := b.WriteString(strconv.FormatFloat(ord, 'f', -1, 64)); err != nil {
+			if _, err := sb.WriteString(strconv.FormatFloat(ord, 'f', -1, 64)); err != nil {
 				return err
 			}
 		}
-		if err := b.WriteByte(']'); err != nil {
+		if err := sb.WriteByte(']'); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func geojsonWriteCoordinatesArray(b *bytes.Buffer, geom *geos.Geom) error {
-	if err := b.WriteByte('['); err != nil {
+func geojsonWriteCoordinatesArray(sb *strings.Builder, geom *geos.Geom) error {
+	if err := sb.WriteByte('['); err != nil {
 		return err
 	}
-	if err := geojsonWriteCoordinates(b, geom); err != nil {
+	if err := geojsonWriteCoordinates(sb, geom); err != nil {
 		return err
 	}
-	return b.WriteByte(']')
+	return sb.WriteByte(']')
 }
 
-func geojsonWriteGeom(b *bytes.Buffer, geom *geos.Geom) error {
+func geojsonWriteGeom(sb *strings.Builder, geom *geos.Geom) error {
 	if geom == nil {
-		_, err := b.WriteString("null")
+		_, err := sb.WriteString("null")
 		return err
 	}
 	typ, ok := geojsonType[geom.TypeID()]
 	if !ok {
 		return fmt.Errorf("unsupported type: %s", geom.Type())
 	}
-	if _, err := b.WriteString(`{"type":"` + typ + `"`); err != nil {
+	if _, err := sb.WriteString(`{"type":"` + typ + `"`); err != nil {
 		return err
 	}
 	switch geom.TypeID() {
@@ -173,116 +174,116 @@ func geojsonWriteGeom(b *bytes.Buffer, geom *geos.Geom) error {
 		if geom.IsEmpty() {
 			return errUnsupportedEmptyGeometry
 		}
-		if _, err := b.WriteString(`,"coordinates":`); err != nil {
+		if _, err := sb.WriteString(`,"coordinates":`); err != nil {
 			return err
 		}
-		if err := geojsonWriteCoordinates(b, geom); err != nil {
+		if err := geojsonWriteCoordinates(sb, geom); err != nil {
 			return err
 		}
 	case geos.LineStringTypeID:
 		if geom.IsEmpty() {
 			return errUnsupportedEmptyGeometry
 		}
-		if _, err := b.WriteString(`,"coordinates":`); err != nil {
+		if _, err := sb.WriteString(`,"coordinates":`); err != nil {
 			return err
 		}
-		if err := geojsonWriteCoordinatesArray(b, geom); err != nil {
+		if err := geojsonWriteCoordinatesArray(sb, geom); err != nil {
 			return err
 		}
 	case geos.PolygonTypeID:
 		if geom.IsEmpty() {
 			return errUnsupportedEmptyGeometry
 		}
-		if _, err := b.WriteString(`,"coordinates":`); err != nil {
+		if _, err := sb.WriteString(`,"coordinates":`); err != nil {
 			return err
 		}
-		if err := geojsonWritePolygonCoordinates(b, geom); err != nil {
+		if err := geojsonWritePolygonCoordinates(sb, geom); err != nil {
 			return err
 		}
 	case geos.MultiPointTypeID:
-		if _, err := b.WriteString(`,"coordinates":[`); err != nil {
+		if _, err := sb.WriteString(`,"coordinates":[`); err != nil {
 			return err
 		}
 		for i, n := 0, geom.NumGeometries(); i < n; i++ {
 			if i != 0 {
-				if err := b.WriteByte(','); err != nil {
+				if err := sb.WriteByte(','); err != nil {
 					return err
 				}
 			}
-			if err := geojsonWriteCoordinates(b, geom.Geometry(i)); err != nil {
+			if err := geojsonWriteCoordinates(sb, geom.Geometry(i)); err != nil {
 				return err
 			}
 		}
-		if err := b.WriteByte(']'); err != nil {
+		if err := sb.WriteByte(']'); err != nil {
 			return err
 		}
 	case geos.MultiLineStringTypeID:
-		if _, err := b.WriteString(`,"coordinates":[`); err != nil {
+		if _, err := sb.WriteString(`,"coordinates":[`); err != nil {
 			return err
 		}
 		for i, n := 0, geom.NumGeometries(); i < n; i++ {
 			if i != 0 {
-				if err := b.WriteByte(','); err != nil {
+				if err := sb.WriteByte(','); err != nil {
 					return err
 				}
 			}
-			if err := geojsonWriteCoordinatesArray(b, geom.Geometry(i)); err != nil {
+			if err := geojsonWriteCoordinatesArray(sb, geom.Geometry(i)); err != nil {
 				return err
 			}
 		}
-		if err := b.WriteByte(']'); err != nil {
+		if err := sb.WriteByte(']'); err != nil {
 			return err
 		}
 	case geos.MultiPolygonTypeID:
-		if _, err := b.WriteString(`,"coordinates":[`); err != nil {
+		if _, err := sb.WriteString(`,"coordinates":[`); err != nil {
 			return err
 		}
 		for i, n := 0, geom.NumGeometries(); i < n; i++ {
 			if i != 0 {
-				if err := b.WriteByte(','); err != nil {
+				if err := sb.WriteByte(','); err != nil {
 					return err
 				}
 			}
-			if err := geojsonWritePolygonCoordinates(b, geom.Geometry(i)); err != nil {
+			if err := geojsonWritePolygonCoordinates(sb, geom.Geometry(i)); err != nil {
 				return err
 			}
 		}
-		if err := b.WriteByte(']'); err != nil {
+		if err := sb.WriteByte(']'); err != nil {
 			return err
 		}
 	case geos.GeometryCollectionTypeID:
-		if _, err := b.WriteString(`,"geometries":[`); err != nil {
+		if _, err := sb.WriteString(`,"geometries":[`); err != nil {
 			return err
 		}
 		for i, n := 0, geom.NumGeometries(); i < n; i++ {
-			if err := geojsonWriteGeom(b, geom.Geometry(i)); err != nil {
+			if err := geojsonWriteGeom(sb, geom.Geometry(i)); err != nil {
 				return err
 			}
 		}
-		if err := b.WriteByte(']'); err != nil {
+		if err := sb.WriteByte(']'); err != nil {
 			return err
 		}
 	}
-	if err := b.WriteByte('}'); err != nil {
+	if err := sb.WriteByte('}'); err != nil {
 		return err
 	}
 	return nil
 }
 
-func geojsonWritePolygonCoordinates(b *bytes.Buffer, geom *geos.Geom) error {
-	if err := b.WriteByte('['); err != nil {
+func geojsonWritePolygonCoordinates(sb *strings.Builder, geom *geos.Geom) error {
+	if err := sb.WriteByte('['); err != nil {
 		return err
 	}
-	if err := geojsonWriteCoordinatesArray(b, geom.ExteriorRing()); err != nil {
+	if err := geojsonWriteCoordinatesArray(sb, geom.ExteriorRing()); err != nil {
 		return err
 	}
 	for i, n := 0, geom.NumInteriorRings(); i < n; i++ {
-		if err := b.WriteByte(','); err != nil {
+		if err := sb.WriteByte(','); err != nil {
 			return err
 		}
-		if err := geojsonWriteCoordinatesArray(b, geom.InteriorRing(i)); err != nil {
+		if err := geojsonWriteCoordinatesArray(sb, geom.InteriorRing(i)); err != nil {
 			return err
 		}
 	}
-	return b.WriteByte(']')
+	return sb.WriteByte(']')
 }

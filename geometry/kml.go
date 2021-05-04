@@ -1,10 +1,10 @@
 package geometry
 
 import (
-	"bytes"
 	"encoding/xml"
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/twpayne/go-geos"
 )
@@ -33,25 +33,26 @@ func kmlEncodeCoords(e *xml.Encoder, startElement xml.StartElement, geom *geos.G
 		if err := e.EncodeToken(kmlCoordinatesStartElement); err != nil {
 			return err
 		}
-		b := &bytes.Buffer{}
+		sb := &strings.Builder{}
+		sb.Grow(initialStringBufferSize)
 		for i, coord := range coords {
 			if i != 0 {
-				if err := b.WriteByte(' '); err != nil {
+				if err := sb.WriteByte(' '); err != nil {
 					return err
 				}
 			}
 			for j, ord := range coord {
 				if j != 0 {
-					if err := b.WriteByte(','); err != nil {
+					if err := sb.WriteByte(','); err != nil {
 						return err
 					}
 				}
-				if _, err := b.WriteString(strconv.FormatFloat(ord, 'f', -1, 64)); err != nil {
+				if _, err := sb.WriteString(strconv.FormatFloat(ord, 'f', -1, 64)); err != nil {
 					return err
 				}
 			}
 		}
-		if err := e.EncodeToken(xml.CharData(b.Bytes())); err != nil {
+		if err := e.EncodeToken(xml.CharData(sb.String())); err != nil {
 			return err
 		}
 		if err := e.EncodeToken(kmlCoordinatesStartElement.End()); err != nil {

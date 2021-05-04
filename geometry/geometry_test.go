@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"runtime"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -168,7 +169,7 @@ func TestGeometry(t *testing.T) {
 			if tc.expectedKML != "" {
 				t.Run("kml", func(t *testing.T) {
 					defer runtime.GC() // Exercise finalizers.
-					data := &bytes.Buffer{}
+					data := &strings.Builder{}
 					require.NoError(t, xml.NewEncoder(data).Encode(tc.geometry))
 					assert.Equal(t, tc.expectedKML, data.String())
 				})
