@@ -1,6 +1,6 @@
 package geometry
 
-import "github.com/twpayne/go-geos"
+import geos "github.com/twpayne/go-geos"
 
 // GobDecode implements gob.GobDecoder.
 func (g *Geometry) GobDecode(data []byte) error {

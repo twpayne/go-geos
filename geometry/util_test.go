@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/twpayne/go-geos"
+	geos "github.com/twpayne/go-geos"
 )
 
 func mustNewGeometryFromWKT(t *testing.T, wkt string) *Geometry {

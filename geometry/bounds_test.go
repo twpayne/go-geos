@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/twpayne/go-geos"
+	geos "github.com/twpayne/go-geos"
 )
 
 func TestBounds(t *testing.T) {

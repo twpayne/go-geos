@@ -4,7 +4,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 
-	"github.com/twpayne/go-geos"
+	geos "github.com/twpayne/go-geos"
 )
 
 // Scan implements sql.Scanner.
