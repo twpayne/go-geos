@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/twpayne/go-geos"
+	geos "github.com/twpayne/go-geos"
 )
 
 var (
