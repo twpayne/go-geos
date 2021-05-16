@@ -12,21 +12,41 @@ import (
 // A Context is a context.
 type Context struct {
 	sync.Mutex
-	handle    C.GEOSContextHandle_t
-	wkbReader *C.struct_GEOSWKBReader_t
-	wkbWriter *C.struct_GEOSWKBWriter_t
-	wktReader *C.struct_GEOSWKTReader_t
-	wktWriter *C.struct_GEOSWKTWriter_t
-	err       error
+	handle           C.GEOSContextHandle_t
+	wkbReader        *C.struct_GEOSWKBReader_t
+	wkbWriter        *C.struct_GEOSWKBWriter_t
+	wktReader        *C.struct_GEOSWKTReader_t
+	wktWriter        *C.struct_GEOSWKTWriter_t
+	err              error
+	geomFinalizeFunc func(*Geom)
+}
+
+// A ContextOption sets an option on a Context.
+type ContextOption func(*Context)
+
+// WithGeomFinalizeFunc sets a function to be called just before a geometry is
+// finalized. This is typically used to log the geometry to help debug geometry
+// leaks.
+func WithGeomFinalizeFunc(geomFinalizeFunc func(*Geom)) ContextOption {
+	return func(c *Context) {
+		c.geomFinalizeFunc = geomFinalizeFunc
+	}
 }
 
 // NewContext returns a new Context.
-func NewContext() *Context {
+func NewContext(options ...ContextOption) *Context {
 	c := &Context{
 		handle: C.GEOS_init_r(),
 	}
 	runtime.SetFinalizer(c, (*Context).finish)
-	C.GEOSContext_setErrorMessageHandler_r(c.handle, (C.GEOSMessageHandler_r)(C.c_errorMessageHandler), unsafe.Pointer(c))
+	// FIXME in GitHub Actions, golangci-lint complains about the following line saying:
+	// Error: dupSubExpr: suspicious identical LHS and RHS for `==` operator (gocritic)
+	// As the line does not contain an `==` operator, disable gocritic on this line.
+	//nolint:gocritic
+	C.GEOSContext_setErrorMessageHandler_r(c.handle, (C.GEOSMessageHandler_r)(C.c_errorMessageHandler), unsafe.Pointer(&c.err))
+	for _, option := range options {
+		option(c)
+	}
 	return c
 }
 
@@ -301,6 +321,6 @@ func (c *Context) newNonNilGeom(geom *C.struct_GEOSGeom_t, parent *Geom) *Geom {
 //nolint:godot
 //export go_errorMessageHandler
 func go_errorMessageHandler(message *C.char, userdata unsafe.Pointer) {
-	c := (*Context)(userdata)
-	c.err = Error(C.GoString(message))
+	errP := (*error)(userdata)
+	*errP = Error(C.GoString(message))
 }

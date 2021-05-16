@@ -44,6 +44,10 @@ it should be explicitly freed by calling its `Destroy()` method. Periodic calls
 to `runtime.GC()` can also help, but the Go runtime makes no guarantees about
 when or if finalizers will be called.
 
+You can set a function to be called whenever a geometry's finalizer is invoked
+with the `WithGeomFinalizeFunc` option to `NewContext`. This can be helpful for
+tracking down geometry leaks.
+
 For more information, see the [documentation for
 `runtime.SetFinalizer()`](https://pkg.go.dev/runtime#SetFinalizer) and [this
 thread on

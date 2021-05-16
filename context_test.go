@@ -3,6 +3,7 @@ package geos
 import (
 	"math"
 	"runtime"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -203,6 +204,20 @@ func TestGeometryConstructors(t *testing.T) {
 			assert.True(t, g.Equals(expectedGeom))
 		})
 	}
+}
+
+func TestFinalizeFunc(t *testing.T) {
+	var wg sync.WaitGroup
+	finalizeHookCalled := false
+	wg.Add(1)
+	c := NewContext(WithGeomFinalizeFunc(func(g *Geom) {
+		defer wg.Done()
+		finalizeHookCalled = true
+	}))
+	_ = c.NewPoint([]float64{0, 0})
+	runtime.GC()
+	wg.Wait()
+	assert.True(t, finalizeHookCalled)
 }
 
 func TestMultipleContexts(t *testing.T) {

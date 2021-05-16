@@ -564,6 +564,9 @@ func (g *Geom) finalize() {
 	if g.context == nil {
 		return
 	}
+	if g.context.geomFinalizeFunc != nil {
+		g.context.geomFinalizeFunc(g)
+	}
 	g.Destroy()
 }
 
