@@ -24,34 +24,6 @@ Package `geos` provides an interface to [GEOS](https://trac.osgeo.org/geos).
 
 * Automatic finalization of GEOS objects.
 
-## Comparison with `github.com/twpayne/go-geom`
-
-[`github.com/twpayne/go-geom`](https://github.com/twpayne/go-geom) is a pure Go
-library providing similar functionality to `geos`. The major differences are:
-
-* `geos` uses [GEOS](https://trac.osgeo.org/geos), which is an extremely mature
-  library with a rich feature set.
-* `geos` uses cgo, with all the disadvantages that that entails, notably
-  expensive function call overhead, more complex memory management and trickier
-  cross-compilation.
-* `go-geom` uses a cache-friendly coordinate layout which is generally faster
-  than GEOS for many operations.
-
-`geos` is a good fit if your program is short-lived (meaning you can ignore
-memory management), or you require the battle-tested geometry functions provided
-by GEOS and are willing to manually handle memory management. `go-geom` is
-recommended for long-running processes with less stringent geometry function
-requirements.
-
-## Exceptions
-
-`geos` uses the stable C GEOS bindings. These bindings catch exceptions from the
-underlying C++ code and convert them to a return code. For normal geometry
-operations, `geos` `panic`s whenever it encounters a return code indicating an
-error, rather than returning an `error`. This behavior is similar to slice
-access in Go (out-of-bounds accesses `panic`) and keeps the API easy to use.
-When parsing WKB and WKT, errors are expected so an `error` is returned.
-
 ## Memory management
 
 `geos` objects live mostly on the C heap, and `geos` sets finalizers on the
@@ -71,6 +43,34 @@ For more information, see the [documentation for
 `runtime.SetFinalizer()`](https://pkg.go.dev/runtime#SetFinalizer) and [this
 thread on
 `golang-nuts`](https://groups.google.com/g/golang-nuts/c/XnV16PxXBfA/m/W8VEzIvHBAAJ).
+
+## Exceptions
+
+`geos` uses the stable C GEOS bindings. These bindings catch exceptions from the
+underlying C++ code and convert them to a return code. For normal geometry
+operations, `geos` panics whenever it encounters a return code indicating an
+error, rather than returning an `error`. This behavior is similar to slice
+access in Go (out-of-bounds accesses panic) and keeps the API easy to use. When
+parsing WKB and WKT, errors are expected so an `error` is returned.
+
+## Comparison with `github.com/twpayne/go-geom`
+
+[`github.com/twpayne/go-geom`](https://github.com/twpayne/go-geom) is a pure Go
+library providing similar functionality to `geos`. The major differences are:
+
+* `geos` uses [GEOS](https://trac.osgeo.org/geos), which is an extremely mature
+  library with a rich feature set.
+* `geos` uses cgo, with all the disadvantages that that entails, notably
+  expensive function call overhead, more complex memory management and trickier
+  cross-compilation.
+* `go-geom` uses a cache-friendly coordinate layout which is generally faster
+  than GEOS for many operations.
+
+`geos` is a good fit if your program is short-lived (meaning you can ignore
+memory management), or you require the battle-tested geometry functions provided
+by GEOS and are willing to manually handle memory management. `go-geom` is
+recommended for long-running processes with less stringent geometry function
+requirements.
 
 ## Licence
 
