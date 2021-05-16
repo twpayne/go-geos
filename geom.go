@@ -439,11 +439,12 @@ func (g *Geom) SRID() int {
 }
 
 // SetSRID sets g's SRID to srid.
-func (g *Geom) SetSRID(srid int) {
+func (g *Geom) SetSRID(srid int) *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
 	C.GEOSSetSRID_r(g.context.handle, g.geom, C.int(srid))
+	return g
 }
 
 // String returns g in WKT format.
