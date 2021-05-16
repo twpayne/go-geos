@@ -24,6 +24,25 @@ Package `geos` provides an interface to [GEOS](https://trac.osgeo.org/geos).
 
 * Automatic finalization of GEOS objects.
 
+## Comparison with `github.com/twpayne/go-geom`
+
+[`github.com/twpayne/go-geom`](https://github.com/twpayne/go-geom) is a pure Go
+library providing similar functionality to `geos`. The major differences are:
+
+* `geos` uses [GEOS](https://trac.osgeo.org/geos), which is an extremely mature
+  library with a rich feature set.
+* `geos` uses cgo, with all the disadvantages that that entails, notably
+  expensive function call overhead, more complex memory management and trickier
+  cross-compilation.
+* `go-geom` uses a cache-friendly coordinate layout which is generally faster
+  than GEOS for many operations.
+
+`geos` is a good fit if your program is short-lived (meaning you can ignore
+memory management), or you require the battle-tested geometry functions provided
+by GEOS and are willing to manually handle memory management. `go-geom` is
+recommended for long-running processes with less stringent geometry function
+requirements.
+
 ## Exceptions
 
 `geos` uses the stable C GEOS bindings. These bindings catch exceptions from the
