@@ -5,6 +5,13 @@ package geos
 // #include "geos.h"
 import "C"
 
+// Version.
+const (
+	VersionMajor = C.GEOS_VERSION_MAJOR
+	VersionMinor = C.GEOS_VERSION_MINOR
+	VersionPatch = C.GEOS_VERSION_PATCH
+)
+
 // A GeometryTypeID is a geometry type id.
 type GeometryTypeID int
 
