@@ -10,6 +10,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func TestCoordSeqEmpty(t *testing.T) {
+	defer runtime.GC() // Exercise finalizers.
+	c := NewContext()
+	s := c.NewCoordSeq(0, 2)
+	assert.Equal(t, 0, s.Size())
+	assert.Equal(t, 2, s.Dimensions())
+	assert.Nil(t, s.ToCoords())
+}
+
 func TestCoordSeqMethods(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
 	c := NewContext()
@@ -19,6 +28,7 @@ func TestCoordSeqMethods(t *testing.T) {
 	assert.Equal(t, 0.0, s.X(0))
 	assert.Equal(t, 0.0, s.Y(0))
 	assert.True(t, math.IsNaN(s.Z(0)))
+	s.SetZ(0, 0)
 	s.SetX(1, 1)
 	s.SetY(1, 2)
 	s.SetZ(1, 3)
@@ -28,6 +38,8 @@ func TestCoordSeqMethods(t *testing.T) {
 	assert.Equal(t, 1.0, s.Ordinate(1, 0))
 	assert.Equal(t, 2.0, s.Ordinate(1, 1))
 	assert.Equal(t, 3.0, s.Ordinate(1, 2))
+	assert.Equal(t, [][]float64{{0, 0, 0}, {1, 2, 3}}, s.ToCoords())
+
 	clone := s.Clone()
 	assert.Equal(t, 1.0, clone.X(1))
 	assert.Equal(t, 2.0, clone.Y(1))
@@ -35,12 +47,13 @@ func TestCoordSeqMethods(t *testing.T) {
 	clone.SetOrdinate(0, 1, -2.0)
 	assert.Equal(t, -1.0, clone.X(0))
 	assert.Equal(t, -2.0, clone.Y(0))
+	assert.Equal(t, [][]float64{{-1, -2, 0}, {1, 2, 3}}, clone.ToCoords())
 
-	// GEOS version 3.8.0 distributed with homebrew on macOS has a bug where
-	// GEOSCoordSeq_clone_r does not clone the dimension correctly. The original
-	// has dimension 3 but the returned clone has dimension 2. As we do not use
-	// three dimensional geometries, we are not affected by this bug, so skip
-	// the tests that fail because of the bug.
+	// GEOS version 3.8.0 has a bug where GEOSCoordSeq_clone_r does not clone
+	// the dimension correctly. The original has dimension 3 but the returned
+	// clone has dimension 2. As we do not use three dimensional geometries, we
+	// are not affected by this bug, so skip the tests that fail because of the
+	// bug.
 	if clone.Dimensions() == 2 {
 		t.Skip("skipping tests in buggy GEOS library")
 	}

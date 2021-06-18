@@ -46,8 +46,8 @@ func TestGeometryMethods(t *testing.T) {
 		{
 			name:                  "linestring",
 			wkt:                   "LINESTRING (0.0000000000000000 0.0000000000000000, 1.0000000000000000 1.0000000000000000)",
-			expectedEmpty:         false,
 			expectedBounds:        &Bounds{MinX: 0, MinY: 0, MaxX: 1, MaxY: 1},
+			expectedEmpty:         false,
 			expectedEnvelopeWKT:   "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))",
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
@@ -147,22 +147,25 @@ func TestGeomMethods(t *testing.T) {
 
 func TestPointMethods(t *testing.T) {
 	for _, tc := range []struct {
-		name      string
-		wkt       string
-		expectedX float64
-		expectedY float64
+		name                   string
+		wkt                    string
+		expectedCoordSeqCoords [][]float64
+		expectedX              float64
+		expectedY              float64
 	}{
 		{
-			name:      "point",
-			wkt:       "POINT (1 2)",
-			expectedX: 1,
-			expectedY: 2,
+			name:                   "point",
+			wkt:                    "POINT (1 2)",
+			expectedCoordSeqCoords: [][]float64{{1, 2}},
+			expectedX:              1,
+			expectedY:              2,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			defer runtime.GC() // Exercise finalizers.
 			c := NewContext()
 			g := mustNewGeomFromWKT(t, c, tc.wkt)
+			assert.Equal(t, tc.expectedCoordSeqCoords, g.CoordSeq().ToCoords())
 			assert.Equal(t, tc.expectedX, g.X())
 			assert.Equal(t, tc.expectedY, g.Y())
 		})
@@ -171,16 +174,18 @@ func TestPointMethods(t *testing.T) {
 
 func TestLineStringMethods(t *testing.T) {
 	for _, tc := range []struct {
-		name              string
-		wkt               string
-		expectedClosed    bool
-		expectedPointWKTs []string
-		expectedRing      bool
+		name                   string
+		wkt                    string
+		expectedClosed         bool
+		expectedCoordSeqCoords [][]float64
+		expectedPointWKTs      []string
+		expectedRing           bool
 	}{
 		{
-			name:           "linestring",
-			wkt:            "LINESTRING (0 1, 2 3)",
-			expectedClosed: false,
+			name:                   "linestring",
+			wkt:                    "LINESTRING (0 1, 2 3)",
+			expectedClosed:         false,
+			expectedCoordSeqCoords: [][]float64{{0, 1}, {2, 3}},
 			expectedPointWKTs: []string{
 				"POINT (0 1)",
 				"POINT (2 3)",
@@ -188,9 +193,10 @@ func TestLineStringMethods(t *testing.T) {
 			expectedRing: false,
 		},
 		{
-			name:           "linearring",
-			wkt:            "LINEARRING (0 0, 1 0, 1 1, 0 0)",
-			expectedClosed: true,
+			name:                   "linearring",
+			wkt:                    "LINEARRING (0 0, 1 0, 1 1, 0 0)",
+			expectedClosed:         true,
+			expectedCoordSeqCoords: [][]float64{{0, 0}, {1, 0}, {1, 1}, {0, 0}},
 			expectedPointWKTs: []string{
 				"POINT (0 0)",
 				"POINT (1 0)",
@@ -211,6 +217,7 @@ func TestLineStringMethods(t *testing.T) {
 				assert.True(t, expectedPoint.Equals(g.Point(i)))
 			}
 			assert.Equal(t, tc.expectedRing, g.IsRing())
+			assert.Equal(t, tc.expectedCoordSeqCoords, g.CoordSeq().ToCoords())
 		})
 	}
 }
