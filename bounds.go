@@ -15,6 +15,16 @@ type Bounds struct {
 	MaxY float64
 }
 
+// NewBounds returns a new bounds.
+func NewBounds(minX, minY, maxX, maxY float64) *Bounds {
+	return &Bounds{
+		MinX: minX,
+		MinY: minY,
+		MaxX: maxX,
+		MaxY: maxY,
+	}
+}
+
 // NewBoundsEmpty returns a new empty bounds.
 func NewBoundsEmpty() *Bounds {
 	return &Bounds{
@@ -27,6 +37,9 @@ func NewBoundsEmpty() *Bounds {
 
 // Contains returns true if b contains other.
 func (b *Bounds) Contains(other *Bounds) bool {
+	if b.IsEmpty() || other.IsEmpty() {
+		return false
+	}
 	return other.MinX >= b.MinX && other.MinY >= b.MinY && other.MaxX <= b.MaxX && other.MaxY <= b.MaxY
 }
 
