@@ -24,24 +24,6 @@ func NewGeometry(geom *geos.Geom) *Geometry {
 	return &Geometry{Geom: geom}
 }
 
-// NewGeometryFromWKB returns a new Geometry from wkb.
-func NewGeometryFromWKB(wkb []byte) (*Geometry, error) {
-	geom, err := geos.NewGeomFromWKB(wkb)
-	if err != nil {
-		return nil, err
-	}
-	return &Geometry{Geom: geom}, nil
-}
-
-// NewGeometryFromWKT returns a new Geometry from wkt.
-func NewGeometryFromWKT(wkt string) (*Geometry, error) {
-	geom, err := geos.NewGeomFromWKT(wkt)
-	if err != nil {
-		return nil, err
-	}
-	return &Geometry{Geom: geom}, nil
-}
-
 // Bounds returns g's bounds.
 func (g *Geometry) Bounds() *geos.Bounds {
 	return g.Geom.Bounds()

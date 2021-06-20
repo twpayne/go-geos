@@ -20,7 +20,7 @@ var (
 	kmlOuterBoundaryIsStartElement = xml.StartElement{Name: xml.Name{Local: "outerBoundaryIs"}}
 )
 
-// MarshalXML implements xml.Marshaler.
+// MarshalXML implements encoding/xml.Marshaler.
 func (g *Geometry) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return kmlEncodeGeom(e, g.Geom)
 }

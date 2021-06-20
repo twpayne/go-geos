@@ -38,7 +38,7 @@ func (g *Geometry) AsGeoJSON() ([]byte, error) {
 	return g.MarshalJSON()
 }
 
-// MarshalJSON implements json.Marshaler.
+// MarshalJSON implements encoding/json.Marshaler.
 func (g *Geometry) MarshalJSON() ([]byte, error) {
 	sb := &strings.Builder{}
 	sb.Grow(initialStringBufferSize)
@@ -48,7 +48,7 @@ func (g *Geometry) MarshalJSON() ([]byte, error) {
 	return []byte(sb.String()), nil
 }
 
-// UnmarshalJSON implements json.Unmarshaler.
+// UnmarshalJSON implements encoding/json.Unmarshaler.
 func (g *Geometry) UnmarshalJSON(data []byte) error {
 	var geoJSON struct {
 		Type        string            `json:"type"`

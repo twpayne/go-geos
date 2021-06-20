@@ -8,14 +8,19 @@ Package `go-geos` provides an interface to [GEOS](https://trac.osgeo.org/geos).
 
 * Fluent Go API.
 
-* The `geometry.Geometry` type implements all GEOS functionality and standard Go
-  interfaces:
+* Low-level `Context`, `CoordSeq`, `Geom`, and `PrepGeom` types provide access
+  to all GEOS methods.
 
-  *  `database/sql/driver.Valuer` and `database/sql.Scanner` (EWKB) for PostGIS
+* High-level `geometry.Geometry` type implements all GEOS functionality and
+  many standard Go interfaces:
+
+  * `database/sql/driver.Valuer` and `database/sql.Scanner` (WKB) for PostGIS
      database integration.
-  *  `encoding/json.Marshaler` and `encoding/json.Unmarshaler` (GeoJSON).
-  *  `encoding/xml.Marshaler` (KML).
-  *  `encoding/gob.GobEncoder` and `encoding/gob.GobDecoder` (GOB).
+  * `encoding/json.Marshaler` and `encoding/json.Unmarshaler` (GeoJSON).
+  * `encoding/xml.Marshaler` (KML).
+  * `encoding.BinaryMarshaler` and `encoding.BinaryUnmarshaler` (WKB).
+  * `encoding.TextMarshaler` and `encoding.TextUnmarshaler` (WKT).
+  * `encoding/gob.GobEncoder` and `encoding/gob.GobDecoder` (GOB).
 
   See the [PostGIS example](examples/postgis/README.md) for a demonstration of
   the use of these interfaces.
@@ -24,7 +29,9 @@ Package `go-geos` provides an interface to [GEOS](https://trac.osgeo.org/geos).
   hood, with locking to ensure safety, even when used across multiple
   goroutines. For best performance, use one `geos.Context` per goroutine.
 
-* Caching of some geometry properties to avoid cgo overhead.
+* Caching of geometry properties to avoid cgo overhead.
+
+* Optimized GeoJSON encoder.
 
 * Automatic finalization of GEOS objects.
 
@@ -50,15 +57,14 @@ thread on
 
 ## Errors, exceptions, and panics
 
-`go-geos` uses the stable C GEOS bindings. These bindings catch C++ exceptions
-from the underlying code and convert them to a return code. For normal geometry
-operations, `go-geos` panics whenever it encounters a GEOS return code
+`go-geos` uses the stable GEOS C bindings. These bindings catch exceptions from
+the underlying C++ code and convert them to an integer return code. For normal
+geometry operations, `go-geos` panics whenever it encounters a GEOS return code
 indicating an error, rather than returning an `error`. Such panics will not
-occur if the `go-geos` is used correctly. Panics will occur for invalid API
-calls, out-of-bounds access, or operations on invalid geometries. This behavior
-is similar to slice access in Go (out-of-bounds accesses panic) and keeps the
-API fluent. When parsing WKB and WKT, errors are expected so an `error` is
-returned.
+occur if `go-geos` is used correctly. Panics will occur for invalid API calls,
+out-of-bounds access, or operations on invalid geometries. This behavior is
+similar to slice access in Go (out-of-bounds accesses panic) and keeps the API
+fluent. When parsing data, errors are expected so an `error` is returned.
 
 ## Comparison with `github.com/twpayne/go-geom`
 

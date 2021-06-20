@@ -2,7 +2,7 @@ package geometry
 
 import geos "github.com/twpayne/go-geos"
 
-// GobDecode implements gob.GobDecoder.
+// GobDecode implements encoding/gob.GobDecoder.
 func (g *Geometry) GobDecode(data []byte) error {
 	if len(data) == 0 {
 		g.Geom = geos.NewEmptyPoint()
@@ -13,7 +13,7 @@ func (g *Geometry) GobDecode(data []byte) error {
 	return err
 }
 
-// GobEncode implements gob.GobEncoder.
+// GobEncode implements encoding/gob.GobEncoder.
 func (g *Geometry) GobEncode() ([]byte, error) {
 	if g.Geom == nil {
 		return nil, nil
