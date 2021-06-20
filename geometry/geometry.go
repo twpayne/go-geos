@@ -19,6 +19,11 @@ func Must(g *Geometry, err error) *Geometry {
 	return g
 }
 
+// NewGeometry returns a new Geometry using geom.
+func NewGeometry(geom *geos.Geom) *Geometry {
+	return &Geometry{Geom: geom}
+}
+
 // NewGeometryFromWKB returns a new Geometry from wkb.
 func NewGeometryFromWKB(wkb []byte) (*Geometry, error) {
 	geom, err := geos.NewGeomFromWKB(wkb)
@@ -42,6 +47,14 @@ func (g *Geometry) Bounds() *geos.Bounds {
 	return g.Geom.Bounds()
 }
 
+// Destroy destroys g's geom.
 func (g *Geometry) Destroy() {
 	g.Geom.Destroy()
+	g.Geom = nil
+}
+
+// SetSRID sets g's SRID.
+func (g *Geometry) SetSRID(srid int) *Geometry {
+	g.Geom.SetSRID(srid)
+	return g
 }

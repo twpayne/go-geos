@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding/gob"
+	"encoding/hex"
 	"encoding/json"
 	"encoding/xml"
 	"runtime"
@@ -13,6 +14,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	geos "github.com/twpayne/go-geos"
 )
 
 var (
@@ -184,4 +187,22 @@ func TestGeometry(t *testing.T) {
 			})
 		})
 	}
+}
+
+func TestNewGeometry(t *testing.T) {
+	expected := NewGeometry(geos.NewPoint([]float64{1, 2}))
+
+	actual, err := NewGeometryFromGeoJSON([]byte(`{"type":"Point","coordinates":[1,2]}`))
+	require.NoError(t, err)
+	assert.Equal(t, expected, actual)
+
+	wkb, err := hex.DecodeString("0101000000000000000000f03f0000000000000040")
+	require.NoError(t, err)
+	actual, err = NewGeometryFromWKB(wkb)
+	require.NoError(t, err)
+	assert.Equal(t, expected, actual)
+
+	actual, err = NewGeometryFromWKT("POINT (1 2)")
+	require.NoError(t, err)
+	assert.Equal(t, expected, actual)
 }
