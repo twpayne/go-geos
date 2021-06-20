@@ -3,8 +3,6 @@ package geos
 import (
 	"fmt"
 	"math"
-
-	"github.com/llgcode/draw2d"
 )
 
 // A Bounds is a two-dimensional bounds.
@@ -46,16 +44,6 @@ func (b *Bounds) Contains(other *Bounds) bool {
 // ContainsPoint returns true if b contains the point at x, y.
 func (b *Bounds) ContainsPoint(x, y float64) bool {
 	return b.MinX <= x && x <= b.MaxX && b.MinY <= y && y <= b.MaxY
-}
-
-// Draw draws b on gc.
-func (b *Bounds) Draw(gc draw2d.GraphicContext) {
-	gc.MoveTo(b.MinX, b.MinY)
-	gc.LineTo(b.MinX, b.MaxY)
-	gc.LineTo(b.MaxX, b.MaxY)
-	gc.LineTo(b.MaxX, b.MinY)
-	gc.LineTo(b.MinX, b.MinY)
-	gc.Stroke()
 }
 
 // Equals returns true if b equals other.
