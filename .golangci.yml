@@ -19,7 +19,6 @@ linters:
   - goerr113
   - gofmt
   - goimports
-  - golint
   - gomodguard
   - goprintffuncname
   - gosec

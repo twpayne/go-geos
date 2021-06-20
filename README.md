@@ -11,7 +11,8 @@ Package `geos` provides an interface to [GEOS](https://trac.osgeo.org/geos).
 * `geometry.Geometry` type implements all GEOS functionality and standard Go
   interfaces:
 
-  *  `sql/driver.Valuer` and `sql.Scanner` (EWKB) for PostGIS database integration.
+  *  `database/sql/driver.Valuer` and `database/sql.Scanner` (EWKB) for PostGIS
+     database integration.
   *  `json.Marshaler` and `json.Unmarshaler` (GeoJSON).
   *  `xml.Marshaler` (KML).
   *  `gob.GobEncoder` and `gob.GobDecoder` (GOB).

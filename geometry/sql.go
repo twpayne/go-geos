@@ -2,34 +2,48 @@ package geometry
 
 import (
 	"database/sql/driver"
+	"encoding/hex"
 	"fmt"
 
 	geos "github.com/twpayne/go-geos"
 )
 
-// Scan implements sql.Scanner.
+// Scan implements database/sql.Scanner.
 func (g *Geometry) Scan(src interface{}) error {
 	switch src := src.(type) {
 	case nil:
 		g.Geom = nil
 		return nil
 	case []byte:
-		if len(src) == 0 {
-			g.Geom = geos.NewEmptyPoint()
-			return nil
+		return g.scanWKB(src)
+	case string:
+		wkb, err := hex.DecodeString(src)
+		if err != nil {
+			return err
 		}
-		var err error
-		g.Geom, err = geos.NewGeomFromWKB(src)
-		return err
+		return g.scanWKB(wkb)
 	default:
-		return fmt.Errorf("want []byte, got %T", src)
+		return fmt.Errorf("want nil, []byte, or string, got %T", src)
 	}
 }
 
-// Value implements driver.Value.
-func (g *Geometry) Value() (driver.Value, error) {
+func (g *Geometry) scanWKB(wkb []byte) error {
+	if len(wkb) == 0 {
+		g.Geom = geos.NewEmptyPoint()
+		return nil
+	}
+	geom, err := geos.NewGeomFromWKB(wkb)
+	if err != nil {
+		return err
+	}
+	g.Geom = geom
+	return nil
+}
+
+// Value implements database/sql/driver.Value.
+func (g Geometry) Value() (driver.Value, error) {
 	if g.Geom == nil {
 		return nil, nil
 	}
-	return g.Geom.ToWKB(), nil
+	return hex.EncodeToString(g.Geom.ToWKB()), nil
 }
