@@ -25,7 +25,7 @@ type FeatureCollection []*Feature
 type feature struct {
 	ID         interface{}            `json:"id,omitempty"`
 	Type       string                 `json:"type"`
-	Geometry   geometry.Geometry      `json:"geometry"`
+	Geometry   *geometry.Geometry     `json:"geometry"`
 	Properties map[string]interface{} `json:"properties,omitempty"`
 }
 
@@ -39,7 +39,7 @@ func (f *Feature) MarshalJSON() ([]byte, error) {
 	return json.Marshal(feature{
 		ID:         f.ID,
 		Type:       featureType,
-		Geometry:   f.Geometry,
+		Geometry:   &f.Geometry,
 		Properties: f.Properties,
 	})
 }
@@ -54,7 +54,7 @@ func (f *Feature) UnmarshalJSON(data []byte) error {
 		return fmt.Errorf("not a Feature: %s", geoJSONFeature.Type)
 	}
 	f.ID = geoJSONFeature.ID
-	f.Geometry = geoJSONFeature.Geometry
+	f.Geometry = *geoJSONFeature.Geometry
 	f.Properties = geoJSONFeature.Properties
 	return nil
 }
@@ -66,7 +66,7 @@ func (fc FeatureCollection) MarshalJSON() ([]byte, error) {
 		feature := feature{
 			ID:         f.ID,
 			Type:       featureType,
-			Geometry:   f.Geometry,
+			Geometry:   &f.Geometry,
 			Properties: f.Properties,
 		}
 		features = append(features, feature)
@@ -93,7 +93,7 @@ func (fc *FeatureCollection) UnmarshalJSON(data []byte) error {
 		}
 		f := &Feature{
 			ID:         feature.ID,
-			Geometry:   feature.Geometry,
+			Geometry:   *feature.Geometry,
 			Properties: feature.Properties,
 		}
 		featureCollection = append(featureCollection, f)
