@@ -54,6 +54,7 @@ func TestBounds(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
+			//nolint:gocritic
 			assert.True(t, tc.bounds.Equals(tc.bounds))
 			assert.Equal(t, tc.expectedEmpty, tc.bounds.IsEmpty())
 			expectedGeom, err := geos.NewGeomFromWKT(tc.expectedGeomWKT)

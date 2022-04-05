@@ -30,6 +30,7 @@ func TestBoundsEmpty(t *testing.T) {
 	assert.False(t, b.Contains(b))
 	assert.False(t, b.Contains(NewBoundsEmpty()))
 	assert.False(t, b.ContainsPoint(0, 0))
+	//nolint:gocritic
 	assert.True(t, b.Equals(b))
 	assert.Equal(t, "POINT EMPTY", b.Geom().ToWKT())
 	assert.True(t, b.IsEmpty())
@@ -43,6 +44,7 @@ func TestBoundsPoint(t *testing.T) {
 	assert.False(t, b.Contains(NewBounds(1, 2, 3, 4)))
 	assert.True(t, b.ContainsPoint(0, 0))
 	assert.False(t, b.ContainsPoint(1, 2))
+	//nolint:gocritic
 	assert.True(t, b.Equals(b))
 	assert.False(t, b.Equals(NewBounds(1, 2, 3, 4)))
 	assert.False(t, b.Equals(NewBoundsEmpty()))
