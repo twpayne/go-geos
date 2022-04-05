@@ -102,6 +102,7 @@ func TestGeometryMethods(t *testing.T) {
 			assert.Equal(t, tc.expectedTypeID, g.TypeID())
 			assert.True(t, g.Clone().Equals(g))
 			assert.Equal(t, !g.IsEmpty(), g.Contains(g))
+			//nolint:gocritic
 			assert.True(t, g.Equals(g))
 			assert.True(t, g.Geometry(0).Equals(g))
 			assert.Equal(t, !g.IsEmpty(), g.Intersects(g))

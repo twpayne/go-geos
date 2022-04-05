@@ -13,14 +13,11 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install -y libgeos-dev
-    - name: Set up Go
-      uses: actions/setup-go@v2
+    - uses: actions/setup-go@v2
       with:
         go-version: 1.x
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Cache Go modules
-      uses: actions/cache@v2
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v2
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
@@ -30,7 +27,17 @@ jobs:
       run: go build ./...
     - name: Test
       run: go test -race -v ./...
-    - name: Lint
-      uses: golangci/golangci-lint-action@v2
+  lint:
+    runs-on: ubuntu-18.04
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y libgeos-dev
+    - uses: actions/setup-go@v2
       with:
-        version: v1.41
+        go-version: 1.x
+    - uses: actions/checkout@v3
+    - uses: golangci/golangci-lint-action@v3.1.0
+      with:
+        version: v1.45.2
+
