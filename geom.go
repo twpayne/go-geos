@@ -4,6 +4,7 @@ package geos
 import "C"
 
 import (
+	"runtime"
 	"unsafe"
 )
 
@@ -83,28 +84,12 @@ func (g *Geom) CoordSeq() *CoordSeq {
 	g.context.Lock()
 	defer g.context.Unlock()
 	s := C.GEOSGeom_getCoordSeq_r(g.context.handle, g.geom)
-	if s == nil {
-		panic(g.context.err)
-	}
-	var (
-		dimensions C.uint
-		size       C.uint
-	)
-	if C.GEOSCoordSeq_getDimensions_r(g.context.handle, s, &dimensions) == 0 {
-		panic(g.context.err)
-	}
-	if C.GEOSCoordSeq_getSize_r(g.context.handle, s, &size) == 0 {
-		panic(g.context.err)
-	}
-	// Don't set a finalizer as s is owned by g and will be finalized when g is
+	coordSeq := g.context.newCoordSeq(s)
+	coordSeq.parent = g
+	// Don't set a finalizer as coordSeq is owned by g and will be finalized when g is
 	// finalized.
-	return &CoordSeq{
-		context:    g.context,
-		s:          s,
-		parent:     g,
-		dimensions: int(dimensions),
-		size:       int(size),
-	}
+	runtime.SetFinalizer(coordSeq, nil)
+	return coordSeq
 }
 
 // CoveredBy returns true if g is covered by other.
