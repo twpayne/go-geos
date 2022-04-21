@@ -190,6 +190,19 @@ func (c *Context) NewPoint(coord []float64) *Geom {
 	return c.newNonNilGeom(C.GEOSGeom_createPoint_r(c.handle, s), nil)
 }
 
+// NewPoints returns a new slice of points populated from coords.
+func (c *Context) NewPoints(coords [][]float64) []*Geom {
+	if coords == nil {
+		return nil
+	}
+	geoms := make([]*Geom, 0, len(coords))
+	for _, coord := range coords {
+		geom := c.NewPoint(coord)
+		geoms = append(geoms, geom)
+	}
+	return geoms
+}
+
 // NewPolygon returns a new point populated with coordss.
 func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
 	if len(coordss) == 0 {

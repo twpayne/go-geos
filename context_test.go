@@ -245,3 +245,12 @@ func TestMultipleContexts(t *testing.T) {
 		}
 	}
 }
+
+func TestNewPoints(t *testing.T) {
+	c := NewContext()
+	assert.Nil(t, c.NewPoints(nil))
+	gs := c.NewPoints([][]float64{{1, 2}, {3, 4}})
+	assert.Len(t, gs, 2)
+	assert.True(t, gs[0].Equals(mustNewGeomFromWKT(t, c, "POINT (1 2)")))
+	assert.True(t, gs[1].Equals(mustNewGeomFromWKT(t, c, "POINT (3 4)")))
+}
