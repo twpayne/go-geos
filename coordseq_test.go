@@ -49,14 +49,6 @@ func TestCoordSeqMethods(t *testing.T) {
 	assert.Equal(t, -2.0, clone.Y(0))
 	assert.Equal(t, [][]float64{{-1, -2, 0}, {1, 2, 3}}, clone.ToCoords())
 
-	// GEOS version 3.8.0 has a bug where GEOSCoordSeq_clone_r does not clone
-	// the dimension correctly. The original has dimension 3 but the returned
-	// clone has dimension 2. As we do not use three dimensional geometries, we
-	// are not affected by this bug, so skip the tests that fail because of the
-	// bug.
-	if clone.Dimensions() == 2 {
-		t.Skip("skipping tests in buggy GEOS library")
-	}
 	require.Equal(t, 3, clone.Dimensions())
 	assert.Equal(t, 3.0, clone.Z(1))
 	clone.SetOrdinate(0, 2, -3.0)
