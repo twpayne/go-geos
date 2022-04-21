@@ -4,7 +4,6 @@ package geos
 import "C"
 
 import (
-	"errors"
 	"unsafe"
 )
 
@@ -378,9 +377,9 @@ func (g *Geom) IsValidReason() string {
 	return C.GoString(reason)
 }
 
-// NearestPoints returns the nearest points of g and other respectively.
-// If nearest points do not exist (e.g., when either geom is empty), returns non-nil error.
-func (g *Geom) NearestPoints(other *Geom) ([2]*Geom, error) {
+// NearestPoints returns the nearest coordinates of g and other. If the nearest
+// coordinates do not exist (e.g., when either geom is empty), it returns nil.
+func (g *Geom) NearestPoints(other *Geom) [][]float64 {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
@@ -390,11 +389,10 @@ func (g *Geom) NearestPoints(other *Geom) ([2]*Geom, error) {
 	}
 	s := C.GEOSNearestPoints_r(g.context.handle, g.geom, other.geom)
 	if s == nil {
-		return [2]*Geom{nil, nil}, errors.New("no nearest points")
+		return nil
 	}
-	coordSeq := g.context.newCoordSeq(s, (*CoordSeq).destroy)
-	coords := coordSeq.toCoords()
-	return [2]*Geom{g.context.NewPoint(coords[0]), g.context.NewPoint(coords[1])}, nil
+	defer C.GEOSCoordSeq_destroy_r(g.context.handle, s)
+	return g.context.newCoordsFromGEOSCoordSeq(s)
 }
 
 // NumGeometries returns the number of geometries in g.

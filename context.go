@@ -272,6 +272,29 @@ func (c *Context) newCoordSeq(gs *C.struct_GEOSCoordSeq_t, finalizer func(*Coord
 	return s
 }
 
+func (c *Context) newCoordsFromGEOSCoordSeq(s *C.struct_GEOSCoordSeq_t) [][]float64 {
+	var (
+		dimensions C.uint
+		size       C.uint
+	)
+	if C.GEOSCoordSeq_getDimensions_r(c.handle, s, &dimensions) == 0 {
+		panic(c.err)
+	}
+	if C.GEOSCoordSeq_getSize_r(c.handle, s, &size) == 0 {
+		panic(c.err)
+	}
+	flatCoords := make([]float64, size*dimensions)
+	if C.c_GEOSCoordSeq_getFlatCoords_r(c.handle, s, size, dimensions, (*C.double)(&flatCoords[0])) == 0 {
+		panic(c.err)
+	}
+	coords := make([][]float64, 0, size)
+	for i := 0; i < int(size); i++ {
+		coord := flatCoords[i*int(dimensions) : (i+1)*int(dimensions)]
+		coords = append(coords, coord)
+	}
+	return coords
+}
+
 func (c *Context) newGEOSCoordSeqFromCoords(coords [][]float64) *C.struct_GEOSCoordSeq_t {
 	flatCoords := make([]float64, 0, len(coords)*len(coords[0]))
 	for _, coord := range coords {
