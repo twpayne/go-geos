@@ -5,7 +5,6 @@ import "C"
 
 import (
 	"errors"
-	"runtime"
 	"unsafe"
 )
 
@@ -85,11 +84,10 @@ func (g *Geom) CoordSeq() *CoordSeq {
 	g.context.Lock()
 	defer g.context.Unlock()
 	s := C.GEOSGeom_getCoordSeq_r(g.context.handle, g.geom)
-	coordSeq := g.context.newCoordSeq(s)
-	coordSeq.parent = g
 	// Don't set a finalizer as coordSeq is owned by g and will be finalized when g is
 	// finalized.
-	runtime.SetFinalizer(coordSeq, nil)
+	coordSeq := g.context.newCoordSeq(s, nil)
+	coordSeq.parent = g
 	return coordSeq
 }
 
@@ -394,7 +392,7 @@ func (g *Geom) NearestPoints(other *Geom) ([2]*Geom, error) {
 	if s == nil {
 		return [2]*Geom{nil, nil}, errors.New("no nearest points")
 	}
-	coordSeq := g.context.newCoordSeq(s)
+	coordSeq := g.context.newCoordSeq(s, (*CoordSeq).destroy)
 	coords := coordSeq.toCoords()
 	return [2]*Geom{g.context.NewPoint(coords[0]), g.context.NewPoint(coords[1])}, nil
 }

@@ -246,7 +246,7 @@ func (c *Context) finish() {
 	C.finishGEOS_r(c.handle)
 }
 
-func (c *Context) newCoordSeq(gs *C.struct_GEOSCoordSeq_t) *CoordSeq {
+func (c *Context) newCoordSeq(gs *C.struct_GEOSCoordSeq_t, finalizer func(*CoordSeq)) *CoordSeq {
 	if gs == nil {
 		return nil
 	}
@@ -266,7 +266,9 @@ func (c *Context) newCoordSeq(gs *C.struct_GEOSCoordSeq_t) *CoordSeq {
 		dimensions: int(dimensions),
 		size:       int(size),
 	}
-	runtime.SetFinalizer(s, (*CoordSeq).destroy)
+	if finalizer != nil {
+		runtime.SetFinalizer(s, finalizer)
+	}
 	return s
 }
 
@@ -308,7 +310,7 @@ func (c *Context) newNonNilCoordSeq(s *C.struct_GEOSCoordSeq_t) *CoordSeq {
 	if s == nil {
 		panic(c.err)
 	}
-	return c.newCoordSeq(s)
+	return c.newCoordSeq(s, (*CoordSeq).destroy)
 }
 
 func (c *Context) newNonNilGeom(geom *C.struct_GEOSGeom_t, parent *Geom) *Geom {
