@@ -190,6 +190,19 @@ func (c *Context) NewPoint(coord []float64) *Geom {
 	return c.newNonNilGeom(C.GEOSGeom_createPoint_r(c.handle, s), nil)
 }
 
+// NewPoints returns a new slice of points populated from coords.
+func (c *Context) NewPoints(coords [][]float64) []*Geom {
+	if coords == nil {
+		return nil
+	}
+	geoms := make([]*Geom, 0, len(coords))
+	for _, coord := range coords {
+		geom := c.NewPoint(coord)
+		geoms = append(geoms, geom)
+	}
+	return geoms
+}
+
 // NewPolygon returns a new point populated with coordss.
 func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
 	if len(coordss) == 0 {
@@ -246,7 +259,7 @@ func (c *Context) finish() {
 	C.finishGEOS_r(c.handle)
 }
 
-func (c *Context) newCoordSeq(gs *C.struct_GEOSCoordSeq_t) *CoordSeq {
+func (c *Context) newCoordSeq(gs *C.struct_GEOSCoordSeq_t, finalizer func(*CoordSeq)) *CoordSeq {
 	if gs == nil {
 		return nil
 	}
@@ -266,8 +279,33 @@ func (c *Context) newCoordSeq(gs *C.struct_GEOSCoordSeq_t) *CoordSeq {
 		dimensions: int(dimensions),
 		size:       int(size),
 	}
-	runtime.SetFinalizer(s, (*CoordSeq).destroy)
+	if finalizer != nil {
+		runtime.SetFinalizer(s, finalizer)
+	}
 	return s
+}
+
+func (c *Context) newCoordsFromGEOSCoordSeq(s *C.struct_GEOSCoordSeq_t) [][]float64 {
+	var (
+		dimensions C.uint
+		size       C.uint
+	)
+	if C.GEOSCoordSeq_getDimensions_r(c.handle, s, &dimensions) == 0 {
+		panic(c.err)
+	}
+	if C.GEOSCoordSeq_getSize_r(c.handle, s, &size) == 0 {
+		panic(c.err)
+	}
+	flatCoords := make([]float64, size*dimensions)
+	if C.c_GEOSCoordSeq_getFlatCoords_r(c.handle, s, size, dimensions, (*C.double)(&flatCoords[0])) == 0 {
+		panic(c.err)
+	}
+	coords := make([][]float64, 0, size)
+	for i := 0; i < int(size); i++ {
+		coord := flatCoords[i*int(dimensions) : (i+1)*int(dimensions)]
+		coords = append(coords, coord)
+	}
+	return coords
 }
 
 func (c *Context) newGEOSCoordSeqFromCoords(coords [][]float64) *C.struct_GEOSCoordSeq_t {
@@ -308,7 +346,7 @@ func (c *Context) newNonNilCoordSeq(s *C.struct_GEOSCoordSeq_t) *CoordSeq {
 	if s == nil {
 		panic(c.err)
 	}
-	return c.newCoordSeq(s)
+	return c.newCoordSeq(s, (*CoordSeq).destroy)
 }
 
 func (c *Context) newNonNilGeom(geom *C.struct_GEOSGeom_t, parent *Geom) *Geom {

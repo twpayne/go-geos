@@ -106,7 +106,10 @@ func (s *CoordSeq) Size() int {
 	return s.size
 }
 
-func (s *CoordSeq) toCoords() [][]float64 {
+// ToCoords returns s as a [][]float64.
+func (s *CoordSeq) ToCoords() [][]float64 {
+	s.context.Lock()
+	defer s.context.Unlock()
 	if s.size == 0 || s.dimensions == 0 {
 		return nil
 	}
@@ -121,13 +124,6 @@ func (s *CoordSeq) toCoords() [][]float64 {
 		j += s.dimensions
 	}
 	return coords
-}
-
-// ToCoords returns s as a [][]float64.
-func (s *CoordSeq) ToCoords() [][]float64 {
-	s.context.Lock()
-	defer s.context.Unlock()
-	return s.toCoords()
 }
 
 // X returns the idx-th X coordinate of s.
