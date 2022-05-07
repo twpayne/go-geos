@@ -258,6 +258,34 @@ func (g *Geom) InteriorRing(n int) *Geom {
 	return g.context.newNonNilGeom(C.GEOSGetInteriorRingN_r(g.context.handle, g.geom, C.int(n)), g)
 }
 
+// Buffer() returns a buffer polygon with width w.
+func (g *Geom) Buffer(width float64, quadsegs int) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+
+	return g.context.newNonNilGeom(C.GEOSBuffer_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs)), g)
+}
+
+//UnaryUnion() returns the union of all components of a single geometry. Usually used to convert a collection into the smallest set of polygons that cover the same area.
+func (g *Geom) UnaryUnion() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+
+	return g.context.newNonNilGeom(C.GEOSUnaryUnion_r(g.context.handle, g.geom), g)
+}
+
+//Densifies a geometry using a given distance tolerance.
+//Additional vertices will be added to every line segment that is greater this tolerance; these vertices will evenly subdivide that segment.
+func (g *Geom) Densify(tolerance float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+
+	return g.context.newNonNilGeom(C.GEOSDensify_r(g.context.handle, g.geom, C.double(tolerance)), g)
+}
+
 // Intersection returns the intersection between g and other.
 func (g *Geom) Intersection(other *Geom) *Geom {
 	g.mustNotBeDestroyed()
