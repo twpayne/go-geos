@@ -10,7 +10,14 @@ jobs:
   main:
     runs-on: ubuntu-20.04
     steps:
-    - name: Install dependencies
+    - name: Cache geos
+      id: cache-geos
+      uses: actions/cache@v3
+      with:
+        path: geos-3.10.2/_build
+        key: ${{ runner.os }}-geos3102
+    - name: Build geos
+      if: steps.cache-geos.outputs.cache-hit != 'true'
       run: |
         wget http://download.osgeo.org/geos/geos-3.10.2.tar.bz2
         tar xvfj geos-3.10.2.tar.bz2
@@ -20,7 +27,10 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
         make
         ctest
-        make install
+    - name: Install geos
+      run: |
+        cd geos-3.10.2/_build
+        sudo make install
     - uses: actions/setup-go@v2
       with:
         go-version: 1.x
@@ -48,7 +58,7 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local 
         make
         ctest
-        make install
+        sudo make install
     - uses: actions/setup-go@v2
       with:
         go-version: 1.x
