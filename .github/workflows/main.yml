@@ -12,7 +12,15 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        sudo apt-get install -y libgeos-dev
+        wget http://download.osgeo.org/geos/geos-3.10.2.tar.bz2
+        tar xvfj geos-3.10.2.tar.bz2
+        cd geos-3.10.2
+        mkdir _build
+        cd _build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local 
+        make
+        ctest
+        make install
     - uses: actions/setup-go@v2
       with:
         go-version: 1.x
@@ -32,7 +40,15 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        sudo apt-get install -y libgeos-dev
+        wget http://download.osgeo.org/geos/geos-3.10.2.tar.bz2
+        tar xvfj geos-3.10.2.tar.bz2
+        cd geos-3.10.2
+        mkdir _build
+        cd _build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local 
+        make
+        ctest
+        make install
     - uses: actions/setup-go@v2
       with:
         go-version: 1.x
