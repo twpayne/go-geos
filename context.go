@@ -17,6 +17,7 @@ type Context struct {
 	wkbWriter        *C.struct_GEOSWKBWriter_t
 	wktReader        *C.struct_GEOSWKTReader_t
 	wktWriter        *C.struct_GEOSWKTWriter_t
+	jsonReader       *C.struct_GEOSGeoJSONReader_t
 	err              error
 	geomFinalizeFunc func(*Geom)
 }
@@ -166,6 +167,19 @@ func (c *Context) NewGeomFromWKT(wkt string) (*Geom, error) {
 	wktCStr := C.CString(wkt)
 	defer C.GEOSFree_r(c.handle, unsafe.Pointer(wktCStr))
 	return c.newGeom(C.GEOSWKTReader_read_r(c.handle, c.wktReader, wktCStr), nil), c.err
+}
+
+// NewGeomFromJSON parses a geometry in JSON format from json.
+func (c *Context) NewGeomFromJSON(json string) (*Geom, error) {
+	c.Lock()
+	defer c.Unlock()
+	c.err = nil
+	if c.jsonReader == nil {
+		c.jsonReader = C.GEOSGeoJSONReader_create_r(c.handle)
+	}
+	jsonCStr := C.CString(json)
+	defer C.GEOSFree_r(c.handle, unsafe.Pointer(jsonCStr))
+	return c.newGeom(C.GEOSGeoJSONReader_readGeometry_r(c.handle, c.jsonReader, jsonCStr), nil), c.err
 }
 
 // NewLinearRing returns a new linear ring populated with coords.

@@ -58,6 +58,11 @@ func NewGeomFromWKT(wkt string) (*Geom, error) {
 	return defaultContext.NewGeomFromWKT(wkt)
 }
 
+// NewGeomFromJSON parses a geometry in GeoJson format from json.
+func NewGeomFromJSON(json string) (*Geom, error) {
+	return defaultContext.NewGeomFromJSON(json)
+}
+
 // NewLinearRing returns a new linear ring populated with coords.
 func NewLinearRing(coords [][]float64) *Geom {
 	return defaultContext.NewLinearRing(coords)

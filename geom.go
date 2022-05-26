@@ -4,6 +4,7 @@ package geos
 import "C"
 
 import (
+	"runtime"
 	"unsafe"
 )
 
@@ -606,6 +607,39 @@ func (g *Geom) Y() float64 {
 	return value
 }
 
+// Calculate the area of a geometry.
+func (g *Geom) Area() float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	var area float64
+	if C.GEOSArea_r(g.context.handle, g.geom, (*C.double)(&area)) == 0 {
+		panic(g.context.err)
+	}
+	return area
+}
+
+//Calculate the length of a geometry.
+func (g *Geom) Length() float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	var area float64
+	if C.GEOSLength_r(g.context.handle, g.geom, (*C.double)(&area)) == 0 {
+		panic(g.context.err)
+	}
+	return area
+}
+
+//Returns a linestring geometry which represents the minimum diameter of the geometry.
+func (g *Geom) MinimumWidth() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+
+	return g.context.newNonNilGeom(C.GEOSMinimumWidth_r(g.context.handle, g.geom), g)
+}
+
 func (g *Geom) finalize() {
 	if g.context == nil {
 		return
@@ -620,4 +654,39 @@ func (g *Geom) mustNotBeDestroyed() {
 	if g.context == nil {
 		panic("destroyed Geom")
 	}
+}
+
+//implements UnmarshalJSON interface
+func (g *Geom) UnmarshalJSON(b []byte) error {
+	c := defaultContext
+	c.Lock()
+	defer c.Unlock()
+	c.err = nil
+	if c.jsonReader == nil {
+		c.jsonReader = C.GEOSGeoJSONReader_create_r(c.handle)
+	}
+	jsonCStr := C.CString(string(b))
+	defer C.GEOSFree_r(c.handle, unsafe.Pointer(jsonCStr))
+	new_geom := C.GEOSGeoJSONReader_readGeometry_r(c.handle, c.jsonReader, jsonCStr)
+	var (
+		typeID           C.int
+		numGeometries    C.int
+		numPoints        C.int
+		numInteriorRings C.int
+	)
+	if C.c_GEOSGeomGetInfo_r(c.handle, new_geom, &typeID, &numGeometries, &numPoints, &numInteriorRings) == 0 {
+		panic(c.err)
+	}
+
+	g.context = c
+	g.geom = new_geom
+	g.parent = nil
+	g.typeID = GeometryTypeID(typeID)
+	g.numGeometries = int(numGeometries)
+	g.numInteriorRings = int(numInteriorRings)
+	g.numPoints = int(numPoints)
+
+	runtime.SetFinalizer(g, (*Geom).finalize)
+	return c.err
+
 }
