@@ -13,17 +13,18 @@ jobs:
     - name: Create dirs
       if: steps.cache-geos.outputs.cache-hit != 'true'
       run: |
-        mkdir geos-3.10.2
-        mkdir geos-3.10.2/_build
+        mkdir ~/geos-3.10.2
+        mkdir ~/geos-3.10.2/_build
     - name: Cache geos
       id: cache-geos
       uses: actions/cache@v3
       with:
         path: ~/geos-3.10.2/_build
-        key: ${{ runner.os }}-geos3102
+        key: ${{ runner.os }}-geos3102-1
     - name: Build geos
       if: steps.cache-geos.outputs.cache-hit != 'true'
       run: |
+        cd ~
         wget http://download.osgeo.org/geos/geos-3.10.2.tar.bz2
         tar xvfj geos-3.10.2.tar.bz2
         cd geos-3.10.2/_build
@@ -32,7 +33,7 @@ jobs:
         ctest
     - name: Install geos
       run: |
-        cd geos-3.10.2/_build
+        cd ~/geos-3.10.2/_build
         sudo make install
         sudo ldconfig
     - uses: actions/setup-go@v2
@@ -55,17 +56,18 @@ jobs:
     - name: Create dirs
       if: steps.cache-geos.outputs.cache-hit != 'true'
       run: |
-        mkdir geos-3.10.2
-        mkdir geos-3.10.2/_build
+        mkdir ~/geos-3.10.2
+        mkdir ~/geos-3.10.2/_build
     - name: Cache geos
       id: cache-geos
       uses: actions/cache@v3
       with:
         path: ~/geos-3.10.2/_build
-        key: ${{ runner.os }}-geos3102
+        key: ${{ runner.os }}-geos3102-1
     - name: Build geos
       if: steps.cache-geos.outputs.cache-hit != 'true'
       run: |
+        cd ~
         wget http://download.osgeo.org/geos/geos-3.10.2.tar.bz2
         tar xvfj geos-3.10.2.tar.bz2
         cd geos-3.10.2
