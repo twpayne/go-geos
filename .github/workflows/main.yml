@@ -61,7 +61,7 @@ jobs:
       id: cache-geos
       uses: actions/cache@v3
       with:
-        path: geos-3.10.2/_build
+        path: ~/geos-3.10.2/_build
         key: ${{ runner.os }}-geos3102
     - name: Build geos
       if: steps.cache-geos.outputs.cache-hit != 'true'
@@ -69,7 +69,6 @@ jobs:
         wget http://download.osgeo.org/geos/geos-3.10.2.tar.bz2
         tar xvfj geos-3.10.2.tar.bz2
         cd geos-3.10.2
-        mkdir _build
         cd _build
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
         make
