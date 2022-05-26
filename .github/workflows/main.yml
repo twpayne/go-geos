@@ -77,7 +77,7 @@ jobs:
         ctest
     - name: Install geos
       run: |
-        cd geos-3.10.2/_build
+        cd ~/geos-3.10.2/_build
         sudo make install
         sudo ldconfig
     - uses: actions/setup-go@v2
