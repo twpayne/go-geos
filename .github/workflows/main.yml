@@ -17,7 +17,7 @@ jobs:
         cd geos-3.10.2
         mkdir _build
         cd _build
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local 
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
         make
         ctest
         make install
