@@ -10,6 +10,11 @@ jobs:
   main:
     runs-on: ubuntu-20.04
     steps:
+    - name: Create dirs
+      if: steps.cache-geos.outputs.cache-hit != 'true'
+      run: |
+        mkdir geos-3.10.2
+        mkdir geos-3.10.2/_build
     - name: Cache geos
       id: cache-geos
       uses: actions/cache@v3
@@ -49,6 +54,11 @@ jobs:
   lint:
     runs-on: ubuntu-20.04
     steps:
+    - name: Create dirs
+      if: steps.cache-geos.outputs.cache-hit != 'true'
+      run: |
+        mkdir geos-3.10.2
+        mkdir geos-3.10.2/_build
     - name: Cache geos
       id: cache-geos
       uses: actions/cache@v3
