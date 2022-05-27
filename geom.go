@@ -258,6 +258,14 @@ func (g *Geom) InteriorRing(n int) *Geom {
 	return g.context.newNonNilGeom(C.GEOSGetInteriorRingN_r(g.context.handle, g.geom, C.int(n)), g)
 }
 
+// Buffer buffers a geometry.
+func (g *Geom) Buffer(width float64, quadsegs int) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSBuffer_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs)), g)
+}
+
 // Intersection returns the intersection between g and other.
 func (g *Geom) Intersection(other *Geom) *Geom {
 	g.mustNotBeDestroyed()
