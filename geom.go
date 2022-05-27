@@ -268,7 +268,7 @@ func (g *Geom) Buffer(width float64, quadsegs int) *Geom {
 	return g.context.newNonNilGeom(C.GEOSBuffer_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs)), g)
 }
 
-//UnaryUnion() returns the union of all components of a single geometry. Usually used to convert a collection into the smallest set of polygons that cover the same area.
+// UnaryUnion() returns the union of all components of a single geometry. Usually used to convert a collection into the smallest set of polygons that cover the same area.
 func (g *Geom) UnaryUnion() *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
@@ -277,8 +277,8 @@ func (g *Geom) UnaryUnion() *Geom {
 	return g.context.newNonNilGeom(C.GEOSUnaryUnion_r(g.context.handle, g.geom), g)
 }
 
-//Densifies a geometry using a given distance tolerance.
-//Additional vertices will be added to every line segment that is greater this tolerance; these vertices will evenly subdivide that segment.
+// Densifies a geometry using a given distance tolerance.
+// Additional vertices will be added to every line segment that is greater this tolerance; these vertices will evenly subdivide that segment.
 func (g *Geom) Densify(tolerance float64) *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
@@ -619,7 +619,7 @@ func (g *Geom) Area() float64 {
 	return area
 }
 
-//Calculate the length of a geometry.
+// Calculate the length of a geometry.
 func (g *Geom) Length() float64 {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
@@ -631,7 +631,7 @@ func (g *Geom) Length() float64 {
 	return area
 }
 
-//Returns a linestring geometry which represents the minimum diameter of the geometry.
+// Returns a linestring geometry which represents the minimum diameter of the geometry.
 func (g *Geom) MinimumWidth() *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
@@ -656,7 +656,7 @@ func (g *Geom) mustNotBeDestroyed() {
 	}
 }
 
-//implements UnmarshalJSON interface
+// Implements UnmarshalJSON interface
 func (g *Geom) UnmarshalJSON(b []byte) error {
 	c := defaultContext
 	c.Lock()
@@ -667,19 +667,19 @@ func (g *Geom) UnmarshalJSON(b []byte) error {
 	}
 	jsonCStr := C.CString(string(b))
 	defer C.GEOSFree_r(c.handle, unsafe.Pointer(jsonCStr))
-	new_geom := C.GEOSGeoJSONReader_readGeometry_r(c.handle, c.jsonReader, jsonCStr)
+	newgeom := C.GEOSGeoJSONReader_readGeometry_r(c.handle, c.jsonReader, jsonCStr)
 	var (
 		typeID           C.int
 		numGeometries    C.int
 		numPoints        C.int
 		numInteriorRings C.int
 	)
-	if C.c_GEOSGeomGetInfo_r(c.handle, new_geom, &typeID, &numGeometries, &numPoints, &numInteriorRings) == 0 {
+	if C.c_GEOSGeomGetInfo_r(c.handle, newgeom, &typeID, &numGeometries, &numPoints, &numInteriorRings) == 0 {
 		panic(c.err)
 	}
 
 	g.context = c
-	g.geom = new_geom
+	g.geom = newgeom
 	g.parent = nil
 	g.typeID = GeometryTypeID(typeID)
 	g.numGeometries = int(numGeometries)
@@ -688,5 +688,4 @@ func (g *Geom) UnmarshalJSON(b []byte) error {
 
 	runtime.SetFinalizer(g, (*Geom).finalize)
 	return c.err
-
 }
