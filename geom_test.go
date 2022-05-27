@@ -1,6 +1,7 @@
 package geos
 
 import (
+	"encoding/json"
 	"math"
 	"runtime"
 	"testing"
@@ -20,6 +21,8 @@ func TestGeometryMethods(t *testing.T) {
 		expectedSRID          int
 		expectedType          string
 		expectedTypeID        GeometryTypeID
+		expectedLength        float64
+		expectedArea          float64
 	}{
 		{
 			name:                  "point",
@@ -31,6 +34,8 @@ func TestGeometryMethods(t *testing.T) {
 			expectedSRID:          0,
 			expectedType:          "Point",
 			expectedTypeID:        PointTypeID,
+			expectedLength:        0,
+			expectedArea:          0,
 		},
 		{
 			name:                  "point_empty",
@@ -42,6 +47,8 @@ func TestGeometryMethods(t *testing.T) {
 			expectedSRID:          0,
 			expectedType:          "Point",
 			expectedTypeID:        PointTypeID,
+			expectedLength:        0,
+			expectedArea:          0,
 		},
 		{
 			name:                  "linestring",
@@ -53,6 +60,8 @@ func TestGeometryMethods(t *testing.T) {
 			expectedSRID:          0,
 			expectedType:          "LineString",
 			expectedTypeID:        LineStringTypeID,
+			expectedLength:        math.Sqrt(2),
+			expectedArea:          0,
 		},
 		{
 			name:                  "linestring_empty",
@@ -64,6 +73,8 @@ func TestGeometryMethods(t *testing.T) {
 			expectedSRID:          0,
 			expectedType:          "LineString",
 			expectedTypeID:        LineStringTypeID,
+			expectedLength:        0,
+			expectedArea:          0,
 		},
 		{
 			name:                  "polygon",
@@ -75,6 +86,8 @@ func TestGeometryMethods(t *testing.T) {
 			expectedSRID:          0,
 			expectedType:          "Polygon",
 			expectedTypeID:        PolygonTypeID,
+			expectedLength:        math.Sqrt(2) + 2,
+			expectedArea:          0.5,
 		},
 		{
 			name:                  "polygon_empty",
@@ -86,6 +99,8 @@ func TestGeometryMethods(t *testing.T) {
 			expectedSRID:          0,
 			expectedType:          "Polygon",
 			expectedTypeID:        PolygonTypeID,
+			expectedLength:        0,
+			expectedArea:          0,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -110,6 +125,8 @@ func TestGeometryMethods(t *testing.T) {
 			assert.Equal(t, "Valid Geometry", g.IsValidReason())
 			g.SetSRID(4326)
 			assert.Equal(t, 4326, g.SRID())
+			assert.Equal(t, tc.expectedLength, g.Length())
+			assert.Equal(t, tc.expectedArea, g.Area())
 		})
 	}
 }
@@ -148,6 +165,8 @@ func TestGeomMethods(t *testing.T) {
 	assert.False(t, southEastSquare.Touches(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")))
 	assert.True(t, middleSquare.Within(unitSquare))
 	assert.False(t, unitSquare.Within(middleSquare))
+	assert.Equal(t, 3, northSouthLine.Densify(0.5).NumPoints())
+	assert.Equal(t, 1.0, northSouthLine.Buffer(0.5, 4).MinimumWidth().Length())
 }
 
 func TestPointMethods(t *testing.T) {
@@ -265,6 +284,12 @@ func TestWKTError(t *testing.T) {
 	assert.Equal(t, err.Error(), "ParseException: Unexpected EOF parsing WKB")
 }
 
+func TestJsonError(t *testing.T) {
+	_, err := NewContext().NewGeomFromJSON("invalidjson")
+	assert.Error(t, err)
+	assert.Equal(t, err.Error(), "ParseException: Error parsing JSON: '[json.exception.parse_error.101] parse error at line 1, column 1: syntax error while parsing value - invalid literal; last read: 'i''")
+}
+
 func TestWKXRoundTrip(t *testing.T) {
 	for _, tc := range []struct {
 		name string
@@ -289,4 +314,38 @@ func TestWKXRoundTrip(t *testing.T) {
 			assert.Equal(t, tc.wkt, newG.ToWKT())
 		})
 	}
+}
+func TestFromJSON(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		json string
+		wkt  string
+	}{
+		{
+			name: "point",
+			json: `{ "type": "Point","coordinates": [30, 10]}`,
+			wkt:  "POINT (30.0000000000000000 10.0000000000000000)",
+		},
+		{
+			name: "line_string",
+			json: `{ "type": "LineString","coordinates": [[30, 10], [10, 30]]}`,
+			wkt:  "LINESTRING (30.0000000000000000 10.0000000000000000, 10.0000000000000000 30.0000000000000000)",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			defer runtime.GC() // Exercise finalizers.
+			c := NewContext()
+			jsonG, err := c.NewGeomFromJSON(tc.json)
+			require.NoError(t, err)
+			assert.Equal(t, tc.wkt, jsonG.ToWKT())
+		})
+	}
+}
+
+func TestUnmarshalJSON(t *testing.T) {
+	var g *Geom
+	jsonData := []byte(`{ "type": "Point","coordinates": [30, 10]}`)
+	err := json.Unmarshal(jsonData, &g)
+	require.NoError(t, err)
+	assert.Equal(t, "POINT (30.0000000000000000 10.0000000000000000)", g.ToWKT())
 }
