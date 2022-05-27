@@ -627,6 +627,15 @@ func (g *Geom) Y() float64 {
 	return value
 }
 
+// MinimumWidth returns a linestring geometry which represents the minimum
+// diameter of the geometry
+func (g *Geom) MinimumWidth() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSMinimumWidth_r(g.context.handle, g.geom), g)
+}
+
 func (g *Geom) finalize() {
 	if g.context == nil {
 		return
