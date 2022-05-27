@@ -156,7 +156,9 @@ func TestGeomMethods(t *testing.T) {
 	assert.True(t, unitSquare.EqualsExact(unitSquare, 0.125))
 	assert.True(t, northSouthLine.Intersects(eastWestLine))
 	assert.False(t, southEastSquare.Intersects(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")))
-	assert.Equal(t, [][]float64{{1, 1}, {2, 2}}, unitSquare.NearestPoints(mustNewGeomFromWKT(t, c, "POLYGON ((2 2, 3 2, 3 3, 2 3, 2 2))")))
+	if versionEqualOrGreaterThan(3, 8, 0) {
+		assert.Equal(t, [][]float64{{1, 1}, {2, 2}}, unitSquare.NearestPoints(mustNewGeomFromWKT(t, c, "POLYGON ((2 2, 3 2, 3 3, 2 3, 2 2))")))
+	}
 	assert.Nil(t, unitSquare.NearestPoints(mustNewGeomFromWKT(t, c, "GEOMETRYCOLLECTION EMPTY")))
 	assert.True(t, middleSquare.Overlaps(southEastSquare))
 	assert.False(t, northWestSquare.Overlaps(southEastSquare))

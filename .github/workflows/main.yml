@@ -10,7 +10,11 @@ jobs:
   main:
     strategy:
       matrix:
+        go-version:
+        - 1.x
+        - 1.17.x
         os:
+        - ubuntu-18.04
         - ubuntu-20.04
         - ubuntu-22.04
     runs-on: ${{ matrix.os }}
@@ -20,7 +24,7 @@ jobs:
         sudo apt-get install -y libgeos-dev
     - uses: actions/setup-go@v2
       with:
-        go-version: 1.x
+        go-version: ${{ matrix.go-version }}
     - uses: actions/checkout@v2
     - uses: actions/cache@v2
       with:
@@ -31,7 +35,7 @@ jobs:
     - name: Build
       run: go build ./...
     - name: Test
-      run: go test -race -v ./...
+      run: go test -race ./...
   lint:
     runs-on: ubuntu-20.04
     steps:
