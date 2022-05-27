@@ -543,6 +543,14 @@ func (g *Geom) TypeID() GeometryTypeID {
 	return g.typeID
 }
 
+// UnaryUnion returns the union of all components of a single geometry.
+func (g *Geom) UnaryUnion() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSUnaryUnion_r(g.context.handle, g.geom), g)
+}
+
 // Within returns if g is within other.
 func (g *Geom) Within(other *Geom) bool {
 	g.mustNotBeDestroyed()
