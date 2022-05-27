@@ -20,6 +20,7 @@ func TestGeometryMethods(t *testing.T) {
 		expectedSRID          int
 		expectedType          string
 		expectedTypeID        GeometryTypeID
+		expectedArea          float64
 	}{
 		{
 			name:                  "point",
@@ -31,6 +32,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedSRID:          0,
 			expectedType:          "Point",
 			expectedTypeID:        PointTypeID,
+			expectedArea:          0,
 		},
 		{
 			name:                  "point_empty",
@@ -42,6 +44,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedSRID:          0,
 			expectedType:          "Point",
 			expectedTypeID:        PointTypeID,
+			expectedArea:          0,
 		},
 		{
 			name:                  "linestring",
@@ -53,6 +56,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedSRID:          0,
 			expectedType:          "LineString",
 			expectedTypeID:        LineStringTypeID,
+			expectedArea:          0,
 		},
 		{
 			name:                  "linestring_empty",
@@ -64,6 +68,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedSRID:          0,
 			expectedType:          "LineString",
 			expectedTypeID:        LineStringTypeID,
+			expectedArea:          0,
 		},
 		{
 			name:                  "polygon",
@@ -75,6 +80,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedSRID:          0,
 			expectedType:          "Polygon",
 			expectedTypeID:        PolygonTypeID,
+			expectedArea:          0.5,
 		},
 		{
 			name:                  "polygon_empty",
@@ -86,6 +92,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedSRID:          0,
 			expectedType:          "Polygon",
 			expectedTypeID:        PolygonTypeID,
+			expectedArea:          0,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -110,6 +117,7 @@ func TestGeometryMethods(t *testing.T) {
 			assert.Equal(t, "Valid Geometry", g.IsValidReason())
 			g.SetSRID(4326)
 			assert.Equal(t, 4326, g.SRID())
+			assert.Equal(t, tc.expectedArea, g.Area())
 		})
 	}
 }

@@ -32,6 +32,18 @@ func (g *Geom) Destroy() {
 	*g = Geom{} // Clear all references.
 }
 
+// Area calculates the area of a geometry.
+func (g *Geom) Area() float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	var area float64
+	if C.GEOSArea_r(g.context.handle, g.geom, (*C.double)(&area)) == 0 {
+		panic(g.context.err)
+	}
+	return area
+}
+
 // Bounds returns g's bounds.
 func (g *Geom) Bounds() *Bounds {
 	g.mustNotBeDestroyed()
