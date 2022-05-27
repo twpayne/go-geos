@@ -266,6 +266,15 @@ func (g *Geom) Buffer(width float64, quadsegs int) *Geom {
 	return g.context.newNonNilGeom(C.GEOSBuffer_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs)), g)
 }
 
+// Densify densifies a geometry using a given distance tolerance.
+func (g *Geom) Densify(tolerance float64) *Geom {
+	requireVersion(3, 10, 0)
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSDensify_r(g.context.handle, g.geom, C.double(tolerance)), g)
+}
+
 // Intersection returns the intersection between g and other.
 func (g *Geom) Intersection(other *Geom) *Geom {
 	g.mustNotBeDestroyed()

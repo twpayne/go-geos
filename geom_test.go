@@ -148,6 +148,9 @@ func TestGeomMethods(t *testing.T) {
 	assert.False(t, southEastSquare.Touches(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")))
 	assert.True(t, middleSquare.Within(unitSquare))
 	assert.False(t, unitSquare.Within(middleSquare))
+	if versionEqualOrGreaterThan(3, 10, 0) {
+		assert.Equal(t, 3, northSouthLine.Densify(0.5).NumPoints())
+	}
 }
 
 func TestPointMethods(t *testing.T) {

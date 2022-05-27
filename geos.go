@@ -35,6 +35,33 @@ func (e Error) Error() string {
 }
 
 var (
-	errIndexOutOfRange     = Error("index out of range")
 	errDimensionOutOfRange = Error("dimension out of range")
+	errIndexOutOfRange     = Error("index out of range")
+	errVersionTooLow       = Error("version too low")
 )
+
+// requireVersionOrPanic panics if the GEOS version is not at least
+// major.minor.patch.
+func requireVersion(major, minor, patch int) {
+	if !versionEqualOrGreaterThan(major, minor, patch) {
+		panic(errVersionTooLow)
+	}
+}
+
+// versionEqualOrGreaterThan returns true if the GEOS version is at least
+// major.minor.patch.
+func versionEqualOrGreaterThan(major, minor, patch int) bool {
+	switch {
+	case VersionMajor > major:
+		return true
+	case VersionMajor < major:
+		return false
+	}
+	switch {
+	case VersionMinor > minor:
+		return true
+	case VersionMinor < minor:
+		return false
+	}
+	return VersionPatch >= patch
+}
