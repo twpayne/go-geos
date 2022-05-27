@@ -406,6 +406,18 @@ func (g *Geom) IsValidReason() string {
 	return C.GoString(reason)
 }
 
+// Length calculates the length of a geometry.
+func (g *Geom) Length() float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	var length float64
+	if C.GEOSLength_r(g.context.handle, g.geom, (*C.double)(&length)) == 0 {
+		panic(g.context.err)
+	}
+	return length
+}
+
 // NearestPoints returns the nearest coordinates of g and other. If the nearest
 // coordinates do not exist (e.g., when either geom is empty), it returns nil.
 func (g *Geom) NearestPoints(other *Geom) [][]float64 {

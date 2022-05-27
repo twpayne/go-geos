@@ -21,6 +21,7 @@ func TestGeometryMethods(t *testing.T) {
 		expectedType          string
 		expectedTypeID        GeometryTypeID
 		expectedArea          float64
+		expectedLength        float64
 	}{
 		{
 			name:                  "point",
@@ -33,6 +34,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedType:          "Point",
 			expectedTypeID:        PointTypeID,
 			expectedArea:          0,
+			expectedLength:        0,
 		},
 		{
 			name:                  "point_empty",
@@ -45,6 +47,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedType:          "Point",
 			expectedTypeID:        PointTypeID,
 			expectedArea:          0,
+			expectedLength:        0,
 		},
 		{
 			name:                  "linestring",
@@ -57,6 +60,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedType:          "LineString",
 			expectedTypeID:        LineStringTypeID,
 			expectedArea:          0,
+			expectedLength:        math.Sqrt(2),
 		},
 		{
 			name:                  "linestring_empty",
@@ -69,6 +73,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedType:          "LineString",
 			expectedTypeID:        LineStringTypeID,
 			expectedArea:          0,
+			expectedLength:        0,
 		},
 		{
 			name:                  "polygon",
@@ -81,6 +86,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedType:          "Polygon",
 			expectedTypeID:        PolygonTypeID,
 			expectedArea:          0.5,
+			expectedLength:        math.Sqrt(2) + 2,
 		},
 		{
 			name:                  "polygon_empty",
@@ -93,6 +99,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedType:          "Polygon",
 			expectedTypeID:        PolygonTypeID,
 			expectedArea:          0,
+			expectedLength:        0,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -118,6 +125,7 @@ func TestGeometryMethods(t *testing.T) {
 			g.SetSRID(4326)
 			assert.Equal(t, 4326, g.SRID())
 			assert.Equal(t, tc.expectedArea, g.Area())
+			assert.Equal(t, tc.expectedLength, g.Length())
 		})
 	}
 }
