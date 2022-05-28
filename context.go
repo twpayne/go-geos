@@ -1,5 +1,6 @@
 package geos
 
+// #include <stdlib.h>
 // #include "geos.h"
 import "C"
 
@@ -151,7 +152,7 @@ func (c *Context) NewGeomFromWKB(wkb []byte) (*Geom, error) {
 		c.wkbReader = C.GEOSWKBReader_create_r(c.handle)
 	}
 	wkbCBuf := C.CBytes(wkb)
-	defer C.GEOSFree_r(c.handle, wkbCBuf)
+	defer C.free(wkbCBuf)
 	return c.newGeom(C.GEOSWKBReader_read_r(c.handle, c.wkbReader, (*C.uchar)(wkbCBuf), C.ulong(len(wkb))), nil), c.err
 }
 
@@ -164,7 +165,7 @@ func (c *Context) NewGeomFromWKT(wkt string) (*Geom, error) {
 		c.wktReader = C.GEOSWKTReader_create_r(c.handle)
 	}
 	wktCStr := C.CString(wkt)
-	defer C.GEOSFree_r(c.handle, unsafe.Pointer(wktCStr))
+	defer C.free(unsafe.Pointer(wktCStr))
 	return c.newGeom(C.GEOSWKTReader_read_r(c.handle, c.wktReader, wktCStr), nil), c.err
 }
 
