@@ -533,6 +533,7 @@ func (g *Geom) Touches(other *Geom) bool {
 // ToGeoJSON returns g in GeoJSON format.
 func (g *Geom) ToGeoJSON(indent int) string {
 	requireVersion(3, 10, 0)
+	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
 	if g.context.geoJSONWriter == nil {
