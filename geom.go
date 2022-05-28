@@ -530,6 +530,19 @@ func (g *Geom) Touches(other *Geom) bool {
 	}
 }
 
+// ToGeoJSON returns g in GeoJSON format.
+func (g *Geom) ToGeoJSON(indent int) string {
+	requireVersion(3, 10, 0)
+	g.context.Lock()
+	defer g.context.Unlock()
+	if g.context.geoJSONWriter == nil {
+		g.context.geoJSONWriter = C.GEOSGeoJSONWriter_create_r(g.context.handle)
+	}
+	geoJSONCStr := C.GEOSGeoJSONWriter_writeGeometry_r(g.context.handle, g.context.geoJSONWriter, g.geom, C.int(indent))
+	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer(geoJSONCStr))
+	return C.GoString(geoJSONCStr)
+}
+
 // ToWKB returns g in WKB format.
 func (g *Geom) ToWKB() []byte {
 	g.mustNotBeDestroyed()

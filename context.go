@@ -14,6 +14,8 @@ import (
 type Context struct {
 	sync.Mutex
 	handle           C.GEOSContextHandle_t
+	geoJSONReader    *C.struct_GEOSGeoJSONReader_t
+	geoJSONWriter    *C.struct_GEOSGeoJSONWriter_t
 	wkbReader        *C.struct_GEOSWKBReader_t
 	wkbWriter        *C.struct_GEOSWKBWriter_t
 	wktReader        *C.struct_GEOSWKTReader_t
@@ -143,6 +145,20 @@ func (c *Context) NewGeomFromBounds(bounds *Bounds) *Geom {
 	return g
 }
 
+// NewGeomFromGeoJSON returns a new geometry in JSON format from json.
+func (c *Context) NewGeomFromGeoJSON(geoJSON string) (*Geom, error) {
+	requireVersion(3, 10, 0)
+	c.Lock()
+	defer c.Unlock()
+	c.err = nil
+	if c.geoJSONReader == nil {
+		c.geoJSONReader = C.GEOSGeoJSONReader_create_r(c.handle)
+	}
+	geoJSONCStr := C.CString(geoJSON)
+	defer C.free(unsafe.Pointer(geoJSONCStr))
+	return c.newGeom(C.GEOSGeoJSONReader_readGeometry_r(c.handle, c.geoJSONReader, geoJSONCStr), nil), c.err
+}
+
 // NewGeomFromWKB parses a geometry in WKB format from wkb.
 func (c *Context) NewGeomFromWKB(wkb []byte) (*Geom, error) {
 	c.Lock()
@@ -245,6 +261,12 @@ func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
 func (c *Context) finish() {
 	c.Lock()
 	defer c.Unlock()
+	if c.geoJSONReader != nil {
+		C.GEOSGeoJSONReader_destroy_r(c.handle, c.geoJSONReader)
+	}
+	if c.geoJSONWriter != nil {
+		C.GEOSGeoJSONWriter_destroy_r(c.handle, c.geoJSONWriter)
+	}
 	if c.wkbReader != nil {
 		C.GEOSWKBReader_destroy_r(c.handle, c.wkbReader)
 	}
