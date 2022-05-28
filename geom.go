@@ -32,6 +32,18 @@ func (g *Geom) Destroy() {
 	*g = Geom{} // Clear all references.
 }
 
+// Area calculates the area of a geometry.
+func (g *Geom) Area() float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	var area float64
+	if C.GEOSArea_r(g.context.handle, g.geom, (*C.double)(&area)) == 0 {
+		panic(g.context.err)
+	}
+	return area
+}
+
 // Bounds returns g's bounds.
 func (g *Geom) Bounds() *Bounds {
 	g.mustNotBeDestroyed()
@@ -258,6 +270,23 @@ func (g *Geom) InteriorRing(n int) *Geom {
 	return g.context.newNonNilGeom(C.GEOSGetInteriorRingN_r(g.context.handle, g.geom, C.int(n)), g)
 }
 
+// Buffer buffers a geometry.
+func (g *Geom) Buffer(width float64, quadsegs int) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSBuffer_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs)), g)
+}
+
+// Densify densifies a geometry using a given distance tolerance.
+func (g *Geom) Densify(tolerance float64) *Geom {
+	requireVersion(3, 10, 0)
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSDensify_r(g.context.handle, g.geom, C.double(tolerance)), g)
+}
+
 // Intersection returns the intersection between g and other.
 func (g *Geom) Intersection(other *Geom) *Geom {
 	g.mustNotBeDestroyed()
@@ -375,6 +404,18 @@ func (g *Geom) IsValidReason() string {
 	}
 	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer(reason))
 	return C.GoString(reason)
+}
+
+// Length calculates the length of a geometry.
+func (g *Geom) Length() float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	var length float64
+	if C.GEOSLength_r(g.context.handle, g.geom, (*C.double)(&length)) == 0 {
+		panic(g.context.err)
+	}
+	return length
 }
 
 // NearestPoints returns the nearest coordinates of g and other. If the nearest
@@ -535,6 +576,14 @@ func (g *Geom) TypeID() GeometryTypeID {
 	return g.typeID
 }
 
+// UnaryUnion returns the union of all components of a single geometry.
+func (g *Geom) UnaryUnion() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSUnaryUnion_r(g.context.handle, g.geom), g)
+}
+
 // Within returns if g is within other.
 func (g *Geom) Within(other *Geom) bool {
 	g.mustNotBeDestroyed()
@@ -576,6 +625,15 @@ func (g *Geom) Y() float64 {
 		panic(g.context.err)
 	}
 	return value
+}
+
+// MinimumWidth returns a linestring geometry which represents the minimum
+// diameter of the geometry
+func (g *Geom) MinimumWidth() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSMinimumWidth_r(g.context.handle, g.geom), g)
 }
 
 func (g *Geom) finalize() {
