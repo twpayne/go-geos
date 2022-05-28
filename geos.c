@@ -213,8 +213,38 @@ GEOSGeometry *c_newGEOSGeomFromBounds_r(GEOSContextHandle_t handle, int *typeID,
   return polygon;
 }
 
-#if GEOS_VERSION_MAJOR < 3 || (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 10)
-GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g, double tolerance) {
+#if GEOS_VERSION_MAJOR < 3 ||                                                  \
+    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 10)
+
+GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
+                            double tolerance) {
   return NULL;
 }
+
+GEOSGeoJSONReader *GEOSGeoJSONReader_create_r(GEOSContextHandle_t handle) {
+  return NULL;
+}
+
+void GEOSGeoJSONReader_destroy_r(GEOSContextHandle_t handle,
+                                 GEOSGeoJSONReader *reader) {}
+
+GEOSGeometry *GEOSGeoJSONReader_readGeometry_r(GEOSContextHandle_t handle,
+                                               GEOSGeoJSONReader *reader,
+                                               const char *geojson) {
+  return NULL;
+}
+
+GEOSGeoJSONWriter *GEOSGeoJSONWriter_create_r(GEOSContextHandle_t handle) {
+  return NULL;
+}
+
+void GEOSGeoJSONWriter_destroy_r(GEOSContextHandle_t handle,
+                                 GEOSGeoJSONWriter *reader) {}
+
+char *GEOSGeoJSONWriter_writeGeometry_r(GEOSContextHandle_t handle,
+                                        GEOSGeoJSONWriter *writer,
+                                        const GEOSGeometry *g, int indent) {
+  return NULL;
+}
+
 #endif

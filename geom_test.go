@@ -3,6 +3,7 @@ package geos
 import (
 	"math"
 	"runtime"
+	"strconv"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -273,6 +274,43 @@ func TestGeometryPanics(t *testing.T) {
 		g.Destroy()
 		g.Destroy()
 	})
+}
+
+func TestNewGeomFromGeoJSON(t *testing.T) {
+	skipIfVersionLessThan(t, 3, 10, 0)
+	for i, tc := range []struct {
+		geoJSON     string
+		expectedWKT string
+	}{
+		{
+			geoJSON:     `{"type":"Point","coordinates":[1,2]}`,
+			expectedWKT: "POINT (1 2)",
+		},
+		{
+			geoJSON:     `{"type":"LineString","coordinates":[[1,2],[3,4]]}`,
+			expectedWKT: "LINESTRING (1 2, 3 4)",
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			defer runtime.GC() // Exercise finalizers.
+			context := NewContext()
+			actualGeom, err := context.NewGeomFromGeoJSON(tc.geoJSON)
+			require.NoError(t, err)
+			assert.True(t, mustNewGeomFromWKT(t, context, tc.expectedWKT).Equals(actualGeom))
+		})
+	}
+}
+
+func TestNewGeomFromGeoJSONError(t *testing.T) {
+	skipIfVersionLessThan(t, 3, 10, 0)
+	_, err := NewContext().NewGeomFromGeoJSON(`{"type":`)
+	assert.Error(t, err)
+}
+
+func TestGeomToJSON(t *testing.T) {
+	skipIfVersionLessThan(t, 3, 10, 0)
+	geom := mustNewGeomFromWKT(t, NewContext(), "POINT (1 2)")
+	assert.Equal(t, `{"type":"Point","coordinates":[1.0,2.0]}`, geom.ToGeoJSON(-1))
 }
 
 func TestWKBError(t *testing.T) {
