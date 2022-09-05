@@ -85,6 +85,6 @@ by GEOS and are willing to handle memory management manually. `go-geom` is
 recommended for long-running processes with less stringent geometry function
 requirements.
 
-## Licence
+## License
 
 MIT
