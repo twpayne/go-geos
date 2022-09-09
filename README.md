@@ -2,7 +2,7 @@
 
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/twpayne/go-geos)](https://pkg.go.dev/github.com/twpayne/go-geos)
 
-Package `go-geos` provides an interface to [GEOS](https://trac.osgeo.org/geos).
+Package `go-geos` provides an interface to [GEOS](https://libgeos.org).
 
 ## Features
 
@@ -71,8 +71,8 @@ fluent. When parsing data, errors are expected so an `error` is returned.
 [`github.com/twpayne/go-geom`](https://github.com/twpayne/go-geom) is a pure Go
 library providing similar functionality to `go-geos`. The major differences are:
 
-* `go-geos` uses [GEOS](https://trac.osgeo.org/geos), which is an extremely
-  mature library with a rich feature set.
+* `go-geos` uses [GEOS](https://libgeos.org), which is an extremely mature
+  library with a rich feature set.
 * `go-geos` uses cgo, with all the disadvantages that that entails, notably
   expensive function call overhead, more complex memory management and trickier
   cross-compilation.
