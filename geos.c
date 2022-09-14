@@ -13,6 +13,8 @@ int c_GEOSCoordSeq_getFlatCoords_r(GEOSContextHandle_t handle,
                                    const GEOSCoordSequence *s,
                                    unsigned int size, unsigned int dims,
                                    double *flatCoords) {
+#if GEOS_VERSION_MAJOR < 3 ||                                                  \
+    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 10)
   double *val = flatCoords;
   for (unsigned int idx = 0; idx < size; ++idx) {
     for (unsigned int dim = 0; dim < dims; ++dim) {
@@ -22,6 +24,11 @@ int c_GEOSCoordSeq_getFlatCoords_r(GEOSContextHandle_t handle,
     }
   }
   return 1;
+#else
+  int hasZ = dims > 2;
+  int hasM = dims > 3;
+  return GEOSCoordSeq_copyToBuffer_r(handle, s, flatCoords, hasZ, hasM);
+#endif
 }
 
 // c_GEOSGeomBounds_r extends bounds to include g.
@@ -142,6 +149,8 @@ GEOSCoordSequence *c_newGEOSCoordSeqFromFlatCoords_r(GEOSContextHandle_t handle,
                                                      unsigned int size,
                                                      unsigned int dims,
                                                      const double *flatCoords) {
+#if GEOS_VERSION_MAJOR < 3 ||                                                  \
+    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 10)
   GEOSCoordSequence *s = GEOSCoordSeq_create_r(handle, size, dims);
   if (s == NULL) {
     return NULL;
@@ -156,6 +165,11 @@ GEOSCoordSequence *c_newGEOSCoordSeqFromFlatCoords_r(GEOSContextHandle_t handle,
     }
   }
   return s;
+#else
+  int hasZ = dims > 2;
+  int hasM = dims > 3;
+  return GEOSCoordSeq_copyFromBuffer_r(handle, flatCoords, size, hasZ, hasM);
+#endif
 }
 
 // c_newGEOSGeomFromBounds_r returns a new GEOSGeom representing bounds. It
@@ -185,12 +199,14 @@ GEOSGeometry *c_newGEOSGeomFromBounds_r(GEOSContextHandle_t handle, int *typeID,
     *typeID = GEOS_POINT;
     return g;
   }
+  const double flatCoords[10] = {minX, minY, maxX, minY, maxX,
+                                 maxY, minX, maxY, minX, minY};
+#if GEOS_VERSION_MAJOR < 3 ||                                                  \
+    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 10)
   GEOSCoordSequence *s = GEOSCoordSeq_create_r(handle, 5, 2);
   if (s == NULL) {
     return NULL;
   }
-  const double flatCoords[10] = {minX, minY, maxX, minY, maxX,
-                                 maxY, minX, maxY, minX, minY};
   const double *val = flatCoords;
   for (unsigned idx = 0; idx < 5; idx++) {
     if (GEOSCoordSeq_setX_r(handle, s, idx, *val++) == 0 ||
@@ -199,6 +215,13 @@ GEOSGeometry *c_newGEOSGeomFromBounds_r(GEOSContextHandle_t handle, int *typeID,
       return NULL;
     }
   }
+#else
+  GEOSCoordSequence *s =
+      GEOSCoordSeq_copyFromBuffer_r(handle, flatCoords, 5, 0, 0);
+  if (s == NULL) {
+    return NULL;
+  }
+#endif
   GEOSGeometry *shell = GEOSGeom_createLinearRing_r(handle, s);
   if (shell == NULL) {
     GEOSCoordSeq_destroy_r(handle, s);
