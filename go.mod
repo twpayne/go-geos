@@ -1,11 +1,12 @@
 module github.com/twpayne/go-geos
 
-go 1.17
+go 1.18
 
 require (
 	github.com/lib/pq v1.10.6
 	github.com/ory/dockertest/v3 v3.9.1
 	github.com/stretchr/testify v1.8.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -36,5 +37,4 @@ require (
 	golang.org/x/net v0.0.0-20220526153639-5463443f8c37 // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
