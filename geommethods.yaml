@@ -1,0 +1,76 @@
+- name: Area
+  comment: returns g's area
+  type: float64Property
+- name: Clone
+  comment: returns a clone of g
+  type: unary
+  geosFunction: GEOSGeom_clone_r
+- name: ConvexHull
+  comment: returns g's convex hull
+  type: unary
+- name: Contains
+  comment: returns true if g contains other
+  type: binaryPredicate
+- name: CoveredBy
+  comment: returns true if g is covered by other
+  type: binaryPredicate
+- name: Covers
+  comment: returns true if g covers other
+  type: binaryPredicate
+- name: Crosses
+  comment: returns true if g crosses other
+  type: binaryPredicate
+- name: Disjoint
+  comment: returns true if g is disjoint from other
+  type: binaryPredicate
+- name: Envelope
+  comment: returns the envelope of g
+  type: unary
+- name: Equals
+  comment: returns true if g equals other
+  type: binaryPredicate
+- name: Intersects
+  comment: returns true if g intersects other
+  type: binaryPredicate
+- name: IsClosed
+  comment: returns true if g is closed
+  type: unaryPredicate
+- name: IsEmpty
+  comment: returns true if g is empty
+  type: unaryPredicate
+- name: IsRing
+  comment: returns true if g is a ring
+  type: unaryPredicate
+- name: IsSimple
+  comment: returns true if g is simple
+  type: unaryPredicate
+- name: IsValid
+  comment: returns true if g is valid
+  type: unaryPredicate
+- name: Length
+  comment: returns g's length
+  type: float64Property
+- name: MinimumWidth
+  type: unary
+  comment: returns a linestring geometry which represents the minimum diameter of g
+- name: Overlaps
+  comment: returns true if g overlaps other
+  type: binaryPredicate
+- name: Touches
+  comment: returns true if g touches other
+  type: binaryPredicate
+- name: UnaryUnion
+  comment: returns the union of all components of a single geometry
+  type: unary
+  geosFunction: GEOSUnaryUnion_r
+- name: Within
+  comment: returns true if g is within other
+  type: binaryPredicate
+- name: X
+  comment: returns g's X coordinate
+  type: float64Property
+  geosFunction: GEOSGeomGetX_r
+- name: Y
+  comment: returns g's Y coordinate
+  type: float64Property
+  geosFunction: GEOSGeomGetY_r
