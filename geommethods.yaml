@@ -41,6 +41,12 @@
 - name: Equals
   comment: returns true if g equals other
   type: binaryPredicate
+- name: EqualsExact
+  comment: returns true if g equals other exactly
+  type: binaryPredicate
+  extraArgs:
+  - name: tolerance
+    type: float64
 - name: FrechetDistance
   comment: returns the Fréchet distance between g and other
   type: float64BinaryProperty

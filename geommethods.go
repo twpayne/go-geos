@@ -206,6 +206,25 @@ func (g *Geom) Equals(other *Geom) bool {
 	}
 }
 
+// EqualsExact returns true if g equals other exactly.
+func (g *Geom) EqualsExact(other *Geom, tolerance float64) bool {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	switch C.GEOSEqualsExact_r(g.context.handle, g.geom, other.geom, C.double(tolerance)) {
+	case 0:
+		return false
+	case 1:
+		return true
+	default:
+		panic(g.context.err)
+	}
+}
+
 // FrechetDistance returns the Fréchet distance between g and other.
 func (g *Geom) FrechetDistance(other *Geom) float64 {
 	g.mustNotBeDestroyed()
