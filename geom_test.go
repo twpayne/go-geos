@@ -152,6 +152,7 @@ func TestGeomMethods(t *testing.T) {
 	assert.False(t, northSouthLine.Disjoint(eastWestLine))
 	assert.True(t, southEastSquare.Disjoint(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")))
 	assert.Equal(t, unitSquare.Distance(unitSquare), 0.)
+	assert.Equal(t, unitSquare.Distance(mustNewGeomFromWKT(t, c, "POLYGON ((2 0, 3 0, 3 1, 2 1, 2 0))")), 1.)
 	assert.Equal(t, unitSquare.HausdorffDistance(unitSquare), 0.)
 	assert.Equal(t, unitSquare.HausdorffDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
 	assert.Equal(t, unitSquare.HausdorffDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)"), 0.01), 1.)
