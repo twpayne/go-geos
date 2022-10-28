@@ -32,6 +32,12 @@
 - name: Equals
   comment: returns true if g equals other
   type: binaryPredicate
+- name: FrechetDistance
+  comment: returns the Fréchet distance between g and other
+  type: float64BinaryProperty
+- name: HausdorffDistance
+  comment: returns the Hausdorff distance between g and other
+  type: float64BinaryProperty
 - name: Intersects
   comment: returns true if g intersects other
   type: binaryPredicate

@@ -155,6 +155,11 @@ func TestGeomMethods(t *testing.T) {
 	assert.Equal(t, unitSquare.Distance(mustNewGeomFromWKT(t, c, "POLYGON ((2 0, 3 0, 3 1, 2 1, 2 0))")), 1.)
 	assert.True(t, middleSquare.Equals(unitSquare.Intersection(middleSquare)))
 	assert.True(t, unitSquare.EqualsExact(unitSquare, 0.125))
+	assert.Equal(t, unitSquare.FrechetDistance(unitSquare), 0.)
+	assert.Equal(t, mustNewGeomFromWKT(t, c, "LINESTRING (0 1, 0 0)").FrechetDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
+	assert.Equal(t, unitSquare.FrechetDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
+	assert.Equal(t, unitSquare.HausdorffDistance(unitSquare), 0.)
+	assert.Equal(t, unitSquare.HausdorffDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
 	assert.True(t, northSouthLine.Intersects(eastWestLine))
 	assert.False(t, southEastSquare.Intersects(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")))
 	if versionEqualOrGreaterThan(3, 8, 0) {

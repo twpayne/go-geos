@@ -171,6 +171,38 @@ func (g *Geom) Equals(other *Geom) bool {
 	}
 }
 
+// FrechetDistance returns the Fréchet distance between g and other.
+func (g *Geom) FrechetDistance(other *Geom) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var frechetDistance float64
+	if C.GEOSFrechetDistance_r(g.context.handle, g.geom, other.geom, (*C.double)(&frechetDistance)) == 0 {
+		panic(g.context.err)
+	}
+	return frechetDistance
+}
+
+// HausdorffDistance returns the Hausdorff distance between g and other.
+func (g *Geom) HausdorffDistance(other *Geom) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var hausdorffDistance float64
+	if C.GEOSHausdorffDistance_r(g.context.handle, g.geom, other.geom, (*C.double)(&hausdorffDistance)) == 0 {
+		panic(g.context.err)
+	}
+	return hausdorffDistance
+}
+
 // Intersects returns true if g intersects other.
 func (g *Geom) Intersects(other *Geom) bool {
 	g.mustNotBeDestroyed()

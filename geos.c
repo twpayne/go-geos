@@ -244,6 +244,11 @@ GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
   return NULL;
 }
 
+int GEOSFrechetDistance_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
+                          const GEOSGeometry *g2, double *dist) {
+  return 0;
+}
+
 GEOSGeoJSONReader *GEOSGeoJSONReader_create_r(GEOSContextHandle_t handle) {
   return NULL;
 }
