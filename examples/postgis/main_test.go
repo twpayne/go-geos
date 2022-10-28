@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
+	"os/exec"
 	"strings"
 	"testing"
 
@@ -14,6 +15,10 @@ import (
 )
 
 func TestMain(t *testing.T) {
+	if _, err := exec.LookPath("docker"); err != nil {
+		t.Skip("docker not found in $PATH")
+	}
+
 	var (
 		dbName   = "testdb"
 		user     = "testuser"
