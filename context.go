@@ -147,7 +147,6 @@ func (c *Context) NewGeomFromBounds(bounds *Bounds) *Geom {
 
 // NewGeomFromGeoJSON returns a new geometry in JSON format from json.
 func (c *Context) NewGeomFromGeoJSON(geoJSON string) (*Geom, error) {
-	requireVersion(3, 10, 0)
 	c.Lock()
 	defer c.Unlock()
 	c.err = nil

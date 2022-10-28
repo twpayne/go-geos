@@ -97,7 +97,6 @@ func (g *Geom) Buffer(width float64, quadsegs int) *Geom {
 
 // Densify densifies a geometry using a given distance tolerance.
 func (g *Geom) Densify(tolerance float64) *Geom {
-	requireVersion(3, 10, 0)
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
@@ -205,7 +204,6 @@ func (g *Geom) String() string {
 
 // ToGeoJSON returns g in GeoJSON format.
 func (g *Geom) ToGeoJSON(indent int) string {
-	requireVersion(3, 10, 0)
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
