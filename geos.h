@@ -23,12 +23,18 @@ GEOSGeometry *c_newGEOSGeomFromBounds_r(GEOSContextHandle_t handle, int *typeID,
                                         double maxY);
 
 #if GEOS_VERSION_MAJOR < 3 ||                                                  \
+    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 8)
+
+int GEOSDistanceIndexed_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
+                          const GEOSGeometry *g2, double *dist);
+
+#endif
+
+#if GEOS_VERSION_MAJOR < 3 ||                                                  \
     (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 10)
 
 GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
                             double tolerance);
-int GEOSDistanceIndexed_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
-                          const GEOSGeometry *g2);
 char GEOSDistanceWithin_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
                           const GEOSGeometry *g2, double dist);
 int GEOSFrechetDistance_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
