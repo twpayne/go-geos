@@ -128,6 +128,22 @@ func (g *Geom) Disjoint(other *Geom) bool {
 	}
 }
 
+// Distance returns the distance between the closes points on g and other.
+func (g *Geom) Distance(other *Geom) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var distance float64
+	if C.GEOSDistance_r(g.context.handle, g.geom, other.geom, (*C.double)(&distance)) == 0 {
+		panic(g.context.err)
+	}
+	return distance
+}
+
 // Envelope returns the envelope of g.
 func (g *Geom) Envelope() *Geom {
 	g.mustNotBeDestroyed()

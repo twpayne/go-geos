@@ -78,6 +78,29 @@ func (g *Geom) {{ .name }}() float64 {
 	return {{ $varName }}
 }
 
+{{   else if (eq .type "float64BinaryProperty") }}
+{{     $geosFunction := printf "GEOS%s_r" .name }}
+{{     if .geosFunction }}
+{{       $geosFunction = .geosFunction }}
+{{     end }}
+{{     $varName := .name | firstRuneToLower }}
+
+// {{ .name }} {{ .comment }}.
+func (g *Geom) {{ .name }}(other *Geom) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var {{ $varName }} float64
+	if C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom, (*C.double)(&{{ $varName }})) == 0 {
+		panic(g.context.err)
+	}
+	return {{ $varName }}
+}
+
 {{   end }}
 
 {{ end }}
