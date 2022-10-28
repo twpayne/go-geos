@@ -153,6 +153,7 @@ func TestGeomMethods(t *testing.T) {
 	assert.True(t, southEastSquare.Disjoint(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")))
 	assert.Equal(t, unitSquare.Distance(unitSquare), 0.)
 	assert.Equal(t, unitSquare.Distance(mustNewGeomFromWKT(t, c, "POLYGON ((2 0, 3 0, 3 1, 2 1, 2 0))")), 1.)
+	assert.Equal(t, unitSquare.DistanceIndexed(mustNewGeomFromWKT(t, c, "POLYGON ((2 0, 3 0, 3 1, 2 1, 2 0))")), 1.)
 	assert.True(t, middleSquare.Equals(unitSquare.Intersection(middleSquare)))
 	assert.True(t, unitSquare.EqualsExact(unitSquare, 0.125))
 	assert.Equal(t, unitSquare.FrechetDistance(unitSquare), 0.)

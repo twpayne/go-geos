@@ -26,6 +26,9 @@
 - name: Distance
   comment: returns the distance between the closes points on g and other
   type: float64BinaryProperty
+- name: DistanceIndexed
+  comment: returns the distance between g and other, using the indexed facet distance
+  type: float64BinaryProperty
 - name: Envelope
   comment: returns the envelope of g
   type: unary

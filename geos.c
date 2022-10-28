@@ -244,6 +244,11 @@ GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
   return NULL;
 }
 
+int GEOSDistanceIndexed_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
+                          const GEOSGeometry *g2) {
+  return 0;
+}
+
 int GEOSFrechetDistance_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
                           const GEOSGeometry *g2, double *dist) {
   return 0;

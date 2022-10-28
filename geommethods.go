@@ -144,6 +144,22 @@ func (g *Geom) Distance(other *Geom) float64 {
 	return distance
 }
 
+// DistanceIndexed returns the distance between g and other, using the indexed facet distance.
+func (g *Geom) DistanceIndexed(other *Geom) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var distanceIndexed float64
+	if C.GEOSDistanceIndexed_r(g.context.handle, g.geom, other.geom, (*C.double)(&distanceIndexed)) == 0 {
+		panic(g.context.err)
+	}
+	return distanceIndexed
+}
+
 // Envelope returns the envelope of g.
 func (g *Geom) Envelope() *Geom {
 	g.mustNotBeDestroyed()
