@@ -73,6 +73,52 @@ func (g *Geom) Distance(other *Geom) float64 {
 	return distance
 }
 
+// HausdorffDistance returns the Hausdorff distance between g and other. An optional densifyFrac
+// argument is allowed which densifies the geometries using a given distance tolerance.
+func (g *Geom) HausdorffDistance(other *Geom, densifyFrac ...float64) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var distance float64
+	if len(densifyFrac) > 0 {
+		if C.GEOSHausdorffDistanceDensify_r(g.context.handle, g.geom, other.geom, (C.double)(densifyFrac[0]), (*C.double)(&distance)) == 0 {
+			panic(g.context.err)
+		}
+	} else {
+		if C.GEOSHausdorffDistance_r(g.context.handle, g.geom, other.geom, (*C.double)(&distance)) == 0 {
+			panic(g.context.err)
+		}
+	}
+	return distance
+}
+
+// FrechetDistance returns the Fréchet distance between g and other. An optional densifyFrac
+// argument is allowed which densifies the geometries using a given distance tolerance.
+func (g *Geom) FrechetDistance(other *Geom, densifyFrac ...float64) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var distance float64
+	if len(densifyFrac) > 0 {
+		if C.GEOSFrechetDistanceDensify_r(g.context.handle, g.geom, other.geom, (C.double)(densifyFrac[0]), (*C.double)(&distance)) == 0 {
+			panic(g.context.err)
+		}
+	} else {
+		if C.GEOSFrechetDistance_r(g.context.handle, g.geom, other.geom, (*C.double)(&distance)) == 0 {
+			panic(g.context.err)
+		}
+	}
+	return distance
+}
+
 // EqualsExact returns true if g equals other exactly.
 func (g *Geom) EqualsExact(other *Geom, tolerance float64) bool {
 	g.mustNotBeDestroyed()
