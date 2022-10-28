@@ -29,6 +29,12 @@
 - name: DistanceIndexed
   comment: returns the distance between g and other, using the indexed facet distance
   type: float64BinaryProperty
+- name: DistanceWithin
+  comment: returns whether the distance between g and other is within the given dist
+  type: binaryPredicate
+  extraArgs:
+  - name: dist
+    type: float64
 - name: Envelope
   comment: returns the envelope of g
   type: unary

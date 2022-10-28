@@ -160,6 +160,25 @@ func (g *Geom) DistanceIndexed(other *Geom) float64 {
 	return distanceIndexed
 }
 
+// DistanceWithin returns whether the distance between g and other is within the given dist.
+func (g *Geom) DistanceWithin(other *Geom, dist float64) bool {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	switch C.GEOSDistanceWithin_r(g.context.handle, g.geom, other.geom, C.double(dist)) {
+	case 0:
+		return false
+	case 1:
+		return true
+	default:
+		panic(g.context.err)
+	}
+}
+
 // Envelope returns the envelope of g.
 func (g *Geom) Envelope() *Geom {
 	g.mustNotBeDestroyed()

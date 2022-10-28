@@ -249,6 +249,11 @@ int GEOSDistanceIndexed_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
   return 0;
 }
 
+char GEOSDistanceWithin_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
+                          const GEOSGeometry *g2, double dist) {
+  return 2;
+}
+
 int GEOSFrechetDistance_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
                           const GEOSGeometry *g2, double *dist) {
   return 0;

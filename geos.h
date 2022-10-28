@@ -29,6 +29,8 @@ GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
                             double tolerance);
 int GEOSDistanceIndexed_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
                           const GEOSGeometry *g2);
+char GEOSDistanceWithin_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
+                          const GEOSGeometry *g2, double dist);
 int GEOSFrechetDistance_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
                           const GEOSGeometry *g2, double *dist);
 int GEOSFrechetDistanceDensify_r(GEOSContextHandle_t handle,
