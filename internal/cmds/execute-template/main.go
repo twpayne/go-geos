@@ -8,8 +8,8 @@ import (
 	"os"
 	"path"
 	"regexp"
-	"strings"
 	"text/template"
+	"unicode"
 
 	"gopkg.in/yaml.v3"
 )
@@ -40,10 +40,14 @@ func run() error {
 	templateName := path.Base(flag.Arg(0))
 	buffer := &bytes.Buffer{}
 	funcMap := template.FuncMap{
+		"firstRuneToLower": func(s string) string {
+			runes := []rune(s)
+			runes[0] = unicode.ToLower(runes[0])
+			return string(runes)
+		},
 		"replaceAllRegexp": func(expr, repl, s string) string {
 			return regexp.MustCompile(expr).ReplaceAllString(s, repl)
 		},
-		"toLower": strings.ToLower,
 	}
 	tmpl, err := template.New(templateName).Funcs(funcMap).ParseFiles(flag.Args()...)
 	if err != nil {

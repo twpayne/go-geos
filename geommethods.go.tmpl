@@ -64,17 +64,18 @@ func (g *Geom) {{ .name }}(other *Geom) bool {
 {{     if .geosFunction }}
 {{       $geosFunction = .geosFunction }}
 {{     end }}
+{{     $varName := .name | firstRuneToLower }}
 
 // {{ .name }} {{ .comment }}.
 func (g *Geom) {{ .name }}() float64 {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	var {{ .name | toLower }} float64
-    if C.{{ $geosFunction }}(g.context.handle, g.geom, (*C.double)(&{{ .name | toLower }})) == 0 {
+	var {{ $varName }} float64
+    if C.{{ $geosFunction }}(g.context.handle, g.geom, (*C.double)(&{{ $varName }})) == 0 {
 		panic(g.context.err)
 	}
-	return {{ .name | toLower }}
+	return {{ $varName }}
 }
 
 {{   end }}
