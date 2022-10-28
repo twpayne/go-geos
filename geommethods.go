@@ -187,6 +187,22 @@ func (g *Geom) FrechetDistance(other *Geom) float64 {
 	return frechetDistance
 }
 
+// FrechetDistanceDensify returns the Fréchet distance between g and other.
+func (g *Geom) FrechetDistanceDensify(other *Geom, densifyFrac float64) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var frechetDistanceDensify float64
+	if C.GEOSFrechetDistanceDensify_r(g.context.handle, g.geom, other.geom, C.double(densifyFrac), (*C.double)(&frechetDistanceDensify)) == 0 {
+		panic(g.context.err)
+	}
+	return frechetDistanceDensify
+}
+
 // HausdorffDistance returns the Hausdorff distance between g and other.
 func (g *Geom) HausdorffDistance(other *Geom) float64 {
 	g.mustNotBeDestroyed()
@@ -201,6 +217,22 @@ func (g *Geom) HausdorffDistance(other *Geom) float64 {
 		panic(g.context.err)
 	}
 	return hausdorffDistance
+}
+
+// HausdorffDistanceDensify returns the Hausdorff distance between g and other.
+func (g *Geom) HausdorffDistanceDensify(other *Geom, densifyFrac float64) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var hausdorffDistanceDensify float64
+	if C.GEOSHausdorffDistanceDensify_r(g.context.handle, g.geom, other.geom, C.double(densifyFrac), (*C.double)(&hausdorffDistanceDensify)) == 0 {
+		panic(g.context.err)
+	}
+	return hausdorffDistanceDensify
 }
 
 // Intersects returns true if g intersects other.
