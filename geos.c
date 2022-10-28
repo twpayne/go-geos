@@ -237,11 +237,37 @@ GEOSGeometry *c_newGEOSGeomFromBounds_r(GEOSContextHandle_t handle, int *typeID,
 }
 
 #if GEOS_VERSION_MAJOR < 3 ||                                                  \
+    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 8)
+
+int GEOSDistanceIndexed_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
+                          const GEOSGeometry *g2, double *dist) {
+  return 0;
+}
+
+#endif
+
+#if GEOS_VERSION_MAJOR < 3 ||                                                  \
     (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 10)
 
 GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
                             double tolerance) {
   return NULL;
+}
+
+char GEOSDistanceWithin_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
+                          const GEOSGeometry *g2, double dist) {
+  return 2;
+}
+
+int GEOSFrechetDistance_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
+                          const GEOSGeometry *g2, double *dist) {
+  return 0;
+}
+
+int GEOSFrechetDistanceDensify_r(GEOSContextHandle_t handle,
+                                 const GEOSGeometry *g1, const GEOSGeometry *g2,
+                                 double densifyFrac, double *dist) {
+  return 0;
 }
 
 GEOSGeoJSONReader *GEOSGeoJSONReader_create_r(GEOSContextHandle_t handle) {

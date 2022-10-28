@@ -41,7 +41,7 @@ func (g *Geom) {{ .name }}() bool {
 {{   else if (eq .type "binaryPredicate") }}
 
 // {{ .name }} {{ .comment }}.
-func (g *Geom) {{ .name }}(other *Geom) bool {
+func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) bool {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
@@ -49,7 +49,7 @@ func (g *Geom) {{ .name }}(other *Geom) bool {
 		other.context.Lock()
 		defer other.context.Unlock()
 	}
-	switch C.GEOS{{ .name }}_r(g.context.handle, g.geom, other.geom) {
+	switch C.GEOS{{ .name }}_r(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}) {
 	case 0:
 		return false
 	case 1:
@@ -64,17 +64,41 @@ func (g *Geom) {{ .name }}(other *Geom) bool {
 {{     if .geosFunction }}
 {{       $geosFunction = .geosFunction }}
 {{     end }}
+{{     $varName := .name | firstRuneToLower }}
 
 // {{ .name }} {{ .comment }}.
 func (g *Geom) {{ .name }}() float64 {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	var {{ .name | toLower }} float64
-    if C.{{ $geosFunction }}(g.context.handle, g.geom, (*C.double)(&{{ .name | toLower }})) == 0 {
+	var {{ $varName }} float64
+    if C.{{ $geosFunction }}(g.context.handle, g.geom, (*C.double)(&{{ $varName }})) == 0 {
 		panic(g.context.err)
 	}
-	return {{ .name | toLower }}
+	return {{ $varName }}
+}
+
+{{   else if (eq .type "float64BinaryProperty") }}
+{{     $geosFunction := printf "GEOS%s_r" .name }}
+{{     if .geosFunction }}
+{{       $geosFunction = .geosFunction }}
+{{     end }}
+{{     $varName := .name | firstRuneToLower }}
+
+// {{ .name }} {{ .comment }}.
+func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var {{ $varName }} float64
+	if C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}, (*C.double)(&{{ $varName }})) == 0 {
+		panic(g.context.err)
+	}
+	return {{ $varName }}
 }
 
 {{   end }}

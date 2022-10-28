@@ -57,41 +57,6 @@ func (g *Geom) CoordSeq() *CoordSeq {
 	return coordSeq
 }
 
-// Distance returns the distance between the closest points on g and other.
-func (g *Geom) Distance(other *Geom) float64 {
-	g.mustNotBeDestroyed()
-	g.context.Lock()
-	defer g.context.Unlock()
-	if other.context != g.context {
-		other.context.Lock()
-		defer other.context.Unlock()
-	}
-	var distance float64
-	if C.GEOSDistance_r(g.context.handle, g.geom, other.geom, (*C.double)(&distance)) == 0 {
-		panic(g.context.err)
-	}
-	return distance
-}
-
-// EqualsExact returns true if g equals other exactly.
-func (g *Geom) EqualsExact(other *Geom, tolerance float64) bool {
-	g.mustNotBeDestroyed()
-	g.context.Lock()
-	defer g.context.Unlock()
-	if other.context != g.context {
-		other.context.Lock()
-		defer other.context.Unlock()
-	}
-	switch C.GEOSEqualsExact_r(g.context.handle, g.geom, other.geom, C.double(tolerance)) {
-	case 0:
-		return false
-	case 1:
-		return true
-	default:
-		panic(g.context.err)
-	}
-}
-
 // ExteriorRing returns the exterior ring.
 func (g *Geom) ExteriorRing() *Geom {
 	g.mustNotBeDestroyed()

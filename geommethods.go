@@ -128,6 +128,57 @@ func (g *Geom) Disjoint(other *Geom) bool {
 	}
 }
 
+// Distance returns the distance between the closes points on g and other.
+func (g *Geom) Distance(other *Geom) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var distance float64
+	if C.GEOSDistance_r(g.context.handle, g.geom, other.geom, (*C.double)(&distance)) == 0 {
+		panic(g.context.err)
+	}
+	return distance
+}
+
+// DistanceIndexed returns the distance between g and other, using the indexed facet distance.
+func (g *Geom) DistanceIndexed(other *Geom) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var distanceIndexed float64
+	if C.GEOSDistanceIndexed_r(g.context.handle, g.geom, other.geom, (*C.double)(&distanceIndexed)) == 0 {
+		panic(g.context.err)
+	}
+	return distanceIndexed
+}
+
+// DistanceWithin returns whether the distance between g and other is within the given dist.
+func (g *Geom) DistanceWithin(other *Geom, dist float64) bool {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	switch C.GEOSDistanceWithin_r(g.context.handle, g.geom, other.geom, C.double(dist)) {
+	case 0:
+		return false
+	case 1:
+		return true
+	default:
+		panic(g.context.err)
+	}
+}
+
 // Envelope returns the envelope of g.
 func (g *Geom) Envelope() *Geom {
 	g.mustNotBeDestroyed()
@@ -153,6 +204,89 @@ func (g *Geom) Equals(other *Geom) bool {
 	default:
 		panic(g.context.err)
 	}
+}
+
+// EqualsExact returns true if g equals other exactly.
+func (g *Geom) EqualsExact(other *Geom, tolerance float64) bool {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	switch C.GEOSEqualsExact_r(g.context.handle, g.geom, other.geom, C.double(tolerance)) {
+	case 0:
+		return false
+	case 1:
+		return true
+	default:
+		panic(g.context.err)
+	}
+}
+
+// FrechetDistance returns the Fréchet distance between g and other.
+func (g *Geom) FrechetDistance(other *Geom) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var frechetDistance float64
+	if C.GEOSFrechetDistance_r(g.context.handle, g.geom, other.geom, (*C.double)(&frechetDistance)) == 0 {
+		panic(g.context.err)
+	}
+	return frechetDistance
+}
+
+// FrechetDistanceDensify returns the Fréchet distance between g and other.
+func (g *Geom) FrechetDistanceDensify(other *Geom, densifyFrac float64) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var frechetDistanceDensify float64
+	if C.GEOSFrechetDistanceDensify_r(g.context.handle, g.geom, other.geom, C.double(densifyFrac), (*C.double)(&frechetDistanceDensify)) == 0 {
+		panic(g.context.err)
+	}
+	return frechetDistanceDensify
+}
+
+// HausdorffDistance returns the Hausdorff distance between g and other.
+func (g *Geom) HausdorffDistance(other *Geom) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var hausdorffDistance float64
+	if C.GEOSHausdorffDistance_r(g.context.handle, g.geom, other.geom, (*C.double)(&hausdorffDistance)) == 0 {
+		panic(g.context.err)
+	}
+	return hausdorffDistance
+}
+
+// HausdorffDistanceDensify returns the Hausdorff distance between g and other.
+func (g *Geom) HausdorffDistanceDensify(other *Geom, densifyFrac float64) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	var hausdorffDistanceDensify float64
+	if C.GEOSHausdorffDistanceDensify_r(g.context.handle, g.geom, other.geom, C.double(densifyFrac), (*C.double)(&hausdorffDistanceDensify)) == 0 {
+		panic(g.context.err)
+	}
+	return hausdorffDistanceDensify
 }
 
 // Intersects returns true if g intersects other.

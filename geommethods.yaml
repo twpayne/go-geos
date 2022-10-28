@@ -23,12 +23,48 @@
 - name: Disjoint
   comment: returns true if g is disjoint from other
   type: binaryPredicate
+- name: Distance
+  comment: returns the distance between the closes points on g and other
+  type: float64BinaryProperty
+- name: DistanceIndexed
+  comment: returns the distance between g and other, using the indexed facet distance
+  type: float64BinaryProperty
+- name: DistanceWithin
+  comment: returns whether the distance between g and other is within the given dist
+  type: binaryPredicate
+  extraArgs:
+  - name: dist
+    type: float64
 - name: Envelope
   comment: returns the envelope of g
   type: unary
 - name: Equals
   comment: returns true if g equals other
   type: binaryPredicate
+- name: EqualsExact
+  comment: returns true if g equals other exactly
+  type: binaryPredicate
+  extraArgs:
+  - name: tolerance
+    type: float64
+- name: FrechetDistance
+  comment: returns the Fréchet distance between g and other
+  type: float64BinaryProperty
+- name: FrechetDistanceDensify
+  comment: returns the Fréchet distance between g and other
+  type: float64BinaryProperty
+  extraArgs:
+  - name: densifyFrac
+    type: float64
+- name: HausdorffDistance
+  comment: returns the Hausdorff distance between g and other
+  type: float64BinaryProperty
+- name: HausdorffDistanceDensify
+  comment: returns the Hausdorff distance between g and other
+  type: float64BinaryProperty
+  extraArgs:
+  - name: densifyFrac
+    type: float64
 - name: Intersects
   comment: returns true if g intersects other
   type: binaryPredicate

@@ -8,8 +8,8 @@ import (
 	"os"
 	"path"
 	"regexp"
-	"strings"
 	"text/template"
+	"unicode"
 
 	"gopkg.in/yaml.v3"
 )
@@ -17,6 +17,10 @@ import (
 var (
 	templateDataFilename = flag.String("data", "", "data filename")
 	outputFilename       = flag.String("output", "", "output filename")
+
+	cTypes = map[string]string{
+		"float64": "C.double",
+	}
 )
 
 func run() error {
@@ -40,10 +44,21 @@ func run() error {
 	templateName := path.Base(flag.Arg(0))
 	buffer := &bytes.Buffer{}
 	funcMap := template.FuncMap{
+		"cType": func(goType string) string {
+			cType, ok := cTypes[goType]
+			if !ok {
+				panic(fmt.Sprintf("%s: unknown C type for Go type", goType))
+			}
+			return cType
+		},
+		"firstRuneToLower": func(s string) string {
+			runes := []rune(s)
+			runes[0] = unicode.ToLower(runes[0])
+			return string(runes)
+		},
 		"replaceAllRegexp": func(expr, repl, s string) string {
 			return regexp.MustCompile(expr).ReplaceAllString(s, repl)
 		},
-		"toLower": strings.ToLower,
 	}
 	tmpl, err := template.New(templateName).Funcs(funcMap).ParseFiles(flag.Args()...)
 	if err != nil {

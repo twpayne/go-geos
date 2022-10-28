@@ -153,8 +153,24 @@ func TestGeomMethods(t *testing.T) {
 	assert.True(t, southEastSquare.Disjoint(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")))
 	assert.Equal(t, unitSquare.Distance(unitSquare), 0.)
 	assert.Equal(t, unitSquare.Distance(mustNewGeomFromWKT(t, c, "POLYGON ((2 0, 3 0, 3 1, 2 1, 2 0))")), 1.)
+	if versionEqualOrGreaterThan(3, 8, 0) {
+		assert.Equal(t, unitSquare.DistanceIndexed(mustNewGeomFromWKT(t, c, "POLYGON ((2 0, 3 0, 3 1, 2 1, 2 0))")), 1.)
+	}
+	if versionEqualOrGreaterThan(3, 10, 0) {
+		assert.True(t, unitSquare.DistanceWithin(mustNewGeomFromWKT(t, c, "POINT (2 2)"), 2))
+		assert.False(t, unitSquare.DistanceWithin(mustNewGeomFromWKT(t, c, "POINT (2 2)"), 1))
+	}
 	assert.True(t, middleSquare.Equals(unitSquare.Intersection(middleSquare)))
 	assert.True(t, unitSquare.EqualsExact(unitSquare, 0.125))
+	if versionEqualOrGreaterThan(3, 10, 0) {
+		assert.Equal(t, unitSquare.FrechetDistance(unitSquare), 0.)
+		assert.Equal(t, mustNewGeomFromWKT(t, c, "LINESTRING (0 1, 0 0)").FrechetDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
+		assert.Equal(t, unitSquare.FrechetDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
+		assert.Equal(t, unitSquare.FrechetDistanceDensify(unitSquare, 0.1), 0.)
+		assert.Equal(t, unitSquare.HausdorffDistance(unitSquare), 0.)
+		assert.Equal(t, unitSquare.HausdorffDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
+		assert.Equal(t, unitSquare.HausdorffDistanceDensify(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)"), 0.01), 1.)
+	}
 	assert.True(t, northSouthLine.Intersects(eastWestLine))
 	assert.False(t, southEastSquare.Intersects(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")))
 	if versionEqualOrGreaterThan(3, 8, 0) {
