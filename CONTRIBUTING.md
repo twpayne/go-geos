@@ -6,7 +6,7 @@
 
 ## Adding methods to `*Geom`
 
-Wherever possible, `go-geom` uses code generation to generate wrappers for
+Wherever possible, `go-geos` uses code generation to generate wrappers for
 `*Geom` methods. The generated code is in
 [`geommethods.go`](https://github.com/twpayne/go-geos/blob/master/geommethods.go).
 
@@ -22,7 +22,7 @@ There are five parts to this:
 * [`go generate`](https://go.dev/blog/generate) runs
   `internal/cmds/execute-template/` with `geommethods.yaml` and
   `geommethods.go.tmpl` as inputs and writes `geommethods.go`.
-* [`geom_test.go`](https://github.com/twpayne/go-geos/blob/master/geos_test.go)
+* [`geom_test.go`](https://github.com/twpayne/go-geos/blob/master/geom_test.go)
   contains unit tests to ensure that the method is wrapped correctly.
 
 Adding a method to `*Geom` consists of one or more steps, depending on how
