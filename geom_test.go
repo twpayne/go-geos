@@ -270,11 +270,16 @@ func TestPolygonMethods(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
 	c := NewContext()
 	polygon := mustNewGeomFromWKT(t, c, "POLYGON ((0 0, 3 0, 3 3, 0 3, 0 0), (1 1, 1 2, 2 2, 2 1, 1 1))")
+	assert.Nil(t, polygon.CoordSeq())
 	assert.Equal(t, 1, polygon.NumInteriorRings())
-	expectedOuterRing := mustNewGeomFromWKT(t, c, "LINEARRING (0 0, 3 0, 3 3, 0 3, 0 0)")
-	assert.True(t, expectedOuterRing.Equals(polygon.ExteriorRing()))
-	expectedInnerRing := mustNewGeomFromWKT(t, c, "LINEARRING (1 1, 1 2, 2 2, 2 1, 1 1)")
-	assert.True(t, expectedInnerRing.Equals(polygon.InteriorRing(0)))
+	exteriorRing := polygon.ExteriorRing()
+	expectedExteriorRing := mustNewGeomFromWKT(t, c, "LINEARRING (0 0, 3 0, 3 3, 0 3, 0 0)")
+	assert.True(t, expectedExteriorRing.Equals(exteriorRing))
+	assert.NotNil(t, exteriorRing.CoordSeq())
+	interiorRing := polygon.InteriorRing(0)
+	expectedInteriorRing := mustNewGeomFromWKT(t, c, "LINEARRING (1 1, 1 2, 2 2, 2 1, 1 1)")
+	assert.True(t, expectedInteriorRing.Equals(interiorRing))
+	assert.NotNil(t, interiorRing.CoordSeq())
 }
 
 func TestGeometryPanics(t *testing.T) {

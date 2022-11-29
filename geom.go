@@ -53,6 +53,9 @@ func (g *Geom) CoordSeq() *CoordSeq {
 	// Don't set a finalizer as coordSeq is owned by g and will be finalized when g is
 	// finalized.
 	coordSeq := g.context.newCoordSeq(s, nil)
+	if coordSeq == nil {
+		return nil
+	}
 	coordSeq.parent = g
 	return coordSeq
 }
