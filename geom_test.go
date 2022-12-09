@@ -297,6 +297,15 @@ func TestGeometryPanics(t *testing.T) {
 	})
 }
 
+func TestBinaryMethods(t *testing.T) {
+	defer runtime.GC() // Exercise finalizers.
+	c := NewContext()
+	multiPoint1 := mustNewGeomFromWKT(t, c, "MULTIPOINT (0 0,1 1)")
+	multiPoint2 := mustNewGeomFromWKT(t, c, "MULTIPOINT (1 1,2 2)")
+	difference := multiPoint1.Difference(multiPoint2)
+	assert.True(t, mustNewGeomFromWKT(t, c, "POINT (0 0)").Equals(difference))
+}
+
 func TestNewGeomFromGeoJSON(t *testing.T) {
 	skipIfVersionLessThan(t, 3, 10, 0)
 	for i, tc := range []struct {

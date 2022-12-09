@@ -109,6 +109,30 @@ func (g *Geom) Crosses(other *Geom) bool {
 	}
 }
 
+// Difference returns the difference between g and other.
+func (g *Geom) Difference(other *Geom) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSDifference_r(g.context.handle, g.geom, other.geom), nil)
+}
+
+// DifferencePrec returns the difference between g and other.
+func (g *Geom) DifferencePrec(other *Geom, gridSize float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSDifferencePrec_r(g.context.handle, g.geom, other.geom, C.double(gridSize)), nil)
+}
+
 // Disjoint returns true if g is disjoint from other.
 func (g *Geom) Disjoint(other *Geom) bool {
 	g.mustNotBeDestroyed()

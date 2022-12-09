@@ -20,6 +20,15 @@
 - name: Crosses
   comment: returns true if g crosses other
   type: binaryPredicate
+- name: Difference
+  comment: returns the difference between g and other
+  type: binary
+- name: DifferencePrec
+  comment: returns the difference between g and other
+  type: binary
+  extraArgs:
+  - name: gridSize
+    type: float64
 - name: Disjoint
   comment: returns true if g is disjoint from other
   type: binaryPredicate
