@@ -8,6 +8,20 @@
     type: float64
   - name: quadsegs
     type: int
+- name: BufferWithStyle
+  comment: returns a buffer using the provided style parameters
+  type: unary
+  extraArgs:
+  - name: width
+    type: float64
+  - name: quadsegs
+    type: int
+  - name: endCapStyle
+    type: BufCapStyle
+  - name: joinStyle
+    type: BufJoinStyle
+  - name: mitreLimit
+    type: float64
 - name: Clone
   comment: returns a clone of g
   type: unary

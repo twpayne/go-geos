@@ -24,6 +24,14 @@ func (g *Geom) Buffer(width float64, quadsegs int) *Geom {
 	return g.context.newNonNilGeom(C.GEOSBuffer_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs)), nil)
 }
 
+// BufferWithStyle returns a buffer using the provided style parameters.
+func (g *Geom) BufferWithStyle(width float64, quadsegs int, endCapStyle BufCapStyle, joinStyle BufJoinStyle, mitreLimit float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSBufferWithStyle_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs), C.int(endCapStyle), C.int(joinStyle), C.double(mitreLimit)), nil)
+}
+
 // Clone returns a clone of g.
 func (g *Geom) Clone() *Geom {
 	g.mustNotBeDestroyed()

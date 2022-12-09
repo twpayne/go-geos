@@ -19,8 +19,10 @@ var (
 	outputFilename       = flag.String("output", "", "output filename")
 
 	cTypes = map[string]string{
-		"float64": "C.double",
-		"int":     "C.int",
+		"BufCapStyle":  "C.int",
+		"BufJoinStyle": "C.int",
+		"float64":      "C.double",
+		"int":          "C.int",
 	}
 )
 
