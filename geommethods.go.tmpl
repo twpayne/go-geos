@@ -21,6 +21,24 @@ func (g *Geom) {{ .name }}() *Geom {
     return g.context.newNonNilGeom(C.{{ $geosFunction }}(g.context.handle, g.geom), nil)
 }
 
+{{   else if (eq .type "binary") }}
+{{     $geosFunction := printf "GEOS%s_r" .name }}
+{{     if .geosFunction }}
+{{       $geosFunction = .geosFunction }}
+{{     end }}
+
+// {{ .name }} {{ .comment }}.
+func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) *Geom {
+    g.mustNotBeDestroyed()
+    g.context.Lock()
+    defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+    return g.context.newGeom(C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}), nil)
+}
+
 {{   else if (eq .type "unaryPredicate") }}
 
 // {{ .name }} {{ .comment }}.

@@ -35,6 +35,9 @@ int GEOSDistanceIndexed_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
 
 GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
                             double tolerance);
+GEOSGeometry *GEOSDifferencePrec_r(GEOSContextHandle_t handle,
+                                   const GEOSGeometry *g1,
+                                   const GEOSGeometry *g2, double gridSize);
 char GEOSDistanceWithin_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
                           const GEOSGeometry *g2, double dist);
 int GEOSFrechetDistance_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,

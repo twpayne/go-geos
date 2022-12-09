@@ -254,6 +254,12 @@ GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
   return NULL;
 }
 
+GEOSGeometry *GEOSDifferencePrec_r(GEOSContextHandle_t handle,
+                                   const GEOSGeometry *g1,
+                                   const GEOSGeometry *g2, double gridSize) {
+  return NULL;
+}
+
 char GEOSDistanceWithin_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
                           const GEOSGeometry *g2, double dist) {
   return 2;
