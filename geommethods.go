@@ -327,6 +327,14 @@ func (g *Geom) HausdorffDistanceDensify(other *Geom, densifyFrac float64) float6
 	return hausdorffDistanceDensify
 }
 
+// Interpolate returns a point distance d from the start of g, which must be a linestring.
+func (g *Geom) Interpolate(d float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newGeom(C.GEOSInterpolate_r(g.context.handle, g.geom, C.double(d)), nil)
+}
+
 func (g *Geom) Intersection(other *Geom) *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
