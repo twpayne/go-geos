@@ -17,6 +17,13 @@ func (g *Geom) Area() float64 {
 	return area
 }
 
+func (g *Geom) Buffer(width float64, quadsegs int) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSBuffer_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs)), nil)
+}
+
 // Clone returns a clone of g.
 func (g *Geom) Clone() *Geom {
 	g.mustNotBeDestroyed()
@@ -107,6 +114,13 @@ func (g *Geom) Crosses(other *Geom) bool {
 	default:
 		panic(g.context.err)
 	}
+}
+
+func (g *Geom) Densify(tolerance float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSDensify_r(g.context.handle, g.geom, C.double(tolerance)), nil)
 }
 
 // Difference returns the difference between g and other.
@@ -311,6 +325,17 @@ func (g *Geom) HausdorffDistanceDensify(other *Geom, densifyFrac float64) float6
 		panic(g.context.err)
 	}
 	return hausdorffDistanceDensify
+}
+
+func (g *Geom) Intersection(other *Geom) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSIntersection_r(g.context.handle, g.geom, other.geom), nil)
 }
 
 // Intersects returns true if g intersects other.

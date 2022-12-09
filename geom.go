@@ -90,34 +90,6 @@ func (g *Geom) InteriorRing(n int) *Geom {
 	return g.context.newNonNilGeom(C.GEOSGetInteriorRingN_r(g.context.handle, g.geom, C.int(n)), g)
 }
 
-// Buffer buffers a geometry.
-func (g *Geom) Buffer(width float64, quadsegs int) *Geom {
-	g.mustNotBeDestroyed()
-	g.context.Lock()
-	defer g.context.Unlock()
-	return g.context.newNonNilGeom(C.GEOSBuffer_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs)), g)
-}
-
-// Densify densifies a geometry using a given distance tolerance.
-func (g *Geom) Densify(tolerance float64) *Geom {
-	g.mustNotBeDestroyed()
-	g.context.Lock()
-	defer g.context.Unlock()
-	return g.context.newNonNilGeom(C.GEOSDensify_r(g.context.handle, g.geom, C.double(tolerance)), g)
-}
-
-// Intersection returns the intersection between g and other.
-func (g *Geom) Intersection(other *Geom) *Geom {
-	g.mustNotBeDestroyed()
-	g.context.Lock()
-	defer g.context.Unlock()
-	if other.context != g.context {
-		other.context.Lock()
-		defer other.context.Unlock()
-	}
-	return g.context.newNonNilGeom(C.GEOSIntersection_r(g.context.handle, g.geom, other.geom), nil)
-}
-
 // IsValidReason returns the reason that g is invalid.
 func (g *Geom) IsValidReason() string {
 	g.mustNotBeDestroyed()

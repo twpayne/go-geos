@@ -13,12 +13,12 @@ import "C"
 {{       $geosFunction = .geosFunction }}
 {{     end }}
 
-// {{ .name }} {{ .comment }}.
-func (g *Geom) {{ .name }}() *Geom {
+{{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
+func (g *Geom) {{ .name }}({{ range $index, $arg := .extraArgs }}{{ if $index }}, {{ end }}{{ $arg.name }} {{ $arg.type }}{{ end }}) *Geom {
     g.mustNotBeDestroyed()
     g.context.Lock()
     defer g.context.Unlock()
-    return g.context.newNonNilGeom(C.{{ $geosFunction }}(g.context.handle, g.geom), nil)
+    return g.context.newNonNilGeom(C.{{ $geosFunction }}(g.context.handle, g.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}), nil)
 }
 
 {{   else if (eq .type "binary") }}
@@ -27,7 +27,7 @@ func (g *Geom) {{ .name }}() *Geom {
 {{       $geosFunction = .geosFunction }}
 {{     end }}
 
-// {{ .name }} {{ .comment }}.
+{{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) *Geom {
     g.mustNotBeDestroyed()
     g.context.Lock()
@@ -41,7 +41,7 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 
 {{   else if (eq .type "unaryPredicate") }}
 
-// {{ .name }} {{ .comment }}.
+{{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}() bool {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
@@ -58,7 +58,7 @@ func (g *Geom) {{ .name }}() bool {
 
 {{   else if (eq .type "binaryPredicate") }}
 
-// {{ .name }} {{ .comment }}.
+{{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) bool {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
@@ -84,7 +84,7 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 {{     end }}
 {{     $varName := .name | firstRuneToLower }}
 
-// {{ .name }} {{ .comment }}.
+{{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}() float64 {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
@@ -103,7 +103,7 @@ func (g *Geom) {{ .name }}() float64 {
 {{     end }}
 {{     $varName := .name | firstRuneToLower }}
 
-// {{ .name }} {{ .comment }}.
+{{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) float64 {
 	g.mustNotBeDestroyed()
 	g.context.Lock()

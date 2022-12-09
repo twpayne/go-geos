@@ -1,6 +1,13 @@
 - name: Area
   comment: returns g's area
   type: float64Property
+- name: Buffer
+  type: unary
+  extraArgs:
+  - name: width
+    type: float64
+  - name: quadsegs
+    type: int
 - name: Clone
   comment: returns a clone of g
   type: unary
@@ -20,6 +27,11 @@
 - name: Crosses
   comment: returns true if g crosses other
   type: binaryPredicate
+- name: Densify
+  type: unary
+  extraArgs:
+  - name: tolerance
+    type: float64
 - name: Difference
   comment: returns the difference between g and other
   type: binary
@@ -74,6 +86,8 @@
   extraArgs:
   - name: densifyFrac
     type: float64
+- name: Intersection
+  type: binary
 - name: Intersects
   comment: returns true if g intersects other
   type: binaryPredicate
