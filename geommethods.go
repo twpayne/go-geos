@@ -343,6 +343,14 @@ func (g *Geom) Interpolate(d float64) *Geom {
 	return g.context.newGeom(C.GEOSInterpolate_r(g.context.handle, g.geom, C.double(d)), nil)
 }
 
+// InterpolateNormalized returns the point that is at proportion from the start.
+func (g *Geom) InterpolateNormalized(proportion float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newGeom(C.GEOSInterpolateNormalized_r(g.context.handle, g.geom, C.double(proportion)), nil)
+}
+
 func (g *Geom) Intersection(other *Geom) *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()

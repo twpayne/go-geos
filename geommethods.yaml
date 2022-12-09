@@ -107,6 +107,13 @@
   extraArgs:
   - name: d
     type: float64
+- name: InterpolateNormalized
+  comment: returns the point that is at proportion from the start
+  type: unary
+  nil: true
+  extraArgs:
+  - name: proportion
+    type: float64
 - name: Intersection
   type: binary
 - name: Intersects
