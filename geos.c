@@ -276,6 +276,12 @@ int GEOSFrechetDistanceDensify_r(GEOSContextHandle_t handle,
   return 0;
 }
 
+GEOSGeometry *GEOSIntersectionPrec_r(GEOSContextHandle_t handle,
+                                     const GEOSGeometry *g1,
+                                     const GEOSGeometry *g2, double gridSize) {
+  return NULL;
+}
+
 GEOSGeoJSONReader *GEOSGeoJSONReader_create_r(GEOSContextHandle_t handle) {
   return NULL;
 }

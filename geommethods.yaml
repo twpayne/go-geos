@@ -116,6 +116,11 @@
     type: float64
 - name: Intersection
   type: binary
+- name: IntersectionPrec
+  type: binary
+  extraArgs:
+  - name: gridSize
+    type: float64
 - name: Intersects
   comment: returns true if g intersects other
   type: binaryPredicate

@@ -362,6 +362,17 @@ func (g *Geom) Intersection(other *Geom) *Geom {
 	return g.context.newGeom(C.GEOSIntersection_r(g.context.handle, g.geom, other.geom), nil)
 }
 
+func (g *Geom) IntersectionPrec(other *Geom, gridSize float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSIntersectionPrec_r(g.context.handle, g.geom, other.geom, C.double(gridSize)), nil)
+}
+
 // Intersects returns true if g intersects other.
 func (g *Geom) Intersects(other *Geom) bool {
 	g.mustNotBeDestroyed()
