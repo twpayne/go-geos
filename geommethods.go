@@ -486,6 +486,13 @@ func (g *Geom) Length() float64 {
 	return length
 }
 
+func (g *Geom) MaximumInscribedCircle(tolerance float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSMaximumInscribedCircle_r(g.context.handle, g.geom, C.double(tolerance)), nil)
+}
+
 func (g *Geom) MinimumRotatedRectangle() *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()

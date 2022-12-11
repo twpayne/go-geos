@@ -154,6 +154,11 @@
 - name: Length
   comment: returns g's length
   type: float64Property
+- name: MaximumInscribedCircle
+  type: unary
+  extraArgs:
+  - name: tolerance
+    type: float64
 - name: MinimumRotatedRectangle
   type: unary
 - name: MinimumWidth

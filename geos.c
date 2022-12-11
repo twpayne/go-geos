@@ -282,6 +282,12 @@ GEOSGeometry *GEOSIntersectionPrec_r(GEOSContextHandle_t handle,
   return NULL;
 }
 
+GEOSGeometry *GEOSMaximumInscribedCircle_r(GEOSContextHandle_t handle,
+                                           const GEOSGeometry *g,
+                                           double tolerance) {
+  return NULL;
+}
+
 GEOSGeoJSONReader *GEOSGeoJSONReader_create_r(GEOSContextHandle_t handle) {
   return NULL;
 }

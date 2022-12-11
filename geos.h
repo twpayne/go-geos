@@ -48,6 +48,9 @@ int GEOSFrechetDistanceDensify_r(GEOSContextHandle_t handle,
 GEOSGeometry *GEOSIntersectionPrec_r(GEOSContextHandle_t handle,
                                      const GEOSGeometry *g1,
                                      const GEOSGeometry *g2, double gridSize);
+GEOSGeometry *GEOSMaximumInscribedCircle_r(GEOSContextHandle_t handle,
+                                           const GEOSGeometry *g,
+                                           double tolerance);
 
 struct GEOSGeoJSONReader_t {};
 typedef struct GEOSGeoJSONReader_t GEOSGeoJSONReader;
