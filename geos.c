@@ -276,6 +276,18 @@ int GEOSFrechetDistanceDensify_r(GEOSContextHandle_t handle,
   return 0;
 }
 
+GEOSGeometry *GEOSIntersectionPrec_r(GEOSContextHandle_t handle,
+                                     const GEOSGeometry *g1,
+                                     const GEOSGeometry *g2, double gridSize) {
+  return NULL;
+}
+
+GEOSGeometry *GEOSMaximumInscribedCircle_r(GEOSContextHandle_t handle,
+                                           const GEOSGeometry *g,
+                                           double tolerance) {
+  return NULL;
+}
+
 GEOSGeoJSONReader *GEOSGeoJSONReader_create_r(GEOSContextHandle_t handle) {
   return NULL;
 }
@@ -299,6 +311,17 @@ void GEOSGeoJSONWriter_destroy_r(GEOSContextHandle_t handle,
 char *GEOSGeoJSONWriter_writeGeometry_r(GEOSContextHandle_t handle,
                                         GEOSGeoJSONWriter *writer,
                                         const GEOSGeometry *g, int indent) {
+  return NULL;
+}
+
+#endif
+
+#if GEOS_VERSION_MAJOR < 3 ||                                                  \
+    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 11)
+
+GEOSGeometry *GEOSConcaveHull_r(GEOSContextHandle_t handle,
+                                const GEOSGeometry *g, double ratio,
+                                unsigned int allowHoles) {
   return NULL;
 }
 

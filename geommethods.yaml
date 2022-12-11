@@ -8,10 +8,31 @@
     type: float64
   - name: quadsegs
     type: int
+- name: BufferWithStyle
+  comment: returns a buffer using the provided style parameters
+  type: unary
+  extraArgs:
+  - name: width
+    type: float64
+  - name: quadsegs
+    type: int
+  - name: endCapStyle
+    type: BufCapStyle
+  - name: joinStyle
+    type: BufJoinStyle
+  - name: mitreLimit
+    type: float64
 - name: Clone
   comment: returns a clone of g
   type: unary
   geosFunction: GEOSGeom_clone_r
+- name: ConcaveHull
+  type: unary
+  extraArgs:
+  - name: ratio
+    type: float64
+  - name: allowHoles
+    type: uint
 - name: ConvexHull
   comment: returns g's convex hull
   type: unary
@@ -86,8 +107,27 @@
   extraArgs:
   - name: densifyFrac
     type: float64
+- name: Interpolate
+  comment: returns a point distance d from the start of g, which must be a linestring
+  type: unary
+  nil: true
+  extraArgs:
+  - name: d
+    type: float64
+- name: InterpolateNormalized
+  comment: returns the point that is at proportion from the start
+  type: unary
+  nil: true
+  extraArgs:
+  - name: proportion
+    type: float64
 - name: Intersection
   type: binary
+- name: IntersectionPrec
+  type: binary
+  extraArgs:
+  - name: gridSize
+    type: float64
 - name: Intersects
   comment: returns true if g intersects other
   type: binaryPredicate
@@ -114,12 +154,48 @@
 - name: Length
   comment: returns g's length
   type: float64Property
+- name: MaximumInscribedCircle
+  type: unary
+  extraArgs:
+  - name: tolerance
+    type: float64
+- name: MinimumRotatedRectangle
+  type: unary
 - name: MinimumWidth
   type: unary
   comment: returns a linestring geometry which represents the minimum diameter of g
+- name: OffsetCurve
+  type: unary
+  extraArgs:
+  - name: width
+    type: float64
+  - name: quadsegs
+    type: int
+  #- name: endCapStyle
+  #  type: BufCapStyle
+  - name: joinStyle
+    type: BufJoinStyle
+  - name: mitreLimit
+    type: float64
 - name: Overlaps
   comment: returns true if g overlaps other
   type: binaryPredicate
+#- name: PolygonHoleSimplify
+#  type: unary
+#  extraArgs:
+#  - name: isOuter
+#    type: int
+#  - name: vertexNumFraction
+#    type: float64
+#- name: PolygonHoleSimplifyMode
+#  type: unary
+#  extraArgs:
+#  - name: isOuter
+#    type: int
+#  - name: parameterMode
+#    type: uint
+#  - name: vertexNumFraction
+#    type: float64
 - name: Touches
   comment: returns true if g touches other
   type: binaryPredicate

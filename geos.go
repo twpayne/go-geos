@@ -27,6 +27,24 @@ const (
 	TypeIDGeometryCollection TypeID = C.GEOS_GEOMETRYCOLLECTION
 )
 
+type BufCapStyle int
+
+// Buffer cap styles.
+const (
+	BufCapStyleRound  BufCapStyle = C.GEOSBUF_CAP_ROUND
+	BufCapStyleFlat   BufCapStyle = C.GEOSBUF_CAP_FLAT
+	BufCapStyleSquare BufCapStyle = C.GEOSBUF_CAP_SQUARE
+)
+
+type BufJoinStyle int
+
+// Buffer join styles.
+const (
+	BufJoinStyleRound BufJoinStyle = C.GEOSBUF_JOIN_ROUND
+	BufJoinStyleMitre BufJoinStyle = C.GEOSBUF_JOIN_MITRE
+	BufJoinStyleBevel BufJoinStyle = C.GEOSBUF_JOIN_BEVEL
+)
+
 // An Error is an error returned by GEOS.
 type Error string
 

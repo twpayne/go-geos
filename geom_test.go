@@ -306,6 +306,17 @@ func TestBinaryMethods(t *testing.T) {
 	assert.True(t, mustNewGeomFromWKT(t, c, "POINT (0 0)").Equals(difference))
 }
 
+func TestGeomInterpolate(t *testing.T) {
+	defer runtime.GC() // Exercise finalizers.
+	c := NewContext()
+
+	lineString := mustNewGeomFromWKT(t, c, "LINESTRING (0 0,1 0)")
+	assert.True(t, mustNewGeomFromWKT(t, c, "POINT (0.5 0)").Equals(lineString.Interpolate(0.5)))
+
+	point := mustNewGeomFromWKT(t, c, "POINT (0 0)")
+	assert.Nil(t, point.Interpolate(0.5))
+}
+
 func TestNewGeomFromGeoJSON(t *testing.T) {
 	skipIfVersionLessThan(t, 3, 10, 0)
 	for i, tc := range []struct {
