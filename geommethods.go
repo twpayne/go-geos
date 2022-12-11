@@ -476,6 +476,13 @@ func (g *Geom) MinimumWidth() *Geom {
 	return g.context.newNonNilGeom(C.GEOSMinimumWidth_r(g.context.handle, g.geom), nil)
 }
 
+func (g *Geom) OffsetCurve(width float64, quadsegs int, joinStyle BufJoinStyle, mitreLimit float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSOffsetCurve_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs), C.int(joinStyle), C.double(mitreLimit)), nil)
+}
+
 // Overlaps returns true if g overlaps other.
 func (g *Geom) Overlaps(other *Geom) bool {
 	g.mustNotBeDestroyed()

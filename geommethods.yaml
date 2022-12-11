@@ -145,6 +145,19 @@
 - name: MinimumWidth
   type: unary
   comment: returns a linestring geometry which represents the minimum diameter of g
+- name: OffsetCurve
+  type: unary
+  extraArgs:
+  - name: width
+    type: float64
+  - name: quadsegs
+    type: int
+  #- name: endCapStyle
+  #  type: BufCapStyle
+  - name: joinStyle
+    type: BufJoinStyle
+  - name: mitreLimit
+    type: float64
 - name: Overlaps
   comment: returns true if g overlaps other
   type: binaryPredicate
