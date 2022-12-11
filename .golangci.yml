@@ -10,6 +10,7 @@ linters:
   - depguard
   - dogsled
   - dupl
+  - dupword
   - durationcheck
   - errcheck
   - errchkjson
@@ -20,6 +21,8 @@ linters:
   - exportloopref
   - forbidigo
   - forcetypeassert
+  - gci
+  - gochecknoinits
   - goconst
   - gocritic
   - godot
@@ -37,6 +40,7 @@ linters:
   - ineffassign
   - interfacebloat
   - ireturn
+  - loggercheck
   - misspell
   - nakedret
   - nilerr
@@ -45,45 +49,41 @@ linters:
   - nosprintfhostport
   - prealloc
   - predeclared
+  - promlinter
+  - reassign
   - staticcheck
   - stylecheck
   - tagliatelle
   - tenv
+  - testableexamples
   - thelper
   - typecheck
   - unconvert
   - unparam
   - unused
+  - usestdlibvars
   - whitespace
   disable:
   - cyclop
-  - exhaustivestruct
   - exhaustruct
   - funlen
-  - gci
   - gochecknoglobals
-  - gochecknoinits
   - gocognit
   - gocyclo
   - godox
   - goheader
   - gomnd
   - gomoddirectives
-  - ifshort
   - lll
   - maintidx
   - makezero
   - nestif
   - nlreturn
-  - nlreturn
   - nolintlint
   - paralleltest
-  - promlinter
   - revive
   - rowserrcheck # https://github.com/golangci/golangci-lint/issues/2649
-  - scopelint
   - sqlclosecheck # https://github.com/golangci/golangci-lint/issues/2649
-  - structcheck # https://github.com/golangci/golangci-lint/issues/2649
   - testpackage
   - tparallel
   - varnamelen
@@ -92,6 +92,11 @@ linters:
   - wsl
 
 linters-settings:
+  gci:
+    sections:
+    - standard
+    - default
+    - prefix(github.com/twpayne/go-geos)
   goimports:
     local-prefixes: github.com/twpayne/go-geos
 
