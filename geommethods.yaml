@@ -173,6 +173,22 @@
 - name: Overlaps
   comment: returns true if g overlaps other
   type: binaryPredicate
+#- name: PolygonHoleSimplify
+#  type: unary
+#  extraArgs:
+#  - name: isOuter
+#    type: int
+#  - name: vertexNumFraction
+#    type: float64
+#- name: PolygonHoleSimplifyMode
+#  type: unary
+#  extraArgs:
+#  - name: isOuter
+#    type: int
+#  - name: parameterMode
+#    type: uint
+#  - name: vertexNumFraction
+#    type: float64
 - name: Touches
   comment: returns true if g touches other
   type: binaryPredicate
