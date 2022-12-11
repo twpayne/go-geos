@@ -486,6 +486,13 @@ func (g *Geom) Length() float64 {
 	return length
 }
 
+func (g *Geom) MinimumRotatedRectangle() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSMinimumRotatedRectangle_r(g.context.handle, g.geom), nil)
+}
+
 // MinimumWidth returns a linestring geometry which represents the minimum diameter of g.
 func (g *Geom) MinimumWidth() *Geom {
 	g.mustNotBeDestroyed()

@@ -154,6 +154,8 @@
 - name: Length
   comment: returns g's length
   type: float64Property
+- name: MinimumRotatedRectangle
+  type: unary
 - name: MinimumWidth
   type: unary
   comment: returns a linestring geometry which represents the minimum diameter of g
