@@ -9,6 +9,7 @@ on:
 jobs:
   main:
     strategy:
+      fail-fast: false
       matrix:
         go-version:
         - 1.x
