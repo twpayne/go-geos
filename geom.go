@@ -14,7 +14,7 @@ type Geom struct {
 	context          *Context
 	geom             *C.struct_GEOSGeom_t
 	parent           *Geom
-	typeID           GeometryTypeID
+	typeID           TypeID
 	numGeometries    int
 	numInteriorRings int
 	numPoints        int
@@ -231,7 +231,7 @@ func (g *Geom) Type() string {
 }
 
 // TypeID returns g's geometry type id.
-func (g *Geom) TypeID() GeometryTypeID {
+func (g *Geom) TypeID() TypeID {
 	g.mustNotBeDestroyed()
 	return g.typeID
 }

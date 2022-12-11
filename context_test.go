@@ -19,14 +19,14 @@ func TestGeometryConstructors(t *testing.T) {
 		{
 			name: "NewCollection_MultiPoint_empty",
 			newGeomFunc: func(c *Context) *Geom {
-				return c.NewCollection(MultiPointTypeID, nil)
+				return c.NewCollection(TypeIDMultiPoint, nil)
 			},
 			expectedWKT: "MULTIPOINT EMPTY",
 		},
 		{
 			name: "NewCollection_MultiPoint_one",
 			newGeomFunc: func(c *Context) *Geom {
-				return c.NewCollection(MultiPointTypeID, []*Geom{
+				return c.NewCollection(TypeIDMultiPoint, []*Geom{
 					c.NewPoint([]float64{0, 1}),
 				})
 			},
@@ -35,7 +35,7 @@ func TestGeometryConstructors(t *testing.T) {
 		{
 			name: "NewCollection_MultiPoint_many",
 			newGeomFunc: func(c *Context) *Geom {
-				return c.NewCollection(MultiPointTypeID, []*Geom{
+				return c.NewCollection(TypeIDMultiPoint, []*Geom{
 					c.NewPoint([]float64{0, 1}),
 					c.NewPoint([]float64{2, 3}),
 					c.NewPoint([]float64{4, 5}),
@@ -46,31 +46,31 @@ func TestGeometryConstructors(t *testing.T) {
 		{
 			name: "NewCollection_MultiLineString_empty",
 			newGeomFunc: func(c *Context) *Geom {
-				return c.NewCollection(MultiLineStringTypeID, nil)
+				return c.NewCollection(TypeIDMultiLineString, nil)
 			},
 			expectedWKT: "MULTILINESTRING EMPTY",
 		},
 		{
 			name: "NewCollection_MultiPolygon_empty",
 			newGeomFunc: func(c *Context) *Geom {
-				return c.NewCollection(MultiPolygonTypeID, nil)
+				return c.NewCollection(TypeIDMultiPolygon, nil)
 			},
 			expectedWKT: "MULTIPOLYGON EMPTY",
 		},
 		{
 			name: "NewCollection_GeometryCollection_empty",
 			newGeomFunc: func(c *Context) *Geom {
-				return c.NewCollection(GeometryCollectionTypeID, nil)
+				return c.NewCollection(TypeIDGeometryCollection, nil)
 			},
 			expectedWKT: "GEOMETRYCOLLECTION EMPTY",
 		},
 		{
 			name: "NewCollection_GeometryCollection_many",
 			newGeomFunc: func(c *Context) *Geom {
-				return c.NewCollection(GeometryCollectionTypeID, []*Geom{
+				return c.NewCollection(TypeIDGeometryCollection, []*Geom{
 					c.NewPoint([]float64{0, 1}),
 					c.NewLineString([][]float64{{2, 3}, {4, 5}}),
-					c.NewCollection(MultiPointTypeID, []*Geom{
+					c.NewCollection(TypeIDMultiPoint, []*Geom{
 						c.NewPoint([]float64{6, 7}),
 					}),
 				})
@@ -80,28 +80,28 @@ func TestGeometryConstructors(t *testing.T) {
 		{
 			name: "NewEmptyCollection_MultiPoint",
 			newGeomFunc: func(c *Context) *Geom {
-				return c.NewEmptyCollection(MultiPointTypeID)
+				return c.NewEmptyCollection(TypeIDMultiPoint)
 			},
 			expectedWKT: "MULTIPOINT EMPTY",
 		},
 		{
 			name: "NewEmptyCollection_MultiLineString",
 			newGeomFunc: func(c *Context) *Geom {
-				return c.NewEmptyCollection(MultiLineStringTypeID)
+				return c.NewEmptyCollection(TypeIDMultiLineString)
 			},
 			expectedWKT: "MULTILINESTRING EMPTY",
 		},
 		{
 			name: "NewEmptyCollection_MultiPolygon",
 			newGeomFunc: func(c *Context) *Geom {
-				return c.NewEmptyCollection(MultiPolygonTypeID)
+				return c.NewEmptyCollection(TypeIDMultiPolygon)
 			},
 			expectedWKT: "MULTIPOLYGON EMPTY",
 		},
 		{
 			name: "NewEmptyCollection_GeometryCollection",
 			newGeomFunc: func(c *Context) *Geom {
-				return c.NewEmptyCollection(GeometryCollectionTypeID)
+				return c.NewEmptyCollection(TypeIDGeometryCollection)
 			},
 			expectedWKT: "GEOMETRYCOLLECTION EMPTY",
 		},

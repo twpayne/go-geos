@@ -14,7 +14,7 @@ func NewGeomFromBounds(bounds *Bounds) *Geom {
 }
 
 // NewCollection returns a new collection.
-func NewCollection(typeID GeometryTypeID, geoms []*Geom) *Geom {
+func NewCollection(typeID TypeID, geoms []*Geom) *Geom {
 	return defaultContext.NewCollection(typeID, geoms)
 }
 
@@ -29,7 +29,7 @@ func NewCoordSeqFromCoords(coords [][]float64) *CoordSeq {
 }
 
 // NewEmptyCollection returns a new empty collection.
-func NewEmptyCollection(typeID GeometryTypeID) *Geom {
+func NewEmptyCollection(typeID TypeID) *Geom {
 	return defaultContext.NewEmptyCollection(typeID)
 }
 
