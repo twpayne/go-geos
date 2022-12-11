@@ -26,6 +26,13 @@
   comment: returns a clone of g
   type: unary
   geosFunction: GEOSGeom_clone_r
+- name: ConcaveHull
+  type: unary
+  extraArgs:
+  - name: ratio
+    type: float64
+  - name: allowHoles
+    type: uint
 - name: ConvexHull
   comment: returns g's convex hull
   type: unary

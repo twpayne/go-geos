@@ -309,3 +309,14 @@ char *GEOSGeoJSONWriter_writeGeometry_r(GEOSContextHandle_t handle,
 }
 
 #endif
+
+#if GEOS_VERSION_MAJOR < 3 ||                                                  \
+    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 11)
+
+GEOSGeometry *GEOSConcaveHull_r(GEOSContextHandle_t handle,
+                                const GEOSGeometry *g, double ratio,
+                                unsigned int allowHoles) {
+  return NULL;
+}
+
+#endif

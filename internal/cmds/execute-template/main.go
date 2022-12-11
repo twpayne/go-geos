@@ -23,6 +23,7 @@ var (
 		"BufJoinStyle": "C.int",
 		"float64":      "C.double",
 		"int":          "C.int",
+		"uint":         "C.unsigned",
 	}
 )
 

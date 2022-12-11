@@ -40,6 +40,13 @@ func (g *Geom) Clone() *Geom {
 	return g.context.newNonNilGeom(C.GEOSGeom_clone_r(g.context.handle, g.geom), nil)
 }
 
+func (g *Geom) ConcaveHull(ratio float64, allowHoles uint) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSConcaveHull_r(g.context.handle, g.geom, C.double(ratio), C.unsigned(allowHoles)), nil)
+}
+
 // ConvexHull returns g's convex hull.
 func (g *Geom) ConvexHull() *Geom {
 	g.mustNotBeDestroyed()
