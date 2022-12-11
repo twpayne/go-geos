@@ -20,7 +20,7 @@ func TestGeometryMethods(t *testing.T) {
 		expectedNumGeometries int
 		expectedSRID          int
 		expectedType          string
-		expectedTypeID        GeometryTypeID
+		expectedTypeID        TypeID
 		expectedArea          float64
 		expectedLength        float64
 	}{
@@ -33,7 +33,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
 			expectedType:          "Point",
-			expectedTypeID:        PointTypeID,
+			expectedTypeID:        TypeIDPoint,
 			expectedArea:          0,
 			expectedLength:        0,
 		},
@@ -46,7 +46,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
 			expectedType:          "Point",
-			expectedTypeID:        PointTypeID,
+			expectedTypeID:        TypeIDPoint,
 			expectedArea:          0,
 			expectedLength:        0,
 		},
@@ -59,7 +59,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
 			expectedType:          "LineString",
-			expectedTypeID:        LineStringTypeID,
+			expectedTypeID:        TypeIDLineString,
 			expectedArea:          0,
 			expectedLength:        math.Sqrt(2),
 		},
@@ -72,7 +72,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
 			expectedType:          "LineString",
-			expectedTypeID:        LineStringTypeID,
+			expectedTypeID:        TypeIDLineString,
 			expectedArea:          0,
 			expectedLength:        0,
 		},
@@ -85,7 +85,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
 			expectedType:          "Polygon",
-			expectedTypeID:        PolygonTypeID,
+			expectedTypeID:        TypeIDPolygon,
 			expectedArea:          0.5,
 			expectedLength:        math.Sqrt(2) + 2,
 		},
@@ -98,7 +98,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
 			expectedType:          "Polygon",
-			expectedTypeID:        PolygonTypeID,
+			expectedTypeID:        TypeIDPolygon,
 			expectedArea:          0,
 			expectedLength:        0,
 		},

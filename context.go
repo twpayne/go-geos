@@ -69,7 +69,7 @@ func (c *Context) Clone(g *Geom) *Geom {
 }
 
 // NewCollection returns a new collection.
-func (c *Context) NewCollection(typeID GeometryTypeID, geoms []*Geom) *Geom {
+func (c *Context) NewCollection(typeID TypeID, geoms []*Geom) *Geom {
 	if len(geoms) == 0 {
 		return c.NewEmptyCollection(typeID)
 	}
@@ -101,7 +101,7 @@ func (c *Context) NewCoordSeqFromCoords(coords [][]float64) *CoordSeq {
 }
 
 // NewEmptyCollection returns a new empty collection.
-func (c *Context) NewEmptyCollection(typeID GeometryTypeID) *Geom {
+func (c *Context) NewEmptyCollection(typeID TypeID) *Geom {
 	c.Lock()
 	defer c.Unlock()
 	return c.newNonNilGeom(C.GEOSGeom_createEmptyCollection_r(c.handle, C.int(typeID)), nil)
@@ -138,7 +138,7 @@ func (c *Context) NewGeomFromBounds(bounds *Bounds) *Geom {
 	g := &Geom{
 		context:       c,
 		geom:          geom,
-		typeID:        GeometryTypeID(typeID),
+		typeID:        TypeID(typeID),
 		numGeometries: 1,
 	}
 	runtime.SetFinalizer(g, (*Geom).finalize)
@@ -355,7 +355,7 @@ func (c *Context) newGeom(geom *C.struct_GEOSGeom_t, parent *Geom) *Geom {
 		context:          c,
 		geom:             geom,
 		parent:           parent,
-		typeID:           GeometryTypeID(typeID),
+		typeID:           TypeID(typeID),
 		numGeometries:    int(numGeometries),
 		numInteriorRings: int(numInteriorRings),
 		numPoints:        int(numPoints),

@@ -20,6 +20,7 @@ var (
 
 	cTypes = map[string]string{
 		"float64": "C.double",
+		"int":     "C.int",
 	}
 )
 
