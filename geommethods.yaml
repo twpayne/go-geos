@@ -94,18 +94,23 @@
 - name: IsClosed
   comment: returns true if g is closed
   type: unaryPredicate
+  geosFunction: GEOSisClosed_r
 - name: IsEmpty
   comment: returns true if g is empty
   type: unaryPredicate
+  geosFunction: GEOSisEmpty_r
 - name: IsRing
   comment: returns true if g is a ring
   type: unaryPredicate
+  geosFunction: GEOSisRing_r
 - name: IsSimple
   comment: returns true if g is simple
   type: unaryPredicate
+  geosFunction: GEOSisSimple_r
 - name: IsValid
   comment: returns true if g is valid
   type: unaryPredicate
+  geosFunction: GEOSisValid_r
 - name: Length
   comment: returns g's length
   type: float64Property

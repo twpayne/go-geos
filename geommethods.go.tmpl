@@ -5,48 +5,44 @@ package geos
 // #include "geos.h"
 import "C"
 
-{{ range . }}
+{{- range . }}
+{{-   $geosFunction := printf "GEOS%s_r" .name }}
+{{-   if .geosFunction }}
+{{-     $geosFunction = .geosFunction }}
+{{-   end }}
 
-{{   if (eq .type "unary") }}
-{{     $geosFunction := printf "GEOS%s_r" .name }}
-{{     if .geosFunction }}
-{{       $geosFunction = .geosFunction }}
-{{     end }}
+{{-   if eq .type "unary" }}
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}({{ range $index, $arg := .extraArgs }}{{ if $index }}, {{ end }}{{ $arg.name }} {{ $arg.type }}{{ end }}) *Geom {
-    g.mustNotBeDestroyed()
-    g.context.Lock()
-    defer g.context.Unlock()
-    return g.context.newNonNilGeom(C.{{ $geosFunction }}(g.context.handle, g.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}), nil)
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.new{{ if not .nil }}NonNil{{ end }}Geom(C.{{ $geosFunction }}(g.context.handle, g.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}), nil)
 }
 
-{{   else if (eq .type "binary") }}
-{{     $geosFunction := printf "GEOS%s_r" .name }}
-{{     if .geosFunction }}
-{{       $geosFunction = .geosFunction }}
-{{     end }}
+{{-   else if eq .type "binary" }}
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) *Geom {
-    g.mustNotBeDestroyed()
-    g.context.Lock()
-    defer g.context.Unlock()
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
 	if other.context != g.context {
 		other.context.Lock()
 		defer other.context.Unlock()
 	}
-    return g.context.newGeom(C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}), nil)
+	return g.context.newGeom(C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}), nil)
 }
 
-{{   else if (eq .type "unaryPredicate") }}
+{{-   else if eq .type "unaryPredicate" }}
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}() bool {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	switch C.GEOS{{ .name | replaceAllRegexp "^I" "i" }}_r(g.context.handle, g.geom) {
+	switch C.{{ $geosFunction }}(g.context.handle, g.geom) {
 	case 0:
 		return false
 	case 1:
@@ -56,7 +52,7 @@ func (g *Geom) {{ .name }}() bool {
 	}
 }
 
-{{   else if (eq .type "binaryPredicate") }}
+{{-   else if eq .type "binaryPredicate" }}
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) bool {
@@ -67,7 +63,7 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 		other.context.Lock()
 		defer other.context.Unlock()
 	}
-	switch C.GEOS{{ .name }}_r(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}) {
+	switch C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}) {
 	case 0:
 		return false
 	case 1:
@@ -77,12 +73,8 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 	}
 }
 
-{{   else if (eq .type "float64Property") }}
-{{     $geosFunction := printf "GEOS%s_r" .name }}
-{{     if .geosFunction }}
-{{       $geosFunction = .geosFunction }}
-{{     end }}
-{{     $varName := .name | firstRuneToLower }}
+{{-   else if eq .type "float64Property" }}
+{{-     $varName := .name | firstRuneToLower }}
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}() float64 {
@@ -96,12 +88,8 @@ func (g *Geom) {{ .name }}() float64 {
 	return {{ $varName }}
 }
 
-{{   else if (eq .type "float64BinaryProperty") }}
-{{     $geosFunction := printf "GEOS%s_r" .name }}
-{{     if .geosFunction }}
-{{       $geosFunction = .geosFunction }}
-{{     end }}
-{{     $varName := .name | firstRuneToLower }}
+{{-   else if eq .type "float64BinaryProperty" }}
+{{-     $varName := .name | firstRuneToLower }}
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) float64 {
@@ -119,6 +107,6 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 	return {{ $varName }}
 }
 
-{{   end }}
+{{-  end }}
 
-{{ end }}
+{{- end }}
