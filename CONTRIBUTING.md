@@ -42,7 +42,6 @@ releases](https://ubuntu.com/about/release-cycle). These are:
 
 | Ubuntu Version | `libgeos` version |
 | -------------- | ----------------- |
-| 18.04 LTS      | 3.6.2             |
 | 20.04 LTS      | 3.8.0             |
 | 22.04 LTS      | 3.10.2            |
 
