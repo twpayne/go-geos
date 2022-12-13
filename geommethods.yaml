@@ -154,6 +154,9 @@
 - name: Length
   comment: returns g's length
   type: float64Property
+- name: MakeValid
+  comment: repair an invalid geometry, returning a valid output
+  type: unary
 - name: MaximumInscribedCircle
   type: unary
   extraArgs:
