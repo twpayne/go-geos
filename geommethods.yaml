@@ -196,6 +196,8 @@
 #    type: uint
 #  - name: vertexNumFraction
 #    type: float64
+- name: SymDifference
+  type: binary
 - name: Touches
   comment: returns true if g touches other
   type: binaryPredicate
