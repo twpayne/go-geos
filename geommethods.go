@@ -486,7 +486,7 @@ func (g *Geom) Length() float64 {
 	return length
 }
 
-// MakeValid Repair an invalid geometry, returning a valid output..
+// MakeValid repair an invalid geometry, returning a valid output.
 func (g *Geom) MakeValid() *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
