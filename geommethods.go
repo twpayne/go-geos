@@ -534,6 +534,17 @@ func (g *Geom) Overlaps(other *Geom) bool {
 	}
 }
 
+func (g *Geom) SymDifference(other *Geom) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSSymDifference_r(g.context.handle, g.geom, other.geom), nil)
+}
+
 // Touches returns true if g touches other.
 func (g *Geom) Touches(other *Geom) bool {
 	g.mustNotBeDestroyed()
