@@ -19,11 +19,12 @@ var (
 	outputFilename       = flag.String("output", "", "output filename")
 
 	cTypes = map[string]string{
-		"BufCapStyle":  "C.int",
-		"BufJoinStyle": "C.int",
-		"float64":      "C.double",
-		"int":          "C.int",
-		"uint":         "C.unsigned",
+		"BufCapStyle":      "C.int",
+		"BufJoinStyle":     "C.int",
+		"float64":          "C.double",
+		"int":              "C.int",
+		"uint":             "C.unsigned",
+		"...PrecisionRule": "PrecisionRulesOr",
 	}
 )
 

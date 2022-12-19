@@ -57,6 +57,30 @@ var (
 	errIndexOutOfRange     = Error("index out of range")
 )
 
+type PrecisionRule int
+
+// PrecisionRules.
+const (
+	// The output is always valid. Collapsed geometry elements
+	// (including both polygons and lines) are removed.
+	PrecisionRuleValidOutput PrecisionRule = C.GEOS_PREC_VALID_OUTPUT
+	// Precision reduction is performed pointwise. Output geometry may
+	// be invalid due to collapse or self-intersection.
+	PrecisionRulePointwise PrecisionRule = C.GEOS_PREC_NO_TOPO
+	// Like the default mode, except that collapsed linear geometry
+	// elements are preserved. Collapsed polygonal input elements are
+	// removed.
+	PrecisionRuleKeepCollapsed PrecisionRule = C.GEOS_PREC_KEEP_COLLAPSED
+)
+
+func PrecisionRulesOr(flags []PrecisionRule) C.int {
+	result := 0
+	for _, rule := range flags {
+		result |= int(rule)
+	}
+	return C.int(result)
+}
+
 // versionEqualOrGreaterThan returns true if the GEOS version is at least
 // major.minor.patch.
 func versionEqualOrGreaterThan(major, minor, patch int) bool {
