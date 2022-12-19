@@ -63,7 +63,7 @@ type PrecisionRule int
 const (
 	// The output is always valid. Collapsed geometry elements
 	// (including both polygons and lines) are removed.
-	PrecisionRuleValidOutput PrecisionRule = C.GEOS_PREC_VALID_OUTPUT
+	PrecisionRuleValidOutput PrecisionRule = 0 // C.GEOS_PREC_VALID_OUTPUT
 	// Precision reduction is performed pointwise. Output geometry may
 	// be invalid due to collapse or self-intersection.
 	PrecisionRulePointwise PrecisionRule = C.GEOS_PREC_NO_TOPO
