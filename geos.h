@@ -25,6 +25,8 @@ GEOSGeometry *c_newGEOSGeomFromBounds_r(GEOSContextHandle_t handle, int *typeID,
 #if GEOS_VERSION_MAJOR < 3 ||                                                  \
     (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 10)
 
+#define GEOS_PREC_VALID_OUTPUT 0
+
 GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
                             double tolerance);
 GEOSGeometry *GEOSDifferencePrec_r(GEOSContextHandle_t handle,

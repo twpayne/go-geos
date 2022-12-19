@@ -199,6 +199,14 @@
 #    type: uint
 #  - name: vertexNumFraction
 #    type: float64
+- name: SetPrecision
+  type: unary
+  geosFunction: GEOSGeom_setPrecision_r
+  extraArgs:
+    - name: gridSize
+      type: float64
+    - name: flags
+      type: PrecisionRule
 - name: SymDifference
   type: binary
 - name: Touches

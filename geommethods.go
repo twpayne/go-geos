@@ -542,6 +542,13 @@ func (g *Geom) Overlaps(other *Geom) bool {
 	}
 }
 
+func (g *Geom) SetPrecision(gridSize float64, flags PrecisionRule) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSGeom_setPrecision_r(g.context.handle, g.geom, C.double(gridSize), C.int(flags)), nil)
+}
+
 func (g *Geom) SymDifference(other *Geom) *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
