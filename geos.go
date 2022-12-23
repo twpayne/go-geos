@@ -57,6 +57,15 @@ var (
 	errIndexOutOfRange     = Error("index out of range")
 )
 
+type PrecisionRule int
+
+// Precision rules.
+const (
+	PrecisionRuleValidOutput   PrecisionRule = C.GEOS_PREC_VALID_OUTPUT
+	PrecisionRulePointwise     PrecisionRule = C.GEOS_PREC_NO_TOPO
+	PrecisionRuleKeepCollapsed PrecisionRule = C.GEOS_PREC_KEEP_COLLAPSED
+)
+
 // versionEqualOrGreaterThan returns true if the GEOS version is at least
 // major.minor.patch.
 func versionEqualOrGreaterThan(major, minor, patch int) bool {
