@@ -25,7 +25,7 @@ jobs:
     - uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f
       with:
         go-version: ${{ matrix.go-version }}
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
+    - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
     - uses: actions/cache@4723a57e26efda3a62cbde1812113b730952852d
       with:
         path: ~/go/pkg/mod
@@ -49,7 +49,7 @@ jobs:
     - uses: actions/setup-go@c4a742cab115ed795e34d4513e2cf7d472deb55f
       with:
         go-version: 1.x
-    - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8
+    - uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b
     - uses: golangci/golangci-lint-action@0ad9a0988b3973e851ab0a07adf248ec2e100376
       with:
         version: v1.50.1
