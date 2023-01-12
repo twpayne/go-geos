@@ -216,6 +216,12 @@
   comment: returns the union of all components of a single geometry
   type: unary
   geosFunction: GEOSUnaryUnion_r
+- name: UnaryUnionPrec
+  comment: returns the union of all components of a single geometry
+  type: unary
+  extraArgs:
+  - name: gridSize
+    type: float64
 - name: Within
   comment: returns true if g is within other
   type: binaryPredicate

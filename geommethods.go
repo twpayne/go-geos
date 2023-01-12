@@ -587,6 +587,14 @@ func (g *Geom) UnaryUnion() *Geom {
 	return g.context.newNonNilGeom(C.GEOSUnaryUnion_r(g.context.handle, g.geom), nil)
 }
 
+// UnaryUnionPrec returns the union of all components of a single geometry.
+func (g *Geom) UnaryUnionPrec(gridSize float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSUnaryUnionPrec_r(g.context.handle, g.geom, C.double(gridSize)), nil)
+}
+
 // Within returns true if g is within other.
 func (g *Geom) Within(other *Geom) bool {
 	g.mustNotBeDestroyed()
