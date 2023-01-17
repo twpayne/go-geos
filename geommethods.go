@@ -549,6 +549,14 @@ func (g *Geom) SetPrecision(gridSize float64, flags PrecisionRule) *Geom {
 	return g.context.newNonNilGeom(C.GEOSGeom_setPrecision_r(g.context.handle, g.geom, C.double(gridSize), C.int(flags)), nil)
 }
 
+// Simplify returns a simplified geometry.
+func (g *Geom) Simplify(tolerance float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSSimplify_r(g.context.handle, g.geom, C.double(tolerance)), nil)
+}
+
 func (g *Geom) SymDifference(other *Geom) *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
@@ -628,12 +636,4 @@ func (g *Geom) Y() float64 {
 		panic(g.context.err)
 	}
 	return y
-}
-
-// Simplify Apply the Douglas/Peucker algorithm to the coordinate sequences of the input geometry. Removes "unnecessary" vertices, vertices that are co-linear within the tolerance distance..
-func (g *Geom) Simplify(tolerance float64) *Geom {
-	g.mustNotBeDestroyed()
-	g.context.Lock()
-	defer g.context.Unlock()
-	return g.context.newNonNilGeom(C.GEOSSimplify_r(g.context.handle, g.geom, C.double(tolerance)), nil)
 }
