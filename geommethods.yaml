@@ -227,3 +227,10 @@
   comment: returns g's Y coordinate
   type: float64Property
   geosFunction: GEOSGeomGetY_r
+- name: Simplify
+  comment: Apply the Douglas/Peucker algorithm to the coordinate sequences of the input geometry. Removes "unnecessary" vertices, vertices that are co-linear within the tolerance distance. 
+  type: unary
+  geosFunction: GEOSSimplify_r  
+  extraArgs:
+  - name: tolerance
+    type: float64
