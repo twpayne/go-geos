@@ -27,6 +27,29 @@ const (
 	TypeIDGeometryCollection TypeID = C.GEOS_GEOMETRYCOLLECTION
 )
 
+func (g TypeID) String() string {
+	switch g {
+	case TypeIDPoint:
+		return "POINT"
+	case TypeIDLineString:
+		return "LINESTRING"
+	case TypeIDLinearRing:
+		return "LINEARRING"
+	case TypeIDPolygon:
+		return "POLYGON"
+	case TypeIDMultiPoint:
+		return "MULTIPOINT"
+	case TypeIDMultiLineString:
+		return "MULTILINESTRING"
+	case TypeIDMultiPolygon:
+		return "MULTIPOLYGON"
+	case TypeIDGeometryCollection:
+		return "GEOMETRYCOLLECTION"
+	}
+
+	return "UNKNOWN"
+}
+
 type BufCapStyle int
 
 // Buffer cap styles.

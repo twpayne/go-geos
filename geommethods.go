@@ -5,6 +5,10 @@ package geos
 // #include "geos.h"
 import "C"
 
+import (
+	"fmt"
+)
+
 // Area returns g's area.
 func (g *Geom) Area() float64 {
 	g.mustNotBeDestroyed()
@@ -644,4 +648,50 @@ func (g *Geom) Y() float64 {
 		panic(g.context.err)
 	}
 	return y
+}
+
+
+// GetPoints returns g's coordinates.
+func (g *Geom) GetPoints(list ...*Geom) (*[][]float64, error) {
+	var res [][]float64
+	var err error
+
+	for _, g := range list {
+		_type := g.TypeID()
+
+		switch _type {
+		case TypeIDPoint, TypeIDLineString, TypeIDLinearRing, TypeIDMultiPoint, TypeIDMultiLineString:
+			for i := 0; i < g.NumGeometries(); i++ {
+				p := g.Geometry(i)
+				res = append(res, p.CoordSeq().ToCoords()...)
+			}
+		case TypeIDPolygon:
+			l := g.ExteriorRing()
+			for i := 0; i < l.NumGeometries(); i++ {
+				p := l.Geometry(i)
+				res = append(res, p.CoordSeq().ToCoords()...)
+			}
+		case TypeIDMultiPolygon:
+			for i := 0; i < g.NumGeometries(); i++ {
+				t := g.Geometry(i)
+				l := t.ExteriorRing()
+				for i := 0; i < l.NumGeometries(); i++ {
+					p := l.Geometry(i)
+					res = append(res, p.CoordSeq().ToCoords()...)
+				}
+			}
+		case TypeIDGeometryCollection:
+			var subgeoms []*Geom
+			for i := 0; i < g.NumGeometries(); i++ {
+				subgeoms = append(subgeoms, g.Geometry(i))
+			}
+			s, err := g.GetPoints(subgeoms...)
+			res = append(res, *s...)
+			if err != nil {
+				return &res, fmt.Errorf("GetPoints %v %w %v", _type, err, subgeoms)
+			}
+		}
+	}
+
+	return &res, err
 }

@@ -29,6 +29,8 @@ GEOSGeometry *c_newGEOSGeomFromBounds_r(GEOSContextHandle_t handle, int *typeID,
 
 GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
                             double tolerance);
+GEOSGeometry *GEOSSimplify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
+                            double tolerance);
 GEOSGeometry *GEOSDifferencePrec_r(GEOSContextHandle_t handle,
                                    const GEOSGeometry *g1,
                                    const GEOSGeometry *g2, double gridSize);

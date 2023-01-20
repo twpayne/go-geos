@@ -244,6 +244,11 @@ GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
   return NULL;
 }
 
+GEOSGeometry *GEOSSimplify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
+                            double tolerance) {
+  return NULL;
+}
+
 GEOSGeometry *GEOSDifferencePrec_r(GEOSContextHandle_t handle,
                                    const GEOSGeometry *g1,
                                    const GEOSGeometry *g2, double gridSize) {
