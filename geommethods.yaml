@@ -215,6 +215,12 @@
     type: float64
 - name: SymDifference
   type: binary
+- name: TopologyPreserveSimplify
+  comment: returns a simplified geometry preserving topology
+  type: unary
+  extraArgs:
+  - name: tolerance
+    type: float64
 - name: Touches
   comment: returns true if g touches other
   type: binaryPredicate
