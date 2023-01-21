@@ -443,10 +443,7 @@ func TestGetPoints(t *testing.T) {
 			c := NewContext()
 			g := mustNewGeomFromWKT(t, c, tc.wkt)
 
-			points, err := g.GetPoints(g)
-			if err != nil {
-				t.Fatal(err)
-			}
+			points := g.GetPoints(g)
 			assert.Equal(t, tc.points, points)
 		})
 	}

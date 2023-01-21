@@ -5,10 +5,6 @@ package geos
 // #include "geos.h"
 import "C"
 
-import (
-	"fmt"
-)
-
 // Area returns g's area.
 func (g *Geom) Area() float64 {
 	g.mustNotBeDestroyed()
@@ -650,9 +646,8 @@ func (g *Geom) Y() float64 {
 	return y
 }
 
-
 // GetPoints returns g's coordinates.
-func (g *Geom) GetPoints(list ...*Geom) (*[][]float64, error) {
+func (g *Geom) GetPoints(list ...*Geom) *[][]float64 {
 	var res [][]float64
 	var err error
 
@@ -685,13 +680,12 @@ func (g *Geom) GetPoints(list ...*Geom) (*[][]float64, error) {
 			for i := 0; i < g.NumGeometries(); i++ {
 				subgeoms = append(subgeoms, g.Geometry(i))
 			}
-			s, err := g.GetPoints(subgeoms...)
+			s := g.GetPoints(subgeoms...)
 			res = append(res, *s...)
 			if err != nil {
-				return &res, fmt.Errorf("GetPoints %v %w %v", _type, err, subgeoms)
+				return &res
 			}
 		}
 	}
-
-	return &res, err
+	return &res
 }
