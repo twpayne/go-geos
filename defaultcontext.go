@@ -82,3 +82,15 @@ func NewPoint(coord []float64) *Geom {
 func NewPolygon(coordss [][][]float64) *Geom {
 	return defaultContext.NewPolygon(coordss)
 }
+
+// Polygonize returns a set of geometries which contains linework that
+// represents the edges of a planar graph.
+func Polygonize(geoms []*Geom) *Geom {
+	return defaultContext.Polygonize(geoms)
+}
+
+// PolygonizeValid returns a set of polygons which contains linework that
+// represents the edges of a planar graph.
+func PolygonizeValid(geoms []*Geom) *Geom {
+	return defaultContext.PolygonizeValid(geoms)
+}
