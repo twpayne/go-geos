@@ -46,7 +46,7 @@ func NewContext(options ...ContextOption) *Context {
 	// Error: dupSubExpr: suspicious identical LHS and RHS for `==` operator (gocritic)
 	// As the line does not contain an `==` operator, disable gocritic on this line.
 	//nolint:gocritic
-	C.GEOSContext_setErrorMessageHandler_r(c.handle, (C.GEOSMessageHandler_r)(C.c_errorMessageHandler), unsafe.Pointer(&c.err))
+	C.GEOSContext_setErrorMessageHandler_r(c.handle, C.GEOSMessageHandler_r(C.c_errorMessageHandler), unsafe.Pointer(&c.err))
 	for _, option := range options {
 		option(c)
 	}
@@ -131,7 +131,7 @@ func (c *Context) NewEmptyPolygon() *Geom {
 // NewGeomFromBounds returns a new polygon constructed from bounds.
 func (c *Context) NewGeomFromBounds(bounds *Bounds) *Geom {
 	var typeID C.int
-	geom := C.c_newGEOSGeomFromBounds_r(c.handle, &typeID, (C.double)(bounds.MinX), (C.double)(bounds.MinY), (C.double)(bounds.MaxX), (C.double)(bounds.MaxY))
+	geom := C.c_newGEOSGeomFromBounds_r(c.handle, &typeID, C.double(bounds.MinX), C.double(bounds.MinY), C.double(bounds.MaxX), C.double(bounds.MaxY))
 	if geom == nil {
 		panic(c.err)
 	}
@@ -266,7 +266,7 @@ func (c *Context) Polygonize(geoms []*Geom) *Geom {
 	for i := len(extraContexts) - 1; i > 0; i-- {
 		defer extraContexts[i].Unlock()
 	}
-	return c.newNonNilGeom(C.GEOSPolygonize_r(c.handle, cGeoms, (C.uint)(len(geoms))), nil)
+	return c.newNonNilGeom(C.GEOSPolygonize_r(c.handle, cGeoms, C.uint(len(geoms))), nil)
 }
 
 // PolygonizeValid returns a set of polygons which contains linework that
@@ -278,7 +278,7 @@ func (c *Context) PolygonizeValid(geoms []*Geom) *Geom {
 	for i := len(extraContexts) - 1; i > 0; i-- {
 		defer extraContexts[i].Unlock()
 	}
-	return c.newNonNilGeom(C.GEOSPolygonize_valid_r(c.handle, cGeoms, (C.uint)(len(geoms))), nil)
+	return c.newNonNilGeom(C.GEOSPolygonize_valid_r(c.handle, cGeoms, C.uint(len(geoms))), nil)
 }
 
 func (c *Context) cGeoms(geoms []*Geom) (**C.struct_GEOSGeom_t, []*Context) {
