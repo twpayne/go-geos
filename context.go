@@ -378,7 +378,6 @@ func (c *Context) newNonNilGeom(geom *C.struct_GEOSGeom_t, parent *Geom) *Geom {
 	return c.newGeom(geom, parent)
 }
 
-//nolint:godot
 //export go_errorMessageHandler
 func go_errorMessageHandler(message *C.char, userdata unsafe.Pointer) {
 	errP := (*error)(userdata)

@@ -22,6 +22,7 @@ linters:
   - forbidigo
   - forcetypeassert
   - gci
+  - gocheckcompilerdirectives
   - gochecknoinits
   - goconst
   - gocritic
@@ -45,6 +46,7 @@ linters:
   - nakedret
   - nilerr
   - noctx
+  - nolintlint
   - nonamedreturns
   - nosprintfhostport
   - prealloc
@@ -67,6 +69,7 @@ linters:
   - cyclop
   - exhaustruct
   - funlen
+  - ginkgolinter
   - gochecknoglobals
   - gocognit
   - gocyclo
@@ -79,7 +82,6 @@ linters:
   - makezero
   - nestif
   - nlreturn
-  - nolintlint
   - paralleltest
   - revive
   - rowserrcheck # https://github.com/golangci/golangci-lint/issues/2649
