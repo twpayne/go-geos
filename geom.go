@@ -150,6 +150,21 @@ func (g *Geom) Point(n int) *Geom {
 	return g.context.newNonNilGeom(C.GEOSGeomGetPointN_r(g.context.handle, g.geom, C.int(n)), nil)
 }
 
+// PolygonizeFull returns a set of geometries which contains linework that
+// represents the edge of a planar graph.
+func (g *Geom) PolygonizeFull() (geom, cuts, dangles, invalidRings *Geom) {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	var cCuts, cDangles, cInvalidRings *C.struct_GEOSGeom_t
+	cGeom := C.GEOSPolygonize_full_r(g.context.handle, g.geom, &cCuts, &cDangles, &cInvalidRings) //nolint:gocritic
+	geom = g.context.newNonNilGeom(cGeom, nil)
+	cuts = g.context.newGeom(cCuts, nil)
+	dangles = g.context.newGeom(cDangles, nil)
+	invalidRings = g.context.newGeom(cInvalidRings, nil)
+	return
+}
+
 // SRID returns g's SRID.
 func (g *Geom) SRID() int {
 	g.mustNotBeDestroyed()

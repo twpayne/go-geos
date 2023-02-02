@@ -47,7 +47,6 @@ linters:
   - nilerr
   - noctx
   - nolintlint
-  - nonamedreturns
   - nosprintfhostport
   - prealloc
   - predeclared
@@ -82,6 +81,7 @@ linters:
   - makezero
   - nestif
   - nlreturn
+  - nonamedreturns
   - paralleltest
   - revive
   - rowserrcheck # https://github.com/golangci/golangci-lint/issues/2649

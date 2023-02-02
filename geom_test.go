@@ -317,6 +317,52 @@ func TestGeomInterpolate(t *testing.T) {
 	assert.Nil(t, point.Interpolate(0.5))
 }
 
+func TestGeomPolygonizeFull(t *testing.T) {
+	for _, tc := range []struct {
+		name                    string
+		wkt                     string
+		expectedWKT             string
+		expectedCutsWKT         string
+		expectedDanglesWKT      string
+		expectedInvalidRingsWKT string
+	}{
+		{
+			name:                    "empty",
+			wkt:                     "GEOMETRYCOLLECTION EMPTY",
+			expectedWKT:             "GEOMETRYCOLLECTION EMPTY",
+			expectedCutsWKT:         "GEOMETRYCOLLECTION EMPTY",
+			expectedDanglesWKT:      "GEOMETRYCOLLECTION EMPTY",
+			expectedInvalidRingsWKT: "GEOMETRYCOLLECTION EMPTY",
+		},
+		{
+			name:                    "simple",
+			wkt:                     "MULTILINESTRING ((0 0,1 0,1 1),(1 1,0 1,0 0))",
+			expectedWKT:             "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))",
+			expectedCutsWKT:         "GEOMETRYCOLLECTION EMPTY",
+			expectedDanglesWKT:      "GEOMETRYCOLLECTION EMPTY",
+			expectedInvalidRingsWKT: "GEOMETRYCOLLECTION EMPTY",
+		},
+		{
+			name:                    "dangle",
+			wkt:                     "MULTILINESTRING ((0 0,1 0,1 1),(1 1,0 1,0 0),(0 0,0 -1))",
+			expectedWKT:             "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))",
+			expectedCutsWKT:         "GEOMETRYCOLLECTION EMPTY",
+			expectedDanglesWKT:      "GEOMETRYCOLLECTION (LINESTRING (0 0,0 -1))",
+			expectedInvalidRingsWKT: "GEOMETRYCOLLECTION EMPTY",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			c := NewContext()
+			g := mustNewGeomFromWKT(t, c, tc.wkt)
+			actual, cuts, dangles, invalidRings := g.PolygonizeFull()
+			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedWKT), actual)
+			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedCutsWKT), cuts)
+			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedDanglesWKT), dangles)
+			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedInvalidRingsWKT), invalidRings)
+		})
+	}
+}
+
 func TestNewGeomFromGeoJSON(t *testing.T) {
 	skipIfVersionLessThan(t, 3, 10, 0)
 	for i, tc := range []struct {
