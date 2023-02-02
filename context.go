@@ -269,6 +269,18 @@ func (c *Context) Polygonize(geoms []*Geom) *Geom {
 	return c.newNonNilGeom(C.GEOSPolygonize_r(c.handle, cGeoms, (C.uint)(len(geoms))), nil)
 }
 
+// PolygonizeValid returns a set of polygons which contains linework that
+// represents the edges of a planar graph.
+func (c *Context) PolygonizeValid(geoms []*Geom) *Geom {
+	c.Lock()
+	defer c.Unlock()
+	cGeoms, extraContexts := c.cGeoms(geoms)
+	for i := len(extraContexts) - 1; i > 0; i-- {
+		defer extraContexts[i].Unlock()
+	}
+	return c.newNonNilGeom(C.GEOSPolygonize_valid_r(c.handle, cGeoms, (C.uint)(len(geoms))), nil)
+}
+
 func (c *Context) cGeoms(geoms []*Geom) (**C.struct_GEOSGeom_t, []*Context) {
 	if len(geoms) == 0 {
 		return nil, nil

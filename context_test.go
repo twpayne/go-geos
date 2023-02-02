@@ -257,13 +257,15 @@ func TestNewPoints(t *testing.T) {
 
 func TestPolygonize(t *testing.T) {
 	for _, tc := range []struct {
-		name        string
-		geomWKTs    []string
-		expectedWKT string
+		name             string
+		geomWKTs         []string
+		expectedWKT      string
+		expectedValidWKT string
 	}{
 		{
-			name:        "empty",
-			expectedWKT: "GEOMETRYCOLLECTION EMPTY",
+			name:             "empty",
+			expectedWKT:      "GEOMETRYCOLLECTION EMPTY",
+			expectedValidWKT: "GEOMETRYCOLLECTION EMPTY",
 		},
 		{
 			name: "simple",
@@ -271,7 +273,8 @@ func TestPolygonize(t *testing.T) {
 				"LINESTRING (0 0,1 0,1 1)",
 				"LINESTRING (1 1,0 1,0 0)",
 			},
-			expectedWKT: "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))",
+			expectedWKT:      "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))",
+			expectedValidWKT: "POLYGON ((0 0,1 0,1 1,0 1,0 0))",
 		},
 		{
 			name: "extra_linestring",
@@ -280,7 +283,19 @@ func TestPolygonize(t *testing.T) {
 				"LINESTRING (1 1,0 1,0 0)",
 				"LINESTRING (0 0,0 -1)",
 			},
-			expectedWKT: "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))",
+			expectedWKT:      "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))",
+			expectedValidWKT: "POLYGON ((0 0,1 0,1 1,0 1,0 0))",
+		},
+		{
+			name: "two_polygons",
+			geomWKTs: []string{
+				"LINESTRING (0 0,1 0,1 1)",
+				"LINESTRING (1 1,0 1,0 0)",
+				"LINESTRING (2 2,3 2,3 3)",
+				"LINESTRING (3 3 2 3,2 2)",
+			},
+			expectedWKT:      "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)),POLYGON ((2 2,3 2,3 3,2 3,2 2)))",
+			expectedValidWKT: "MULTIPOLYGON (((0 0,1 0,1 1,0 1,0 0)),((2 2,3 2,3 3,2 3,2 2)))",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
@@ -291,6 +306,7 @@ func TestPolygonize(t *testing.T) {
 				geoms = append(geoms, geom)
 			}
 			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedWKT), c.Polygonize(geoms))
+			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedValidWKT), c.PolygonizeValid(geoms))
 		})
 	}
 }
