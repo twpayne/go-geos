@@ -254,3 +254,57 @@ func TestNewPoints(t *testing.T) {
 	assert.True(t, gs[0].Equals(mustNewGeomFromWKT(t, c, "POINT (1 2)")))
 	assert.True(t, gs[1].Equals(mustNewGeomFromWKT(t, c, "POINT (3 4)")))
 }
+
+func TestPolygonize(t *testing.T) {
+	for _, tc := range []struct {
+		name        string
+		geomWKTs    []string
+		expectedWKT string
+	}{
+		{
+			name:        "empty",
+			expectedWKT: "GEOMETRYCOLLECTION EMPTY",
+		},
+		{
+			name: "simple",
+			geomWKTs: []string{
+				"LINESTRING (0 0,1 0,1 1)",
+				"LINESTRING (1 1,0 1,0 0)",
+			},
+			expectedWKT: "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))",
+		},
+		{
+			name: "extra_linestring",
+			geomWKTs: []string{
+				"LINESTRING (0 0,1 0,1 1)",
+				"LINESTRING (1 1,0 1,0 0)",
+				"LINESTRING (0 0,0 -1)",
+			},
+			expectedWKT: "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			c := NewContext()
+			geoms := make([]*Geom, 0, len(tc.geomWKTs))
+			for _, geomWKT := range tc.geomWKTs {
+				geom := mustNewGeomFromWKT(t, c, geomWKT)
+				geoms = append(geoms, geom)
+			}
+			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedWKT), c.Polygonize(geoms))
+		})
+	}
+}
+
+func TestPolygonizeMultiContext(t *testing.T) {
+	c1 := NewContext()
+	c2 := NewContext()
+	assert.Equal(t,
+		mustNewGeomFromWKT(t, c1, "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))"),
+		c1.Polygonize([]*Geom{
+			mustNewGeomFromWKT(t, c1, "LINESTRING (0 0,1 0)"),
+			mustNewGeomFromWKT(t, c2, "LINESTRING (1 0,1 1)"),
+			mustNewGeomFromWKT(t, c1, "LINESTRING (1 1,0 1)"),
+			mustNewGeomFromWKT(t, c2, "LINESTRING (0 1,0 0)"),
+		}),
+	)
+}

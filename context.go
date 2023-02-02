@@ -257,6 +257,37 @@ func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
 	return c.newNonNilGeom(C.GEOSGeom_createPolygon_r(c.handle, shell, holes, C.uint(nholes)), nil)
 }
 
+// Polygonize returns a set of geometries which contains linework that
+// represents the edges of a planar graph.
+func (c *Context) Polygonize(geoms []*Geom) *Geom {
+	c.Lock()
+	defer c.Unlock()
+	cGeoms, extraContexts := c.cGeoms(geoms)
+	for i := len(extraContexts) - 1; i > 0; i-- {
+		defer extraContexts[i].Unlock()
+	}
+	return c.newNonNilGeom(C.GEOSPolygonize_r(c.handle, cGeoms, (C.uint)(len(geoms))), nil)
+}
+
+func (c *Context) cGeoms(geoms []*Geom) (**C.struct_GEOSGeom_t, []*Context) {
+	if len(geoms) == 0 {
+		return nil, nil
+	}
+	uniqueContexts := map[*Context]struct{}{c: {}}
+	var extraContexts []*Context
+	cGeoms := make([]*C.struct_GEOSGeom_t, 0, len(geoms))
+	for _, geom := range geoms {
+		geom.mustNotBeDestroyed()
+		if _, ok := uniqueContexts[geom.context]; !ok {
+			geom.context.Lock()
+			uniqueContexts[geom.context] = struct{}{}
+			extraContexts = append(extraContexts, geom.context)
+		}
+		cGeoms = append(cGeoms, geom.geom)
+	}
+	return &cGeoms[0], extraContexts
+}
+
 func (c *Context) finish() {
 	c.Lock()
 	defer c.Unlock()
