@@ -263,9 +263,11 @@ func (c *Context) Polygonize(geoms []*Geom) *Geom {
 	c.Lock()
 	defer c.Unlock()
 	cGeoms, extraContexts := c.cGeoms(geoms)
-	for i := len(extraContexts) - 1; i > 0; i-- {
-		defer extraContexts[i].Unlock()
-	}
+	defer func() {
+		for i := len(extraContexts) - 1; i >= 0; i-- {
+			extraContexts[i].Unlock()
+		}
+	}()
 	return c.newNonNilGeom(C.GEOSPolygonize_r(c.handle, cGeoms, C.uint(len(geoms))), nil)
 }
 
@@ -275,9 +277,11 @@ func (c *Context) PolygonizeValid(geoms []*Geom) *Geom {
 	c.Lock()
 	defer c.Unlock()
 	cGeoms, extraContexts := c.cGeoms(geoms)
-	for i := len(extraContexts) - 1; i > 0; i-- {
-		defer extraContexts[i].Unlock()
-	}
+	defer func() {
+		for i := len(extraContexts) - 1; i >= 0; i-- {
+			extraContexts[i].Unlock()
+		}
+	}()
 	return c.newNonNilGeom(C.GEOSPolygonize_valid_r(c.handle, cGeoms, C.uint(len(geoms))), nil)
 }
 
