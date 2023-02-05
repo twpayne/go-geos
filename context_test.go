@@ -314,13 +314,15 @@ func TestPolygonize(t *testing.T) {
 func TestPolygonizeMultiContext(t *testing.T) {
 	c1 := NewContext()
 	c2 := NewContext()
-	assert.Equal(t,
-		mustNewGeomFromWKT(t, c1, "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))"),
-		c1.Polygonize([]*Geom{
-			mustNewGeomFromWKT(t, c1, "LINESTRING (0 0,1 0)"),
-			mustNewGeomFromWKT(t, c2, "LINESTRING (1 0,1 1)"),
-			mustNewGeomFromWKT(t, c1, "LINESTRING (1 1,0 1)"),
-			mustNewGeomFromWKT(t, c2, "LINESTRING (0 1,0 0)"),
-		}),
-	)
+	for i := 0; i < 4; i++ {
+		assert.Equal(t,
+			mustNewGeomFromWKT(t, c1, "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))"),
+			c1.Polygonize([]*Geom{
+				mustNewGeomFromWKT(t, c1, "LINESTRING (0 0,1 0)"),
+				mustNewGeomFromWKT(t, c2, "LINESTRING (1 0,1 1)"),
+				mustNewGeomFromWKT(t, c1, "LINESTRING (1 1,0 1)"),
+				mustNewGeomFromWKT(t, c2, "LINESTRING (0 1,0 0)"),
+			}),
+		)
+	}
 }
