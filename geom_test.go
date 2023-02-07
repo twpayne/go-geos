@@ -364,7 +364,6 @@ func TestGeomPolygonizeFull(t *testing.T) {
 }
 
 func TestNewGeomFromGeoJSON(t *testing.T) {
-	skipIfVersionLessThan(t, 3, 10, 0)
 	for i, tc := range []struct {
 		geoJSON     string
 		expectedWKT string
@@ -389,13 +388,11 @@ func TestNewGeomFromGeoJSON(t *testing.T) {
 }
 
 func TestNewGeomFromGeoJSONError(t *testing.T) {
-	skipIfVersionLessThan(t, 3, 10, 0)
 	_, err := NewContext().NewGeomFromGeoJSON(`{"type":`)
 	assert.Error(t, err)
 }
 
 func TestGeomToJSON(t *testing.T) {
-	skipIfVersionLessThan(t, 3, 10, 0)
 	geom := mustNewGeomFromWKT(t, NewContext(), "POINT (1 2)")
 	assert.Equal(t, `{"type":"Point","coordinates":[1.0,2.0]}`, geom.ToGeoJSON(-1))
 }

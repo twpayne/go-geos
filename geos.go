@@ -1,7 +1,7 @@
 // Package geos provides an interface to GEOS. See https://trac.osgeo.org/geos/.
 package geos
 
-// #cgo LDFLAGS: -lgeos_c
+// #cgo pkg-config: geos
 // #include "geos.h"
 import "C"
 

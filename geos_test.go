@@ -13,10 +13,3 @@ func mustNewGeomFromWKT(t *testing.T, c *Context, wkt string) *Geom {
 	require.True(t, geom.IsValid())
 	return geom
 }
-
-func skipIfVersionLessThan(t *testing.T, major, minor, patch int) {
-	t.Helper()
-	if !versionEqualOrGreaterThan(major, minor, patch) {
-		t.Skip()
-	}
-}

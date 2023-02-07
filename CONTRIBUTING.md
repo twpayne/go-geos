@@ -34,35 +34,25 @@ similar the method is to existing methods:
    `geommethods.go.tmpl`.
 3. If you need to add or modify a template function, you will need to modify
    `internal/cmds/execute-template/`.
-   
+
 ## Maintaining backwards compatibility
 
-`go-geos` supports all `libgeos` versions used in [Ubuntu LTS
-releases](https://ubuntu.com/about/release-cycle). These are:
-
-| Ubuntu Version | `libgeos` version |
-| -------------- | ----------------- |
-| 20.04 LTS      | 3.8.0             |
-| 22.04 LTS      | 3.10.2            |
+`go-geos` supports the libgeos version using in the latest [Ubuntu LTS
+release](https://ubuntu.com/about/release-cycle), which is currently GEOS
+3.10.2.
 
 As `libgeos` is under active development, bugs are fixed and new features are
-added over time. This causes problems when old versions might behave incorrectly
-or miss newly-added features. In these cases:
+added over time. This causes problems when versions might behave incorrectly or
+miss newly-added features. In these cases:
 
 * In general, it is the user's responsibility to ensure that they are using a
   sufficiently recent version of `libgeos` for their needs. `go-geos` can
   forward incorrect results from `libgeos` and behave in an undefined manner
   (including crashing the program) when missing features are invoked.
-* For tests, use the `versionEqualToOrGreaterThan` function to only run the test
-  when the functionality is both present and working correctly. It's OK to skip
-  tests entirely if the functionality is buggy or not present.
-* For new features, you will need to add stubs in
+* For features not present in GEOS 3.10.2, you will need to add stubs in
   [`geos.c`](https://github.com/twpayne/go-geos/blob/master/geos.c) and
   [`geos.h`](https://github.com/twpayne/go-geos/blob/master/geos.h) to provide
-  the function when it is not provided. This is a necessity to permit `go-geos`
-  to compile with earlier versions of `libgeos`. For an example of this, see how
-  `GEOSDistanceIndexed_r` is stubbed.
-  
+  the function when it is not provided.
 
 ## C code formatting
 
