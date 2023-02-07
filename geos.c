@@ -31,6 +31,17 @@ int c_GEOSCoordSeq_getFlatCoords_r(GEOSContextHandle_t handle,
 #endif
 }
 
+uintptr_t c_GEOSGeom_getUserData_r(GEOSContextHandle_t handle,
+                                   const GEOSGeometry *g) {
+  void *userdata = GEOSGeom_getUserData_r(handle, g);
+  return (uintptr_t)userdata;
+}
+
+void c_GEOSGeom_setUserData_r(GEOSContextHandle_t handle, GEOSGeometry *g,
+                              uintptr_t userdata) {
+  GEOSGeom_setUserData_r(handle, g, (void *)userdata);
+}
+
 // c_GEOSGeomBounds_r extends bounds to include g.
 void c_GEOSGeomBounds_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
                         double *minX, double *minY, double *maxX,

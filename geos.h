@@ -1,6 +1,8 @@
 #ifndef GEOS_H
 #define GEOS_H
 
+#include <inttypes.h>
+
 #define GEOS_USE_ONLY_R_API
 #include <geos_c.h>
 
@@ -8,6 +10,10 @@ int c_GEOSCoordSeq_getFlatCoords_r(GEOSContextHandle_t handle,
                                    const GEOSCoordSequence *s,
                                    unsigned int size, unsigned int dims,
                                    double *flatCoords);
+uintptr_t c_GEOSGeom_getUserData_r(GEOSContextHandle_t handle,
+                                   const GEOSGeometry *g);
+void c_GEOSGeom_setUserData_r(GEOSContextHandle_t handle, GEOSGeometry *g,
+                              uintptr_t userdata);
 void c_GEOSGeomBounds_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
                         double *minX, double *minY, double *maxX, double *maxY);
 int c_GEOSGeomGetInfo_r(GEOSContextHandle_t handle, const GEOSGeometry *g,

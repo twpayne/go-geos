@@ -444,3 +444,10 @@ func TestSetPrecision(t *testing.T) {
 	assert.Equal(t, 0., g1.Precision())
 	assert.Equal(t, 1., g2.Precision())
 }
+
+func TestUserData(t *testing.T) {
+	g := mustNewGeomFromWKT(t, NewContext(), "POINT (0 0)")
+	assert.Equal(t, uintptr(0), g.UserData())
+	assert.Equal(t, g, g.SetUserData(1))
+	assert.Equal(t, uintptr(1), g.UserData())
+}

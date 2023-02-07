@@ -194,6 +194,15 @@ func (g *Geom) SetSRID(srid int) *Geom {
 	return g
 }
 
+// SetUserData sets g's userdata and returns g.
+func (g *Geom) SetUserData(userdata uintptr) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	C.c_GEOSGeom_setUserData_r(g.context.handle, g.geom, C.uintptr_t(userdata))
+	return g
+}
+
 // String returns g in WKT format.
 func (g *Geom) String() string {
 	g.mustNotBeDestroyed()
@@ -257,6 +266,14 @@ func (g *Geom) Type() string {
 func (g *Geom) TypeID() TypeID {
 	g.mustNotBeDestroyed()
 	return g.typeID
+}
+
+// UserData returns g's userdata.
+func (g *Geom) UserData() uintptr {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return uintptr(C.c_GEOSGeom_getUserData_r(g.context.handle, g.geom))
 }
 
 func (g *Geom) finalize() {
