@@ -225,6 +225,12 @@
 - name: SymDifference
   comment: returns the symmetric difference between g and other
   type: binary
+- name: SymDifferencePrec
+  comment: returns the symmetric difference between g and other
+  type: binary
+  extraArgs:
+    - name: gridSize
+      type: float64
 - name: TopologyPreserveSimplify
   comment: returns a simplified geometry preserving topology
   type: unary

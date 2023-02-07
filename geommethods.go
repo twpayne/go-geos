@@ -578,6 +578,18 @@ func (g *Geom) SymDifference(other *Geom) *Geom {
 	return g.context.newGeom(C.GEOSSymDifference_r(g.context.handle, g.geom, other.geom), nil)
 }
 
+// SymDifferencePrec returns the symmetric difference between g and other.
+func (g *Geom) SymDifferencePrec(other *Geom, gridSize float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSSymDifferencePrec_r(g.context.handle, g.geom, other.geom, C.double(gridSize)), nil)
+}
+
 // TopologyPreserveSimplify returns a simplified geometry preserving topology.
 func (g *Geom) TopologyPreserveSimplify(tolerance float64) *Geom {
 	g.mustNotBeDestroyed()
