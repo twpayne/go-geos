@@ -165,6 +165,14 @@ func (g *Geom) PolygonizeFull() (geom, cuts, dangles, invalidRings *Geom) {
 	return
 }
 
+// Precision returns g's precision.
+func (g *Geom) Precision() float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return float64(C.GEOSGeom_getPrecision_r(g.context.handle, g.geom))
+}
+
 // SRID returns g's SRID.
 func (g *Geom) SRID() int {
 	g.mustNotBeDestroyed()

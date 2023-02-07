@@ -437,3 +437,10 @@ func TestWKXRoundTrip(t *testing.T) {
 		})
 	}
 }
+
+func TestSetPrecision(t *testing.T) {
+	g1 := mustNewGeomFromWKT(t, NewContext(), "POINT (1 2)")
+	g2 := g1.SetPrecision(1, PrecisionRulePointwise)
+	assert.Equal(t, 0., g1.Precision())
+	assert.Equal(t, 1., g2.Precision())
+}

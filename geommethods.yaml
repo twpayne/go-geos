@@ -212,10 +212,10 @@
   type: unary
   geosFunction: GEOSGeom_setPrecision_r
   extraArgs:
-    - name: gridSize
-      type: float64
-    - name: flags
-      type: PrecisionRule
+  - name: gridSize
+    type: float64
+  - name: flags
+    type: PrecisionRule
 - name: Simplify
   comment: returns a simplified geometry
   type: unary
