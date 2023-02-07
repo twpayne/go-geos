@@ -227,6 +227,9 @@
 - name: UnaryUnion
   comment: returns the union of all components of a single geometry
   type: unary
+- name: Union
+  comment: returns the union of g and other
+  type: binary
 - name: Within
   comment: returns true if g is within other
   type: binaryPredicate

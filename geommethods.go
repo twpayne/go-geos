@@ -603,6 +603,18 @@ func (g *Geom) UnaryUnion() *Geom {
 	return g.context.newNonNilGeom(C.GEOSUnaryUnion_r(g.context.handle, g.geom), nil)
 }
 
+// Union returns the union of g and other.
+func (g *Geom) Union(other *Geom) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSUnion_r(g.context.handle, g.geom, other.geom), nil)
+}
+
 // Within returns true if g is within other.
 func (g *Geom) Within(other *Geom) bool {
 	g.mustNotBeDestroyed()
