@@ -262,12 +262,8 @@ func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
 func (c *Context) Polygonize(geoms []*Geom) *Geom {
 	c.Lock()
 	defer c.Unlock()
-	cGeoms, extraContexts := c.cGeoms(geoms)
-	defer func() {
-		for i := len(extraContexts) - 1; i >= 0; i-- {
-			extraContexts[i].Unlock()
-		}
-	}()
+	cGeoms, unlockFunc := c.cGeomsLocked(geoms)
+	defer unlockFunc()
 	return c.newNonNilGeom(C.GEOSPolygonize_r(c.handle, cGeoms, C.uint(len(geoms))), nil)
 }
 
@@ -276,18 +272,14 @@ func (c *Context) Polygonize(geoms []*Geom) *Geom {
 func (c *Context) PolygonizeValid(geoms []*Geom) *Geom {
 	c.Lock()
 	defer c.Unlock()
-	cGeoms, extraContexts := c.cGeoms(geoms)
-	defer func() {
-		for i := len(extraContexts) - 1; i >= 0; i-- {
-			extraContexts[i].Unlock()
-		}
-	}()
+	cGeoms, unlockFunc := c.cGeomsLocked(geoms)
+	defer unlockFunc()
 	return c.newNonNilGeom(C.GEOSPolygonize_valid_r(c.handle, cGeoms, C.uint(len(geoms))), nil)
 }
 
-func (c *Context) cGeoms(geoms []*Geom) (**C.struct_GEOSGeom_t, []*Context) {
+func (c *Context) cGeomsLocked(geoms []*Geom) (**C.struct_GEOSGeom_t, func()) {
 	if len(geoms) == 0 {
-		return nil, nil
+		return nil, func() {}
 	}
 	uniqueContexts := map[*Context]struct{}{c: {}}
 	var extraContexts []*Context
@@ -301,7 +293,11 @@ func (c *Context) cGeoms(geoms []*Geom) (**C.struct_GEOSGeom_t, []*Context) {
 		}
 		cGeoms = append(cGeoms, geom.geom)
 	}
-	return &cGeoms[0], extraContexts
+	return &cGeoms[0], func() {
+		for i := len(extraContexts) - 1; i >= 0; i-- {
+			extraContexts[i].Unlock()
+		}
+	}
 }
 
 func (c *Context) finish() {
