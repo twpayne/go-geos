@@ -15,6 +15,11 @@ import "C"
 {{-     end }}
 {{-     $geosFunction = .geosFunction }}
 {{-   end }}
+{{-   if not .comment }}
+{{      with printf "%s: comment not set" .name }}
+{{-       fatal . }}
+{{-     end }}
+{{-   end }}
 
 {{-   if eq .type "unary" }}
 
