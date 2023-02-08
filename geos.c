@@ -6,29 +6,15 @@
 
 enum { bounds_MinX, bounds_MinY, bounds_MaxX, bounds_MaxY };
 
-// c_GEOSCoordSeq_getFlatCoords_r writes s's coordinate data to flatCoords,
-// which must contain size*dims elements. It returns 0 on any exception, 1
-// otherwise.
-int c_GEOSCoordSeq_getFlatCoords_r(GEOSContextHandle_t handle,
-                                   const GEOSCoordSequence *s,
-                                   unsigned int size, unsigned int dims,
-                                   double *flatCoords) {
-#if GEOS_VERSION_MAJOR < 3 ||                                                  \
-    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 10)
-  double *val = flatCoords;
-  for (unsigned int idx = 0; idx < size; ++idx) {
-    for (unsigned int dim = 0; dim < dims; ++dim) {
-      if (GEOSCoordSeq_getOrdinate_r(handle, s, idx, dim, val++) == 0) {
-        return 0;
-      }
-    }
-  }
-  return 1;
-#else
-  int hasZ = dims > 2;
-  int hasM = dims > 3;
-  return GEOSCoordSeq_copyToBuffer_r(handle, s, flatCoords, hasZ, hasM);
-#endif
+uintptr_t c_GEOSGeom_getUserData_r(GEOSContextHandle_t handle,
+                                   const GEOSGeometry *g) {
+  void *userdata = GEOSGeom_getUserData_r(handle, g);
+  return (uintptr_t)userdata;
+}
+
+void c_GEOSGeom_setUserData_r(GEOSContextHandle_t handle, GEOSGeometry *g,
+                              uintptr_t userdata) {
+  GEOSGeom_setUserData_r(handle, g, (void *)userdata);
 }
 
 // c_GEOSGeomBounds_r extends bounds to include g.
@@ -143,35 +129,6 @@ void c_errorMessageHandler(const char *message, void *userdata) {
   go_errorMessageHandler(message, userdata);
 }
 
-// c_newGEOSCoordSeqFromFlatCoords returns a new GEOSCoordSequence populated
-// with flatCoords. It returns NULL on any exception.
-GEOSCoordSequence *c_newGEOSCoordSeqFromFlatCoords_r(GEOSContextHandle_t handle,
-                                                     unsigned int size,
-                                                     unsigned int dims,
-                                                     const double *flatCoords) {
-#if GEOS_VERSION_MAJOR < 3 ||                                                  \
-    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 10)
-  GEOSCoordSequence *s = GEOSCoordSeq_create_r(handle, size, dims);
-  if (s == NULL) {
-    return NULL;
-  }
-  const double *val = flatCoords;
-  for (unsigned int idx = 0; idx < size; ++idx) {
-    for (unsigned int dim = 0; dim < dims; ++dim) {
-      if (GEOSCoordSeq_setOrdinate_r(handle, s, idx, dim, *val++) == 0) {
-        GEOSCoordSeq_destroy_r(handle, s);
-        return NULL;
-      }
-    }
-  }
-  return s;
-#else
-  int hasZ = dims > 2;
-  int hasM = dims > 3;
-  return GEOSCoordSeq_copyFromBuffer_r(handle, flatCoords, size, hasZ, hasM);
-#endif
-}
-
 // c_newGEOSGeomFromBounds_r returns a new GEOSGeom representing bounds. It
 // returns NULL on any exception.
 GEOSGeometry *c_newGEOSGeomFromBounds_r(GEOSContextHandle_t handle, int *typeID,
@@ -201,27 +158,11 @@ GEOSGeometry *c_newGEOSGeomFromBounds_r(GEOSContextHandle_t handle, int *typeID,
   }
   const double flatCoords[10] = {minX, minY, maxX, minY, maxX,
                                  maxY, minX, maxY, minX, minY};
-#if GEOS_VERSION_MAJOR < 3 ||                                                  \
-    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 10)
-  GEOSCoordSequence *s = GEOSCoordSeq_create_r(handle, 5, 2);
-  if (s == NULL) {
-    return NULL;
-  }
-  const double *val = flatCoords;
-  for (unsigned idx = 0; idx < 5; idx++) {
-    if (GEOSCoordSeq_setX_r(handle, s, idx, *val++) == 0 ||
-        GEOSCoordSeq_setY_r(handle, s, idx, *val++) == 0) {
-      GEOSCoordSeq_destroy_r(handle, s);
-      return NULL;
-    }
-  }
-#else
   GEOSCoordSequence *s =
       GEOSCoordSeq_copyFromBuffer_r(handle, flatCoords, 5, 0, 0);
   if (s == NULL) {
     return NULL;
   }
-#endif
   GEOSGeometry *shell = GEOSGeom_createLinearRing_r(handle, s);
   if (shell == NULL) {
     GEOSCoordSeq_destroy_r(handle, s);
@@ -235,76 +176,6 @@ GEOSGeometry *c_newGEOSGeomFromBounds_r(GEOSContextHandle_t handle, int *typeID,
   *typeID = GEOS_POLYGON;
   return polygon;
 }
-
-#if GEOS_VERSION_MAJOR < 3 ||                                                  \
-    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 10)
-
-GEOSGeometry *GEOSDensify_r(GEOSContextHandle_t handle, const GEOSGeometry *g,
-                            double tolerance) {
-  return NULL;
-}
-
-GEOSGeometry *GEOSDifferencePrec_r(GEOSContextHandle_t handle,
-                                   const GEOSGeometry *g1,
-                                   const GEOSGeometry *g2, double gridSize) {
-  return NULL;
-}
-
-char GEOSDistanceWithin_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
-                          const GEOSGeometry *g2, double dist) {
-  return 2;
-}
-
-int GEOSFrechetDistance_r(GEOSContextHandle_t handle, const GEOSGeometry *g1,
-                          const GEOSGeometry *g2, double *dist) {
-  return 0;
-}
-
-int GEOSFrechetDistanceDensify_r(GEOSContextHandle_t handle,
-                                 const GEOSGeometry *g1, const GEOSGeometry *g2,
-                                 double densifyFrac, double *dist) {
-  return 0;
-}
-
-GEOSGeometry *GEOSIntersectionPrec_r(GEOSContextHandle_t handle,
-                                     const GEOSGeometry *g1,
-                                     const GEOSGeometry *g2, double gridSize) {
-  return NULL;
-}
-
-GEOSGeometry *GEOSMaximumInscribedCircle_r(GEOSContextHandle_t handle,
-                                           const GEOSGeometry *g,
-                                           double tolerance) {
-  return NULL;
-}
-
-GEOSGeoJSONReader *GEOSGeoJSONReader_create_r(GEOSContextHandle_t handle) {
-  return NULL;
-}
-
-void GEOSGeoJSONReader_destroy_r(GEOSContextHandle_t handle,
-                                 GEOSGeoJSONReader *reader) {}
-
-GEOSGeometry *GEOSGeoJSONReader_readGeometry_r(GEOSContextHandle_t handle,
-                                               GEOSGeoJSONReader *reader,
-                                               const char *geojson) {
-  return NULL;
-}
-
-GEOSGeoJSONWriter *GEOSGeoJSONWriter_create_r(GEOSContextHandle_t handle) {
-  return NULL;
-}
-
-void GEOSGeoJSONWriter_destroy_r(GEOSContextHandle_t handle,
-                                 GEOSGeoJSONWriter *reader) {}
-
-char *GEOSGeoJSONWriter_writeGeometry_r(GEOSContextHandle_t handle,
-                                        GEOSGeoJSONWriter *writer,
-                                        const GEOSGeometry *g, int indent) {
-  return NULL;
-}
-
-#endif
 
 #if GEOS_VERSION_MAJOR < 3 ||                                                  \
     (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 11)

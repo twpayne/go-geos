@@ -165,6 +165,14 @@ func (g *Geom) PolygonizeFull() (geom, cuts, dangles, invalidRings *Geom) {
 	return
 }
 
+// Precision returns g's precision.
+func (g *Geom) Precision() float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return float64(C.GEOSGeom_getPrecision_r(g.context.handle, g.geom))
+}
+
 // SRID returns g's SRID.
 func (g *Geom) SRID() int {
 	g.mustNotBeDestroyed()
@@ -183,6 +191,15 @@ func (g *Geom) SetSRID(srid int) *Geom {
 	g.context.Lock()
 	defer g.context.Unlock()
 	C.GEOSSetSRID_r(g.context.handle, g.geom, C.int(srid))
+	return g
+}
+
+// SetUserData sets g's userdata and returns g.
+func (g *Geom) SetUserData(userdata uintptr) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	C.c_GEOSGeom_setUserData_r(g.context.handle, g.geom, C.uintptr_t(userdata))
 	return g
 }
 
@@ -249,6 +266,14 @@ func (g *Geom) Type() string {
 func (g *Geom) TypeID() TypeID {
 	g.mustNotBeDestroyed()
 	return g.typeID
+}
+
+// UserData returns g's userdata.
+func (g *Geom) UserData() uintptr {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return uintptr(C.c_GEOSGeom_getUserData_r(g.context.handle, g.geom))
 }
 
 func (g *Geom) finalize() {

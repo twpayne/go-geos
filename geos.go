@@ -1,7 +1,7 @@
 // Package geos provides an interface to GEOS. See https://trac.osgeo.org/geos/.
 package geos
 
-// #cgo LDFLAGS: -lgeos_c
+// #cgo pkg-config: geos
 // #include "geos.h"
 import "C"
 
@@ -61,7 +61,9 @@ type PrecisionRule int
 
 // Precision rules.
 const (
+	PrecisionRuleNone          PrecisionRule = 0
 	PrecisionRuleValidOutput   PrecisionRule = C.GEOS_PREC_VALID_OUTPUT
+	PrecisionRuleNoTopo        PrecisionRule = C.GEOS_PREC_NO_TOPO
 	PrecisionRulePointwise     PrecisionRule = C.GEOS_PREC_NO_TOPO
 	PrecisionRuleKeepCollapsed PrecisionRule = C.GEOS_PREC_KEEP_COLLAPSED
 )

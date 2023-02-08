@@ -8,7 +8,17 @@ import "C"
 {{- range . }}
 {{-   $geosFunction := printf "GEOS%s_r" .name }}
 {{-   if .geosFunction }}
+{{-     if eq .geosFunction $geosFunction }}
+{{-       with printf "%s: do not set default .geosFunction" .name }}
+{{-         fatal . }}
+{{-       end }}
+{{-     end }}
 {{-     $geosFunction = .geosFunction }}
+{{-   end }}
+{{-   if not .comment }}
+{{      with printf "%s: comment not set" .name }}
+{{-       fatal . }}
+{{-     end }}
 {{-   end }}
 
 {{-   if eq .type "unary" }}

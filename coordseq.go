@@ -114,7 +114,15 @@ func (s *CoordSeq) ToCoords() [][]float64 {
 		return nil
 	}
 	flatCoords := make([]float64, s.size*s.dimensions)
-	if C.c_GEOSCoordSeq_getFlatCoords_r(s.context.handle, s.s, C.uint(s.size), C.uint(s.dimensions), (*C.double)(&flatCoords[0])) == 0 {
+	var hasZ C.int
+	if s.dimensions > 2 {
+		hasZ = 1
+	}
+	var hasM C.int
+	if s.dimensions > 3 {
+		hasM = 1
+	}
+	if C.GEOSCoordSeq_copyToBuffer_r(s.context.handle, s.s, (*C.double)(&flatCoords[0]), hasZ, hasM) == 0 {
 		panic(s.context.err)
 	}
 	coords := make([][]float64, s.size)

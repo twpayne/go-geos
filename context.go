@@ -262,12 +262,8 @@ func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
 func (c *Context) Polygonize(geoms []*Geom) *Geom {
 	c.Lock()
 	defer c.Unlock()
-	cGeoms, extraContexts := c.cGeoms(geoms)
-	defer func() {
-		for i := len(extraContexts) - 1; i >= 0; i-- {
-			extraContexts[i].Unlock()
-		}
-	}()
+	cGeoms, unlockFunc := c.cGeomsLocked(geoms)
+	defer unlockFunc()
 	return c.newNonNilGeom(C.GEOSPolygonize_r(c.handle, cGeoms, C.uint(len(geoms))), nil)
 }
 
@@ -276,18 +272,14 @@ func (c *Context) Polygonize(geoms []*Geom) *Geom {
 func (c *Context) PolygonizeValid(geoms []*Geom) *Geom {
 	c.Lock()
 	defer c.Unlock()
-	cGeoms, extraContexts := c.cGeoms(geoms)
-	defer func() {
-		for i := len(extraContexts) - 1; i >= 0; i-- {
-			extraContexts[i].Unlock()
-		}
-	}()
+	cGeoms, unlockFunc := c.cGeomsLocked(geoms)
+	defer unlockFunc()
 	return c.newNonNilGeom(C.GEOSPolygonize_valid_r(c.handle, cGeoms, C.uint(len(geoms))), nil)
 }
 
-func (c *Context) cGeoms(geoms []*Geom) (**C.struct_GEOSGeom_t, []*Context) {
+func (c *Context) cGeomsLocked(geoms []*Geom) (**C.struct_GEOSGeom_t, func()) {
 	if len(geoms) == 0 {
-		return nil, nil
+		return nil, func() {}
 	}
 	uniqueContexts := map[*Context]struct{}{c: {}}
 	var extraContexts []*Context
@@ -301,7 +293,11 @@ func (c *Context) cGeoms(geoms []*Geom) (**C.struct_GEOSGeom_t, []*Context) {
 		}
 		cGeoms = append(cGeoms, geom.geom)
 	}
-	return &cGeoms[0], extraContexts
+	return &cGeoms[0], func() {
+		for i := len(extraContexts) - 1; i >= 0; i-- {
+			extraContexts[i].Unlock()
+		}
+	}
 }
 
 func (c *Context) finish() {
@@ -355,18 +351,28 @@ func (c *Context) newCoordSeq(gs *C.struct_GEOSCoordSeq_t, finalizer func(*Coord
 }
 
 func (c *Context) newCoordsFromGEOSCoordSeq(s *C.struct_GEOSCoordSeq_t) [][]float64 {
-	var (
-		dimensions C.uint
-		size       C.uint
-	)
+	var dimensions C.uint
 	if C.GEOSCoordSeq_getDimensions_r(c.handle, s, &dimensions) == 0 {
 		panic(c.err)
 	}
+
+	var size C.uint
 	if C.GEOSCoordSeq_getSize_r(c.handle, s, &size) == 0 {
 		panic(c.err)
 	}
+
+	var hasZ C.int
+	if dimensions > 2 {
+		hasZ = 1
+	}
+
+	var hasM C.int
+	if dimensions > 3 {
+		hasM = 1
+	}
+
 	flatCoords := make([]float64, size*dimensions)
-	if C.c_GEOSCoordSeq_getFlatCoords_r(c.handle, s, size, dimensions, (*C.double)(&flatCoords[0])) == 0 {
+	if C.GEOSCoordSeq_copyToBuffer_r(c.handle, s, (*C.double)(&flatCoords[0]), hasZ, hasM) == 0 {
 		panic(c.err)
 	}
 	coords := make([][]float64, 0, size)
@@ -378,11 +384,21 @@ func (c *Context) newCoordsFromGEOSCoordSeq(s *C.struct_GEOSCoordSeq_t) [][]floa
 }
 
 func (c *Context) newGEOSCoordSeqFromCoords(coords [][]float64) *C.struct_GEOSCoordSeq_t {
+	var hasZ C.int
+	if len(coords[0]) > 2 {
+		hasZ = 1
+	}
+
+	var hasM C.int
+	if len(coords[0]) > 3 {
+		hasM = 1
+	}
+
 	flatCoords := make([]float64, 0, len(coords)*len(coords[0]))
 	for _, coord := range coords {
 		flatCoords = append(flatCoords, coord...)
 	}
-	return C.c_newGEOSCoordSeqFromFlatCoords_r(c.handle, C.uint(len(coords)), C.uint(len(coords[0])), (*C.double)(unsafe.Pointer(&flatCoords[0])))
+	return C.GEOSCoordSeq_copyFromBuffer_r(c.handle, (*C.double)(unsafe.Pointer(&flatCoords[0])), C.uint(len(coords)), hasZ, hasM)
 }
 
 func (c *Context) newGeom(geom *C.struct_GEOSGeom_t, parent *Geom) *Geom {

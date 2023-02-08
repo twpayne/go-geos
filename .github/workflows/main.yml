@@ -14,10 +14,7 @@ jobs:
         go-version:
         - stable
         - oldstable
-        os:
-        - ubuntu-20.04
-        - ubuntu-22.04
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-22.04
     steps:
     - name: Install dependencies
       run: |

@@ -56,6 +56,9 @@ func run() error {
 			}
 			return cType
 		},
+		"fatal": func(s string) string {
+			panic(s)
+		},
 		"firstRuneToLower": func(s string) string {
 			runes := []rune(s)
 			runes[0] = unicode.ToLower(runes[0])

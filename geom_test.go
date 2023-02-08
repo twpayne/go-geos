@@ -364,7 +364,6 @@ func TestGeomPolygonizeFull(t *testing.T) {
 }
 
 func TestNewGeomFromGeoJSON(t *testing.T) {
-	skipIfVersionLessThan(t, 3, 10, 0)
 	for i, tc := range []struct {
 		geoJSON     string
 		expectedWKT string
@@ -389,13 +388,11 @@ func TestNewGeomFromGeoJSON(t *testing.T) {
 }
 
 func TestNewGeomFromGeoJSONError(t *testing.T) {
-	skipIfVersionLessThan(t, 3, 10, 0)
 	_, err := NewContext().NewGeomFromGeoJSON(`{"type":`)
 	assert.Error(t, err)
 }
 
 func TestGeomToJSON(t *testing.T) {
-	skipIfVersionLessThan(t, 3, 10, 0)
 	geom := mustNewGeomFromWKT(t, NewContext(), "POINT (1 2)")
 	assert.Equal(t, `{"type":"Point","coordinates":[1.0,2.0]}`, geom.ToGeoJSON(-1))
 }
@@ -436,4 +433,18 @@ func TestWKXRoundTrip(t *testing.T) {
 			assert.Equal(t, tc.wkt, newG.ToWKT())
 		})
 	}
+}
+
+func TestSetPrecision(t *testing.T) {
+	g1 := mustNewGeomFromWKT(t, NewContext(), "POINT (1 2)")
+	g2 := g1.SetPrecision(1, PrecisionRulePointwise)
+	assert.Equal(t, 0., g1.Precision())
+	assert.Equal(t, 1., g2.Precision())
+}
+
+func TestUserData(t *testing.T) {
+	g := mustNewGeomFromWKT(t, NewContext(), "POINT (0 0)")
+	assert.Equal(t, uintptr(0), g.UserData())
+	assert.Equal(t, g, g.SetUserData(1))
+	assert.Equal(t, uintptr(1), g.UserData())
 }
