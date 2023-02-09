@@ -562,6 +562,14 @@ func (g *Geom) MinimumWidth() *Geom {
 	return g.context.newNonNilGeom(C.GEOSMinimumWidth_r(g.context.handle, g.geom), nil)
 }
 
+// Node returns a new geometry in which no lines cross each other, and all touching occurs at endpoints.
+func (g *Geom) Node() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSNode_r(g.context.handle, g.geom), nil)
+}
+
 // OffsetCurve returns the offset curve line(s) of g.
 func (g *Geom) OffsetCurve(width float64, quadsegs int, joinStyle BufJoinStyle, mitreLimit float64) *Geom {
 	g.mustNotBeDestroyed()

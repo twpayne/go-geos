@@ -195,6 +195,9 @@
 - name: MinimumWidth
   comment: returns a linestring geometry which represents the minimum diameter of g
   type: unary
+- name: Node
+  comment: returns a new geometry in which no lines cross each other, and all touching occurs at endpoints
+  type: unary
 - name: OffsetCurve
   comment: returns the offset curve line(s) of g
   type: unary
