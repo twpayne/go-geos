@@ -23,6 +23,18 @@
     type: BufJoinStyle
   - name: mitreLimit
     type: float64
+- name: ClipByRect
+  comment: returns g clipped to a rectangular polygon
+  type: unary
+  extraArgs:
+  - name: xMin
+    type: float64
+  - name: yMin
+    type: float64
+  - name: xMax
+    type: float64
+  - name: yMax
+    type: float64
 - name: Clone
   comment: returns a clone of g
   type: unary

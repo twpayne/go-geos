@@ -33,6 +33,14 @@ func (g *Geom) BufferWithStyle(width float64, quadsegs int, endCapStyle BufCapSt
 	return g.context.newNonNilGeom(C.GEOSBufferWithStyle_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs), C.int(endCapStyle), C.int(joinStyle), C.double(mitreLimit)), nil)
 }
 
+// ClipByRect returns g clipped to a rectangular polygon.
+func (g *Geom) ClipByRect(xMin float64, yMin float64, xMax float64, yMax float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSClipByRect_r(g.context.handle, g.geom, C.double(xMin), C.double(yMin), C.double(xMax), C.double(yMax)), nil)
+}
+
 // Clone returns a clone of g.
 func (g *Geom) Clone() *Geom {
 	g.mustNotBeDestroyed()
