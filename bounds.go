@@ -46,6 +46,11 @@ func (b *Bounds) ContainsPoint(x, y float64) bool {
 	return b.MinX <= x && x <= b.MaxX && b.MinY <= y && y <= b.MaxY
 }
 
+// ContextGeom returns b as a Geom.
+func (b *Bounds) ContextGeom(context *Context) *Geom {
+	return context.NewGeomFromBounds(b)
+}
+
 // Equals returns true if b equals other.
 func (b *Bounds) Equals(other *Bounds) bool {
 	return b.MinX == other.MinX && b.MinY == other.MinY && b.MaxX == other.MaxX && b.MaxY == other.MaxY
@@ -53,7 +58,7 @@ func (b *Bounds) Equals(other *Bounds) bool {
 
 // Geom returns b as a Geom.
 func (b *Bounds) Geom() *Geom {
-	return defaultContext.NewGeomFromBounds(b)
+	return b.ContextGeom(DefaultContext)
 }
 
 // IsEmpty returns true if b is empty.
