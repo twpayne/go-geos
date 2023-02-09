@@ -24,6 +24,19 @@ func (s *CoordSeq) Dimensions() int {
 	return s.dimensions
 }
 
+// IsCCW returns if s is counter-clockwise.
+func (s *CoordSeq) IsCCW() bool {
+	s.context.Lock()
+	defer s.context.Unlock()
+	var cIsCCW C.char
+	switch C.GEOSCoordSeq_isCCW_r(s.context.handle, s.s, &cIsCCW) {
+	case 1:
+		return cIsCCW != 0
+	default:
+		panic(s.context.err)
+	}
+}
+
 // Ordinate returns the idx-th dim coordinate of s.
 func (s *CoordSeq) Ordinate(idx, dim int) float64 {
 	s.context.Lock()

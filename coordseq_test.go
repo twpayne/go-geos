@@ -19,6 +19,43 @@ func TestCoordSeqEmpty(t *testing.T) {
 	assert.Nil(t, s.ToCoords())
 }
 
+func TestCoordSeqIsCCW(t *testing.T) {
+	for _, tc := range []struct {
+		name        string
+		coords      [][]float64
+		expected    bool
+		expectedErr bool
+	}{
+		{
+			name:     "ccw",
+			coords:   [][]float64{{0, 0}, {1, 0}, {1, 1}, {0, 0}},
+			expected: true,
+		},
+		{
+			name:     "cw",
+			coords:   [][]float64{{0, 0}, {0, 1}, {1, 1}, {0, 0}},
+			expected: false,
+		},
+		{
+			name:        "short",
+			coords:      [][]float64{{0, 0}, {1, 0}, {1, 1}},
+			expectedErr: true,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			defer runtime.GC() // Exercise finalizers.
+			s := NewContext().NewCoordSeqFromCoords(tc.coords)
+			if tc.expectedErr {
+				assert.Panics(t, func() {
+					s.IsCCW()
+				})
+			} else {
+				assert.Equal(t, tc.expected, s.IsCCW())
+			}
+		})
+	}
+}
+
 func TestCoordSeqMethods(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
 	c := NewContext()
