@@ -11,6 +11,7 @@ import (
 	"text/template"
 	"unicode"
 
+	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 )
 
@@ -31,7 +32,7 @@ var (
 func run() error {
 	flag.Parse()
 
-	var templateData any
+	var templateData []map[string]any
 	if *templateDataFilename != "" {
 		dataBytes, err := os.ReadFile(*templateDataFilename)
 		if err != nil {
@@ -40,6 +41,12 @@ func run() error {
 		if err := yaml.Unmarshal(dataBytes, &templateData); err != nil {
 			return err
 		}
+	}
+
+	if !slices.IsSortedFunc(templateData, func(a, b map[string]any) bool {
+		return a["name"].(string) < b["name"].(string) //nolint:forcetypeassert
+	}) {
+		return fmt.Errorf("template data not sorted by name")
 	}
 
 	if flag.NArg() == 0 {

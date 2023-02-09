@@ -49,14 +49,6 @@ func (g *Geom) ConcaveHull(ratio float64, allowHoles uint) *Geom {
 	return g.context.newNonNilGeom(C.GEOSConcaveHull_r(g.context.handle, g.geom, C.double(ratio), C.unsigned(allowHoles)), nil)
 }
 
-// ConvexHull returns g's convex hull.
-func (g *Geom) ConvexHull() *Geom {
-	g.mustNotBeDestroyed()
-	g.context.Lock()
-	defer g.context.Unlock()
-	return g.context.newNonNilGeom(C.GEOSConvexHull_r(g.context.handle, g.geom), nil)
-}
-
 // Contains returns true if g contains other.
 func (g *Geom) Contains(other *Geom) bool {
 	g.mustNotBeDestroyed()
@@ -74,6 +66,14 @@ func (g *Geom) Contains(other *Geom) bool {
 	default:
 		panic(g.context.err)
 	}
+}
+
+// ConvexHull returns g's convex hull.
+func (g *Geom) ConvexHull() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSConvexHull_r(g.context.handle, g.geom), nil)
 }
 
 // CoveredBy returns true if g is covered by other.
@@ -625,6 +625,14 @@ func (g *Geom) UnaryUnion() *Geom {
 	return g.context.newNonNilGeom(C.GEOSUnaryUnion_r(g.context.handle, g.geom), nil)
 }
 
+// UnaryUnionPrec returns the union of all components of a single geometry.
+func (g *Geom) UnaryUnionPrec(gridSize float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSUnaryUnionPrec_r(g.context.handle, g.geom, C.double(gridSize)), nil)
+}
+
 // Union returns the union of g and other.
 func (g *Geom) Union(other *Geom) *Geom {
 	g.mustNotBeDestroyed()
@@ -635,14 +643,6 @@ func (g *Geom) Union(other *Geom) *Geom {
 		defer other.context.Unlock()
 	}
 	return g.context.newGeom(C.GEOSUnion_r(g.context.handle, g.geom, other.geom), nil)
-}
-
-// UnaryUnionPrec returns the union of all components of a single geometry.
-func (g *Geom) UnaryUnionPrec(gridSize float64) *Geom {
-	g.mustNotBeDestroyed()
-	g.context.Lock()
-	defer g.context.Unlock()
-	return g.context.newNonNilGeom(C.GEOSUnaryUnionPrec_r(g.context.handle, g.geom, C.double(gridSize)), nil)
 }
 
 // Within returns true if g is within other.

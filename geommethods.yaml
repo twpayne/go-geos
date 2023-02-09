@@ -35,12 +35,12 @@
     type: float64
   - name: allowHoles
     type: uint
-- name: ConvexHull
-  comment: returns g's convex hull
-  type: unary
 - name: Contains
   comment: returns true if g contains other
   type: binaryPredicate
+- name: ConvexHull
+  comment: returns g's convex hull
+  type: unary
 - name: CoveredBy
   comment: returns true if g is covered by other
   type: binaryPredicate
@@ -243,15 +243,15 @@
 - name: UnaryUnion
   comment: returns the union of all components of a single geometry
   type: unary
-- name: Union
-  comment: returns the union of g and other
-  type: binary
 - name: UnaryUnionPrec
   comment: returns the union of all components of a single geometry
   type: unary
   extraArgs:
   - name: gridSize
     type: float64
+- name: Union
+  comment: returns the union of g and other
+  type: binary
 - name: Within
   comment: returns true if g is within other
   type: binaryPredicate
