@@ -41,6 +41,9 @@
 - name: ConvexHull
   comment: returns g's convex hull
   type: unary
+- name: CoverageUnion
+  comment: returns the union of g for polygonal inputs that are correctly noded and do not overlap
+  type: unary
 - name: CoveredBy
   comment: returns true if g is covered by other
   type: binaryPredicate

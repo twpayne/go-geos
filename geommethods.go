@@ -76,6 +76,14 @@ func (g *Geom) ConvexHull() *Geom {
 	return g.context.newNonNilGeom(C.GEOSConvexHull_r(g.context.handle, g.geom), nil)
 }
 
+// CoverageUnion returns the union of g for polygonal inputs that are correctly noded and do not overlap.
+func (g *Geom) CoverageUnion() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSCoverageUnion_r(g.context.handle, g.geom), nil)
+}
+
 // CoveredBy returns true if g is covered by other.
 func (g *Geom) CoveredBy(other *Geom) bool {
 	g.mustNotBeDestroyed()
