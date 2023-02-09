@@ -33,6 +33,14 @@ func (g *Geom) BufferWithStyle(width float64, quadsegs int, endCapStyle BufCapSt
 	return g.context.newNonNilGeom(C.GEOSBufferWithStyle_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs), C.int(endCapStyle), C.int(joinStyle), C.double(mitreLimit)), nil)
 }
 
+// BuildArea returns the polygonization using all the linework, assuming that rings contained within rings are empty holes, rather than extra PolygonHoleSimplify.
+func (g *Geom) BuildArea() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSBuildArea_r(g.context.handle, g.geom), nil)
+}
+
 // ClipByRect returns g clipped to a rectangular polygon.
 func (g *Geom) ClipByRect(xMin float64, yMin float64, xMax float64, yMax float64) *Geom {
 	g.mustNotBeDestroyed()
