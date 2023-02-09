@@ -321,6 +321,21 @@ func (g *Geom) FrechetDistanceDensify(other *Geom, densifyFrac float64) float64 
 	return frechetDistanceDensify
 }
 
+// HasZ returns if g has Z coordinates.
+func (g *Geom) HasZ() bool {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	switch C.GEOSHasZ_r(g.context.handle, g.geom) {
+	case 0:
+		return false
+	case 1:
+		return true
+	default:
+		panic(g.context.err)
+	}
+}
+
 // HausdorffDistance returns the Hausdorff distance between g and other.
 func (g *Geom) HausdorffDistance(other *Geom) float64 {
 	g.mustNotBeDestroyed()
