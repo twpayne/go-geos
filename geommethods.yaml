@@ -258,6 +258,12 @@
 - name: Union
   comment: returns the union of g and other
   type: binary
+- name: UnionPrec
+  comment: returns the union of g and other
+  type: binary
+  extraArgs:
+  - name: gridSize
+    type: float64
 - name: Within
   comment: returns true if g is within other
   type: binaryPredicate

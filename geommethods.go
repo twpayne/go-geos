@@ -668,6 +668,18 @@ func (g *Geom) Union(other *Geom) *Geom {
 	return g.context.newGeom(C.GEOSUnion_r(g.context.handle, g.geom, other.geom), nil)
 }
 
+// UnionPrec returns the union of g and other.
+func (g *Geom) UnionPrec(other *Geom, gridSize float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSUnionPrec_r(g.context.handle, g.geom, other.geom, C.double(gridSize)), nil)
+}
+
 // Within returns true if g is within other.
 func (g *Geom) Within(other *Geom) bool {
 	g.mustNotBeDestroyed()
