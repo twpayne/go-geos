@@ -121,6 +121,16 @@ func (g *Geom) NearestPoints(other *Geom) [][]float64 {
 	return g.context.newCoordsFromGEOSCoordSeq(s)
 }
 
+func (g *Geom) Normalize() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if C.GEOSNormalize_r(g.context.handle, g.geom) != 0 {
+		panic(g.context.err)
+	}
+	return g
+}
+
 // NumGeometries returns the number of geometries in g.
 func (g *Geom) NumGeometries() int {
 	g.mustNotBeDestroyed()
