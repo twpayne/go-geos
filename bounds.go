@@ -53,7 +53,7 @@ func (b *Bounds) Equals(other *Bounds) bool {
 
 // Geom returns b as a Geom.
 func (b *Bounds) Geom() *Geom {
-	return defaultContext.NewGeomFromBounds(b)
+	return DefaultContext.NewGeomFromBounds(b)
 }
 
 // IsEmpty returns true if b is empty.
