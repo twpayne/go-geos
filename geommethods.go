@@ -589,6 +589,18 @@ func (g *Geom) SetPrecision(gridSize float64, flags PrecisionRule) *Geom {
 	return g.context.newNonNilGeom(C.GEOSGeom_setPrecision_r(g.context.handle, g.geom, C.double(gridSize), C.int(flags)), nil)
 }
 
+// SharedPaths returns the paths shared between g and other, which must be lineal geometries.
+func (g *Geom) SharedPaths(other *Geom) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSSharedPaths_r(g.context.handle, g.geom, other.geom), nil)
+}
+
 // Simplify returns a simplified geometry.
 func (g *Geom) Simplify(tolerance float64) *Geom {
 	g.mustNotBeDestroyed()

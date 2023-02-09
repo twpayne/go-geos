@@ -234,6 +234,9 @@
     type: float64
   - name: flags
     type: PrecisionRule
+- name: SharedPaths
+  comment: returns the paths shared between g and other, which must be lineal geometries
+  type: binary
 - name: Simplify
   comment: returns a simplified geometry
   type: unary
