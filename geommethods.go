@@ -33,6 +33,22 @@ func (g *Geom) BufferWithStyle(width float64, quadsegs int, endCapStyle BufCapSt
 	return g.context.newNonNilGeom(C.GEOSBufferWithStyle_r(g.context.handle, g.geom, C.double(width), C.int(quadsegs), C.int(endCapStyle), C.int(joinStyle), C.double(mitreLimit)), nil)
 }
 
+// BuildArea returns the polygonization using all the linework, assuming that rings contained within rings are empty holes, rather than extra PolygonHoleSimplify.
+func (g *Geom) BuildArea() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSBuildArea_r(g.context.handle, g.geom), nil)
+}
+
+// ClipByRect returns g clipped to a rectangular polygon.
+func (g *Geom) ClipByRect(xMin float64, yMin float64, xMax float64, yMax float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSClipByRect_r(g.context.handle, g.geom, C.double(xMin), C.double(yMin), C.double(xMax), C.double(yMax)), nil)
+}
+
 // Clone returns a clone of g.
 func (g *Geom) Clone() *Geom {
 	g.mustNotBeDestroyed()
@@ -47,14 +63,6 @@ func (g *Geom) ConcaveHull(ratio float64, allowHoles uint) *Geom {
 	g.context.Lock()
 	defer g.context.Unlock()
 	return g.context.newNonNilGeom(C.GEOSConcaveHull_r(g.context.handle, g.geom, C.double(ratio), C.unsigned(allowHoles)), nil)
-}
-
-// ConvexHull returns g's convex hull.
-func (g *Geom) ConvexHull() *Geom {
-	g.mustNotBeDestroyed()
-	g.context.Lock()
-	defer g.context.Unlock()
-	return g.context.newNonNilGeom(C.GEOSConvexHull_r(g.context.handle, g.geom), nil)
 }
 
 // Contains returns true if g contains other.
@@ -74,6 +82,22 @@ func (g *Geom) Contains(other *Geom) bool {
 	default:
 		panic(g.context.err)
 	}
+}
+
+// ConvexHull returns g's convex hull.
+func (g *Geom) ConvexHull() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSConvexHull_r(g.context.handle, g.geom), nil)
+}
+
+// CoverageUnion returns the union of g for polygonal inputs that are correctly noded and do not overlap.
+func (g *Geom) CoverageUnion() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSCoverageUnion_r(g.context.handle, g.geom), nil)
 }
 
 // CoveredBy returns true if g is covered by other.
@@ -313,6 +337,21 @@ func (g *Geom) FrechetDistanceDensify(other *Geom, densifyFrac float64) float64 
 	return frechetDistanceDensify
 }
 
+// HasZ returns if g has Z coordinates.
+func (g *Geom) HasZ() bool {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	switch C.GEOSHasZ_r(g.context.handle, g.geom) {
+	case 0:
+		return false
+	case 1:
+		return true
+	default:
+		panic(g.context.err)
+	}
+}
+
 // HausdorffDistance returns the Hausdorff distance between g and other.
 func (g *Geom) HausdorffDistance(other *Geom) float64 {
 	g.mustNotBeDestroyed()
@@ -523,6 +562,14 @@ func (g *Geom) MinimumWidth() *Geom {
 	return g.context.newNonNilGeom(C.GEOSMinimumWidth_r(g.context.handle, g.geom), nil)
 }
 
+// Node returns a new geometry in which no lines cross each other, and all touching occurs at endpoints.
+func (g *Geom) Node() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSNode_r(g.context.handle, g.geom), nil)
+}
+
 // OffsetCurve returns the offset curve line(s) of g.
 func (g *Geom) OffsetCurve(width float64, quadsegs int, joinStyle BufJoinStyle, mitreLimit float64) *Geom {
 	g.mustNotBeDestroyed()
@@ -556,6 +603,18 @@ func (g *Geom) SetPrecision(gridSize float64, flags PrecisionRule) *Geom {
 	g.context.Lock()
 	defer g.context.Unlock()
 	return g.context.newNonNilGeom(C.GEOSGeom_setPrecision_r(g.context.handle, g.geom, C.double(gridSize), C.int(flags)), nil)
+}
+
+// SharedPaths returns the paths shared between g and other, which must be lineal geometries.
+func (g *Geom) SharedPaths(other *Geom) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSSharedPaths_r(g.context.handle, g.geom, other.geom), nil)
 }
 
 // Simplify returns a simplified geometry.
@@ -625,6 +684,14 @@ func (g *Geom) UnaryUnion() *Geom {
 	return g.context.newNonNilGeom(C.GEOSUnaryUnion_r(g.context.handle, g.geom), nil)
 }
 
+// UnaryUnionPrec returns the union of all components of a single geometry.
+func (g *Geom) UnaryUnionPrec(gridSize float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSUnaryUnionPrec_r(g.context.handle, g.geom, C.double(gridSize)), nil)
+}
+
 // Union returns the union of g and other.
 func (g *Geom) Union(other *Geom) *Geom {
 	g.mustNotBeDestroyed()
@@ -637,12 +704,16 @@ func (g *Geom) Union(other *Geom) *Geom {
 	return g.context.newGeom(C.GEOSUnion_r(g.context.handle, g.geom, other.geom), nil)
 }
 
-// UnaryUnionPrec returns the union of all components of a single geometry.
-func (g *Geom) UnaryUnionPrec(gridSize float64) *Geom {
+// UnionPrec returns the union of g and other.
+func (g *Geom) UnionPrec(other *Geom, gridSize float64) *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	return g.context.newNonNilGeom(C.GEOSUnaryUnionPrec_r(g.context.handle, g.geom, C.double(gridSize)), nil)
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSUnionPrec_r(g.context.handle, g.geom, other.geom, C.double(gridSize)), nil)
 }
 
 // Within returns true if g is within other.

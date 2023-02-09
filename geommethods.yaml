@@ -23,6 +23,21 @@
     type: BufJoinStyle
   - name: mitreLimit
     type: float64
+- name: BuildArea
+  comment: returns the polygonization using all the linework, assuming that rings contained within rings are empty holes, rather than extra PolygonHoleSimplify
+  type: unary
+- name: ClipByRect
+  comment: returns g clipped to a rectangular polygon
+  type: unary
+  extraArgs:
+  - name: xMin
+    type: float64
+  - name: yMin
+    type: float64
+  - name: xMax
+    type: float64
+  - name: yMax
+    type: float64
 - name: Clone
   comment: returns a clone of g
   type: unary
@@ -35,12 +50,15 @@
     type: float64
   - name: allowHoles
     type: uint
-- name: ConvexHull
-  comment: returns g's convex hull
-  type: unary
 - name: Contains
   comment: returns true if g contains other
   type: binaryPredicate
+- name: ConvexHull
+  comment: returns g's convex hull
+  type: unary
+- name: CoverageUnion
+  comment: returns the union of g for polygonal inputs that are correctly noded and do not overlap
+  type: unary
 - name: CoveredBy
   comment: returns true if g is covered by other
   type: binaryPredicate
@@ -101,6 +119,9 @@
   extraArgs:
   - name: densifyFrac
     type: float64
+- name: HasZ
+  comment: returns if g has Z coordinates
+  type: unaryPredicate
 - name: HausdorffDistance
   comment: returns the Hausdorff distance between g and other
   type: float64BinaryProperty
@@ -174,6 +195,9 @@
 - name: MinimumWidth
   comment: returns a linestring geometry which represents the minimum diameter of g
   type: unary
+- name: Node
+  comment: returns a new geometry in which no lines cross each other, and all touching occurs at endpoints
+  type: unary
 - name: OffsetCurve
   comment: returns the offset curve line(s) of g
   type: unary
@@ -216,6 +240,9 @@
     type: float64
   - name: flags
     type: PrecisionRule
+- name: SharedPaths
+  comment: returns the paths shared between g and other, which must be lineal geometries
+  type: binary
 - name: Simplify
   comment: returns a simplified geometry
   type: unary
@@ -243,12 +270,18 @@
 - name: UnaryUnion
   comment: returns the union of all components of a single geometry
   type: unary
-- name: Union
-  comment: returns the union of g and other
-  type: binary
 - name: UnaryUnionPrec
   comment: returns the union of all components of a single geometry
   type: unary
+  extraArgs:
+  - name: gridSize
+    type: float64
+- name: Union
+  comment: returns the union of g and other
+  type: binary
+- name: UnionPrec
+  comment: returns the union of g and other
+  type: binary
   extraArgs:
   - name: gridSize
     type: float64
