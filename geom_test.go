@@ -171,6 +171,8 @@ func TestGeomMethods(t *testing.T) {
 		assert.Equal(t, unitSquare.HausdorffDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
 		assert.Equal(t, unitSquare.HausdorffDistanceDensify(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)"), 0.01), 1.)
 	}
+	assert.Equal(t, eastWestLine.ProjectNormalized(mustNewGeomFromWKT(t, c, "Point (0.5 0.5)")), 0.5)
+	assert.Equal(t, eastWestLine.Project(mustNewGeomFromWKT(t, c, "Point (0.5 0.5)")), 0.5)
 	assert.True(t, northSouthLine.Intersects(eastWestLine))
 	assert.False(t, southEastSquare.Intersects(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")))
 	if versionEqualOrGreaterThan(3, 8, 0) {
