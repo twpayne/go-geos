@@ -597,6 +597,30 @@ func (g *Geom) Overlaps(other *Geom) bool {
 	}
 }
 
+// Project returns the distance of other(a point) projected onto g(a line) from the start of the line.
+func (g *Geom) Project(other *Geom) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return float64(C.GEOSProject_r(g.context.handle, g.geom, other.geom))
+}
+
+// ProjectNormalized returns the proportional distance of other(a point) projected onto g(a line) from the start of the line. For example, a point that projects to the middle of a line would be return 0.5.
+func (g *Geom) ProjectNormalized(other *Geom) float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return float64(C.GEOSProjectNormalized_r(g.context.handle, g.geom, other.geom))
+}
+
 // SetPrecision changes the coordinate precision of g.
 func (g *Geom) SetPrecision(gridSize float64, flags PrecisionRule) *Geom {
 	g.mustNotBeDestroyed()

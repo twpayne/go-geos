@@ -231,6 +231,14 @@
 #    type: uint
 #  - name: vertexNumFraction
 #    type: float64
+- name: Project
+  comment: returns the distance of other(a point) projected onto g(a line) from the start of the line
+  type: float64BinaryProperty
+  valueReturned: true
+- name: ProjectNormalized
+  comment: returns the proportional distance of other(a point) projected onto g(a line) from the start of the line. For example, a point that projects to the middle of a line would be return 0.5
+  type: float64BinaryProperty
+  valueReturned: true
 - name: SetPrecision
   comment: changes the coordinate precision of g
   type: unary

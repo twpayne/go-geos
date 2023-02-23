@@ -110,11 +110,15 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 		other.context.Lock()
 		defer other.context.Unlock()
 	}
+    {{- if .valueReturned }}
+	return float64(C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}))
+    {{- else }}
 	var {{ $varName }} float64
 	if C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}, (*C.double)(&{{ $varName }})) == 0 {
 		panic(g.context.err)
 	}
 	return {{ $varName }}
+    {{- end }}
 }
 
 {{-  end }}
