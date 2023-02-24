@@ -651,6 +651,14 @@ func (g *Geom) RelateBoundaryNodeRule(other *Geom, bnr RelateBoundaryNodeRule) s
 	return C.GoString(relateBoundaryNodeRuleCStr)
 }
 
+// Reverse returns g with sequence orders reversed.
+func (g *Geom) Reverse() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSReverse_r(g.context.handle, g.geom), nil)
+}
+
 // SetPrecision changes the coordinate precision of g.
 func (g *Geom) SetPrecision(gridSize float64, flags PrecisionRule) *Geom {
 	g.mustNotBeDestroyed()

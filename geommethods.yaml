@@ -248,6 +248,9 @@
   extraArgs:
   - name: bnr
     type: RelateBoundaryNodeRule
+- name: Reverse
+  comment: returns g with sequence orders reversed
+  type: unary
 - name: SetPrecision
   comment: changes the coordinate precision of g
   type: unary
