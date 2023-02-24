@@ -5,6 +5,8 @@ package geos
 // #include "geos.h"
 import "C"
 
+import "unsafe"
+
 // Area returns g's area.
 func (g *Geom) Area() float64 {
 	g.mustNotBeDestroyed()
@@ -619,6 +621,20 @@ func (g *Geom) ProjectNormalized(other *Geom) float64 {
 		defer other.context.Unlock()
 	}
 	return float64(C.GEOSProjectNormalized_r(g.context.handle, g.geom, other.geom))
+}
+
+// Relate returns the DE9IM pattern for g and other.
+func (g *Geom) Relate(other *Geom) string {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	relateCStr := C.GEOSRelate_r(g.context.handle, g.geom, other.geom)
+	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer(relateCStr))
+	return C.GoString(relateCStr)
 }
 
 // SetPrecision changes the coordinate precision of g.

@@ -437,6 +437,13 @@ func TestWKXRoundTrip(t *testing.T) {
 	}
 }
 
+func TestGeomRelate(t *testing.T) {
+	c := NewContext()
+	g1 := mustNewGeomFromWKT(t, c, "POINT (0 0)")
+	g2 := mustNewGeomFromWKT(t, c, "LINESTRING (0 0,1 0)")
+	assert.Equal(t, "F0FFFF102", g1.Relate(g2))
+}
+
 func TestSetPrecision(t *testing.T) {
 	g1 := mustNewGeomFromWKT(t, NewContext(), "POINT (1 2)")
 	g2 := g1.SetPrecision(1, PrecisionRulePointwise)
