@@ -3,6 +3,7 @@ package geos
 import (
 	"math"
 	"runtime"
+	"strconv"
 	"sync"
 	"testing"
 
@@ -324,5 +325,56 @@ func TestPolygonizeMultiContext(t *testing.T) {
 				mustNewGeomFromWKT(t, c2, "LINESTRING (0 1,0 0)"),
 			}),
 		)
+	}
+}
+
+func TestSegmentIntersection(t *testing.T) {
+	for i, tc := range []struct {
+		ax0, ay0, ax1, ay1 float64
+		bx0, by0, bx1, by1 float64
+		cx, cy             float64
+		intersects         bool
+	}{
+		{
+			ax0:        0,
+			ay0:        0,
+			ax1:        1,
+			ay1:        1,
+			bx0:        0,
+			by0:        1,
+			bx1:        1,
+			by1:        0,
+			cx:         0.5,
+			cy:         0.5,
+			intersects: true,
+		},
+		{
+			ax0: 0,
+			ay0: 0,
+			ax1: 1,
+			ay1: 0,
+			bx0: 0,
+			by0: 1,
+			bx1: 1,
+			by1: 1,
+		},
+		{
+			ax0:        0,
+			ay0:        0,
+			ax1:        1,
+			ay1:        0,
+			bx0:        0,
+			by0:        0,
+			bx1:        1,
+			by1:        0,
+			intersects: true,
+		},
+	} {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			actualCX, actualCY, actualIntersects := NewContext().SegmentIntersection(tc.ax0, tc.ay0, tc.ax1, tc.ay1, tc.bx0, tc.by0, tc.ax1, tc.by1)
+			assert.Equal(t, tc.cx, actualCX)
+			assert.Equal(t, tc.cy, actualCY)
+			assert.Equal(t, tc.intersects, actualIntersects)
+		})
 	}
 }

@@ -295,6 +295,24 @@ func (c *Context) RelatePatternMatch(mat, pat string) bool {
 	}
 }
 
+// SegmentIntersection returns the coordinate where two lines intersect.
+func (c *Context) SegmentIntersection(ax0, ay0, ax1, ay1, bx0, by0, bx1, by1 float64) (float64, float64, bool) {
+	c.Lock()
+	defer c.Unlock()
+	var cx, cy float64
+	switch C.GEOSSegmentIntersection_r(c.handle,
+		C.double(ax0), C.double(ay0), C.double(ax1), C.double(ay1),
+		C.double(bx0), C.double(by0), C.double(bx1), C.double(by1),
+		(*C.double)(&cx), (*C.double)(&cy)) {
+	case 1:
+		return cx, cy, true
+	case -1:
+		return 0, 0, false
+	default:
+		panic(c.err)
+	}
+}
+
 func (c *Context) cGeomsLocked(geoms []*Geom) (**C.struct_GEOSGeom_t, func()) {
 	if len(geoms) == 0 {
 		return nil, func() {}
