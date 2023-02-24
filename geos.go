@@ -27,6 +27,18 @@ const (
 	TypeIDGeometryCollection TypeID = C.GEOS_GEOMETRYCOLLECTION
 )
 
+// A BoundaryNodeRule is a boundary node rule.
+type RelateBoundaryNodeRule int
+
+// Boundary node rules.
+const (
+	RelateBoundaryNodeRuleMod2                RelateBoundaryNodeRule = C.GEOSRELATE_BNR_MOD2
+	RelateBoundaryNodeRuleOGC                 RelateBoundaryNodeRule = C.GEOSRELATE_BNR_OGC
+	RelateBoundaryNodeRuleEndpoint            RelateBoundaryNodeRule = C.GEOSRELATE_BNR_ENDPOINT
+	RelateBoundaryNodeRuleMultivalentEndpoint RelateBoundaryNodeRule = C.GEOSRELATE_BNR_MULTIVALENT_ENDPOINT
+	RelateBoundaryNodeRuleMonovalentEndpoint  RelateBoundaryNodeRule = C.GEOSRELATE_BNR_MONOVALENT_ENDPOINT
+)
+
 type BufCapStyle int
 
 // Buffer cap styles.

@@ -2,6 +2,7 @@
 
 package geos
 
+// #include <stdlib.h>
 // #include "geos.h"
 import "C"
 
@@ -181,6 +182,27 @@ func (g *Geom) Precision() float64 {
 	g.context.Lock()
 	defer g.context.Unlock()
 	return float64(C.GEOSGeom_getPrecision_r(g.context.handle, g.geom))
+}
+
+// RelatePattern returns if the DE9IM pattern for g and other matches pat.
+func (g *Geom) RelatePattern(other *Geom, pat string) bool {
+	g.mustNotBeDestroyed()
+	patCStr := C.CString(pat)
+	defer C.free(unsafe.Pointer(patCStr))
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	switch C.GEOSRelatePattern_r(g.context.handle, g.geom, other.geom, patCStr) {
+	case 0:
+		return false
+	case 1:
+		return true
+	default:
+		panic(g.context.err)
+	}
 }
 
 // SRID returns g's SRID.

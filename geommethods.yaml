@@ -239,6 +239,18 @@
   comment: returns the proportional distance of other(a point) projected onto g(a line) from the start of the line. For example, a point that projects to the middle of a line would be return 0.5
   type: float64BinaryProperty
   valueReturned: true
+- name: Relate
+  comment: returns the DE9IM pattern for g and other
+  type: stringBinaryProperty
+- name: RelateBoundaryNodeRule
+  comment: returns the DE9IM pattern for g and other
+  type: stringBinaryProperty
+  extraArgs:
+  - name: bnr
+    type: RelateBoundaryNodeRule
+- name: Reverse
+  comment: returns g with sequence orders reversed
+  type: unary
 - name: SetPrecision
   comment: changes the coordinate precision of g
   type: unary

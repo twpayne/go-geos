@@ -5,6 +5,8 @@ package geos
 // #include "geos.h"
 import "C"
 
+import "unsafe"
+
 {{- range . }}
 {{-   $geosFunction := printf "GEOS%s_r" .name }}
 {{-   if .geosFunction }}
@@ -119,6 +121,23 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 	}
 	return {{ $varName }}
     {{- end }}
+}
+
+{{-   else if eq .type "stringBinaryProperty" }}
+{{-     $varName := .name | firstRuneToLower }}
+
+{{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
+func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) string {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	{{ $varName }}CStr := C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }})
+	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer({{ $varName }}CStr))
+	return C.GoString({{ $varName }}CStr)
 }
 
 {{-  end }}
