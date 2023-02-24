@@ -637,6 +637,20 @@ func (g *Geom) Relate(other *Geom) string {
 	return C.GoString(relateCStr)
 }
 
+// RelateBoundaryNodeRule returns the DE9IM pattern for g and other.
+func (g *Geom) RelateBoundaryNodeRule(other *Geom, bnr RelateBoundaryNodeRule) string {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	relateBoundaryNodeRuleCStr := C.GEOSRelateBoundaryNodeRule_r(g.context.handle, g.geom, other.geom, C.int(bnr))
+	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer(relateBoundaryNodeRuleCStr))
+	return C.GoString(relateBoundaryNodeRuleCStr)
+}
+
 // SetPrecision changes the coordinate precision of g.
 func (g *Geom) SetPrecision(gridSize float64, flags PrecisionRule) *Geom {
 	g.mustNotBeDestroyed()
