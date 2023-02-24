@@ -277,6 +277,24 @@ func (c *Context) PolygonizeValid(geoms []*Geom) *Geom {
 	return c.newNonNilGeom(C.GEOSPolygonize_valid_r(c.handle, cGeoms, C.uint(len(geoms))), nil)
 }
 
+// RelatePatternMatch returns if two DE9IM patterns are consistent.
+func (c *Context) RelatePatternMatch(mat, pat string) bool {
+	matCStr := C.CString(mat)
+	defer C.free(unsafe.Pointer(matCStr))
+	patCStr := C.CString(pat)
+	defer C.free(unsafe.Pointer(patCStr))
+	c.Lock()
+	defer c.Unlock()
+	switch C.GEOSRelatePatternMatch_r(c.handle, matCStr, patCStr) {
+	case 0:
+		return false
+	case 1:
+		return true
+	default:
+		panic(c.err)
+	}
+}
+
 func (c *Context) cGeomsLocked(geoms []*Geom) (**C.struct_GEOSGeom_t, func()) {
 	if len(geoms) == 0 {
 		return nil, func() {}
