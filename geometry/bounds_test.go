@@ -1,4 +1,4 @@
-package geometry
+package geometry_test
 
 import (
 	"testing"
@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	geos "github.com/twpayne/go-geos"
+	"github.com/twpayne/go-geos"
 )
 
 func TestBounds(t *testing.T) {

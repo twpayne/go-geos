@@ -1,15 +1,17 @@
-package geos
+package geos_test
 
 import (
 	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/twpayne/go-geos"
 )
 
 func TestPrepGeom(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
-	c := NewContext()
+	c := geos.NewContext()
 	unitSquare := mustNewGeomFromWKT(t, c, "POLYGON ((0 0, 0 1, 1 1, 1 0, 0 0))").Prepare()
 	middleSquare := mustNewGeomFromWKT(t, c, "POLYGON ((0.25 0.25, 0.25 0.75, 0.75 0.75, 0.75 0.25, 0.25 0.25))")
 	assert.True(t, unitSquare.Contains(middleSquare))

@@ -1,4 +1,4 @@
-package geometry
+package geometry_test
 
 import (
 	"encoding/json"
@@ -9,20 +9,21 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/twpayne/go-geos"
+	"github.com/twpayne/go-geos/geometry"
 )
 
 var (
-	_ json.Marshaler   = &Geometry{}
-	_ json.Unmarshaler = &Geometry{}
+	_ json.Marshaler   = &geometry.Geometry{}
+	_ json.Unmarshaler = &geometry.Geometry{}
 )
 
 func TestGeoJSON(t *testing.T) {
 	for i, tc := range []struct {
-		geom       *Geometry
+		geom       *geometry.Geometry
 		geoJSONStr string
 	}{
 		{
-			geom:       NewGeometry(geos.NewPoint([]float64{1, 2})),
+			geom:       geometry.NewGeometry(geos.NewPoint([]float64{1, 2})),
 			geoJSONStr: `{"type":"Point","coordinates":[1,2]}`,
 		},
 	} {
@@ -31,7 +32,7 @@ func TestGeoJSON(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, tc.geoJSONStr, string(actualGeoJSON))
 
-			var geom Geometry
+			var geom geometry.Geometry
 			require.NoError(t, geom.UnmarshalJSON([]byte(tc.geoJSONStr)))
 			assert.True(t, tc.geom.Equals(geom.Geom))
 		})

@@ -1,4 +1,4 @@
-package geos
+package geos_test
 
 import (
 	"fmt"
@@ -8,11 +8,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/twpayne/go-geos"
 )
 
 func TestCoordSeqEmpty(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
-	c := NewContext()
+	c := geos.NewContext()
 	s := c.NewCoordSeq(0, 2)
 	assert.Equal(t, 0, s.Size())
 	assert.Equal(t, 2, s.Dimensions())
@@ -44,7 +46,7 @@ func TestCoordSeqIsCCW(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			defer runtime.GC() // Exercise finalizers.
-			s := NewContext().NewCoordSeqFromCoords(tc.coords)
+			s := geos.NewContext().NewCoordSeqFromCoords(tc.coords)
 			if tc.expectedErr {
 				assert.Panics(t, func() {
 					s.IsCCW()
@@ -58,7 +60,7 @@ func TestCoordSeqIsCCW(t *testing.T) {
 
 func TestCoordSeqMethods(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
-	c := NewContext()
+	c := geos.NewContext()
 	s := c.NewCoordSeq(2, 3)
 	assert.Equal(t, 2, s.Size())
 	assert.Equal(t, 3, s.Dimensions())
@@ -93,7 +95,7 @@ func TestCoordSeqMethods(t *testing.T) {
 }
 
 func TestCoordSeqPanics(t *testing.T) {
-	c := NewContext()
+	c := geos.NewContext()
 	s := c.NewCoordSeq(1, 2)
 
 	assert.Panics(t, func() { s.X(-1) })
@@ -159,7 +161,7 @@ func TestCoordSeqCoordsMethods(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			defer runtime.GC() // Exercise finalizers.
-			c := NewContext()
+			c := geos.NewContext()
 			s := c.NewCoordSeqFromCoords(tc.coords)
 			assert.Equal(t, tc.coords, s.ToCoords())
 		})

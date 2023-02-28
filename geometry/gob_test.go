@@ -1,4 +1,4 @@
-package geometry
+package geometry_test
 
 import (
 	"testing"
@@ -7,13 +7,14 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/twpayne/go-geos"
+	"github.com/twpayne/go-geos/geometry"
 )
 
 func TestGob(t *testing.T) {
-	g := NewGeometry(geos.NewPoint([]float64{1, 2}))
+	g := geometry.NewGeometry(geos.NewPoint([]float64{1, 2}))
 	data, err := g.GobEncode()
 	require.NoError(t, err)
-	var geom Geometry
+	var geom geometry.Geometry
 	require.NoError(t, geom.GobDecode(data))
 	assert.True(t, g.Geom.Equals(geom.Geom))
 }

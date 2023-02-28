@@ -1,4 +1,4 @@
-package geos
+package geos_test
 
 import (
 	"math"
@@ -8,103 +8,105 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/twpayne/go-geos"
 )
 
 func TestGeometryMethods(t *testing.T) {
 	for _, tc := range []struct {
 		name                  string
 		wkt                   string
-		expectedBounds        *Bounds
+		expectedBounds        *geos.Bounds
 		expectedEmpty         bool
 		expectedEnvelopeWKT   string
 		expectedNumGeometries int
 		expectedSRID          int
 		expectedType          string
-		expectedTypeID        TypeID
+		expectedTypeID        geos.TypeID
 		expectedArea          float64
 		expectedLength        float64
 	}{
 		{
 			name:                  "point",
 			wkt:                   "POINT (0.0000000000000000 0.0000000000000000)",
-			expectedBounds:        &Bounds{MinX: 0, MinY: 0, MaxX: 0, MaxY: 0},
+			expectedBounds:        &geos.Bounds{MinX: 0, MinY: 0, MaxX: 0, MaxY: 0},
 			expectedEmpty:         false,
 			expectedEnvelopeWKT:   "POINT (0 0)",
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
 			expectedType:          "Point",
-			expectedTypeID:        TypeIDPoint,
+			expectedTypeID:        geos.TypeIDPoint,
 			expectedArea:          0,
 			expectedLength:        0,
 		},
 		{
 			name:                  "point_empty",
 			wkt:                   "POINT EMPTY",
-			expectedBounds:        &Bounds{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
+			expectedBounds:        &geos.Bounds{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
 			expectedEmpty:         true,
 			expectedEnvelopeWKT:   "POINT EMPTY",
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
 			expectedType:          "Point",
-			expectedTypeID:        TypeIDPoint,
+			expectedTypeID:        geos.TypeIDPoint,
 			expectedArea:          0,
 			expectedLength:        0,
 		},
 		{
 			name:                  "linestring",
 			wkt:                   "LINESTRING (0.0000000000000000 0.0000000000000000, 1.0000000000000000 1.0000000000000000)",
-			expectedBounds:        &Bounds{MinX: 0, MinY: 0, MaxX: 1, MaxY: 1},
+			expectedBounds:        &geos.Bounds{MinX: 0, MinY: 0, MaxX: 1, MaxY: 1},
 			expectedEmpty:         false,
 			expectedEnvelopeWKT:   "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))",
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
 			expectedType:          "LineString",
-			expectedTypeID:        TypeIDLineString,
+			expectedTypeID:        geos.TypeIDLineString,
 			expectedArea:          0,
 			expectedLength:        math.Sqrt(2),
 		},
 		{
 			name:                  "linestring_empty",
 			wkt:                   "LINESTRING EMPTY",
-			expectedBounds:        &Bounds{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
+			expectedBounds:        &geos.Bounds{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
 			expectedEmpty:         true,
 			expectedEnvelopeWKT:   "POLYGON EMPTY",
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
 			expectedType:          "LineString",
-			expectedTypeID:        TypeIDLineString,
+			expectedTypeID:        geos.TypeIDLineString,
 			expectedArea:          0,
 			expectedLength:        0,
 		},
 		{
 			name:                  "polygon",
 			wkt:                   "POLYGON ((0 0, 1 0, 1 1, 0 0))",
-			expectedBounds:        &Bounds{MinX: 0, MinY: 0, MaxX: 1, MaxY: 1},
+			expectedBounds:        &geos.Bounds{MinX: 0, MinY: 0, MaxX: 1, MaxY: 1},
 			expectedEmpty:         false,
 			expectedEnvelopeWKT:   "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))",
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
 			expectedType:          "Polygon",
-			expectedTypeID:        TypeIDPolygon,
+			expectedTypeID:        geos.TypeIDPolygon,
 			expectedArea:          0.5,
 			expectedLength:        math.Sqrt(2) + 2,
 		},
 		{
 			name:                  "polygon_empty",
 			wkt:                   "POLYGON EMPTY",
-			expectedBounds:        &Bounds{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
+			expectedBounds:        &geos.Bounds{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
 			expectedEmpty:         true,
 			expectedEnvelopeWKT:   "POLYGON EMPTY",
 			expectedNumGeometries: 1,
 			expectedSRID:          0,
 			expectedType:          "Polygon",
-			expectedTypeID:        TypeIDPolygon,
+			expectedTypeID:        geos.TypeIDPolygon,
 			expectedArea:          0,
 			expectedLength:        0,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			c := NewContext()
+			c := geos.NewContext()
 			g := mustNewGeomFromWKT(t, c, tc.wkt)
 			assert.Equal(t, tc.expectedBounds, g.Bounds())
 			assert.Equal(t, tc.expectedEmpty, g.IsEmpty())
@@ -133,7 +135,7 @@ func TestGeometryMethods(t *testing.T) {
 
 func TestGeomMethods(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
-	c := NewContext()
+	c := geos.NewContext()
 	unitSquare := mustNewGeomFromWKT(t, c, "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))")
 	northSouthLine := mustNewGeomFromWKT(t, c, "LINESTRING (0.5 0, 0.5 1)")
 	eastWestLine := mustNewGeomFromWKT(t, c, "LINESTRING (0 0.5, 1 0.5)")
@@ -153,31 +155,23 @@ func TestGeomMethods(t *testing.T) {
 	assert.True(t, southEastSquare.Disjoint(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")))
 	assert.Equal(t, unitSquare.Distance(unitSquare), 0.)
 	assert.Equal(t, unitSquare.Distance(mustNewGeomFromWKT(t, c, "POLYGON ((2 0, 3 0, 3 1, 2 1, 2 0))")), 1.)
-	if versionEqualOrGreaterThan(3, 8, 0) {
-		assert.Equal(t, unitSquare.DistanceIndexed(mustNewGeomFromWKT(t, c, "POLYGON ((2 0, 3 0, 3 1, 2 1, 2 0))")), 1.)
-	}
-	if versionEqualOrGreaterThan(3, 10, 0) {
-		assert.True(t, unitSquare.DistanceWithin(mustNewGeomFromWKT(t, c, "POINT (2 2)"), 2))
-		assert.False(t, unitSquare.DistanceWithin(mustNewGeomFromWKT(t, c, "POINT (2 2)"), 1))
-	}
+	assert.Equal(t, unitSquare.DistanceIndexed(mustNewGeomFromWKT(t, c, "POLYGON ((2 0, 3 0, 3 1, 2 1, 2 0))")), 1.)
+	assert.True(t, unitSquare.DistanceWithin(mustNewGeomFromWKT(t, c, "POINT (2 2)"), 2))
+	assert.False(t, unitSquare.DistanceWithin(mustNewGeomFromWKT(t, c, "POINT (2 2)"), 1))
 	assert.True(t, middleSquare.Equals(unitSquare.Intersection(middleSquare)))
 	assert.True(t, unitSquare.EqualsExact(unitSquare, 0.125))
-	if versionEqualOrGreaterThan(3, 10, 0) {
-		assert.Equal(t, unitSquare.FrechetDistance(unitSquare), 0.)
-		assert.Equal(t, mustNewGeomFromWKT(t, c, "LINESTRING (0 1, 0 0)").FrechetDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
-		assert.Equal(t, unitSquare.FrechetDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
-		assert.Equal(t, unitSquare.FrechetDistanceDensify(unitSquare, 0.1), 0.)
-		assert.Equal(t, unitSquare.HausdorffDistance(unitSquare), 0.)
-		assert.Equal(t, unitSquare.HausdorffDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
-		assert.Equal(t, unitSquare.HausdorffDistanceDensify(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)"), 0.01), 1.)
-	}
+	assert.Equal(t, unitSquare.FrechetDistance(unitSquare), 0.)
+	assert.Equal(t, mustNewGeomFromWKT(t, c, "LINESTRING (0 1, 0 0)").FrechetDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
+	assert.Equal(t, unitSquare.FrechetDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
+	assert.Equal(t, unitSquare.FrechetDistanceDensify(unitSquare, 0.1), 0.)
+	assert.Equal(t, unitSquare.HausdorffDistance(unitSquare), 0.)
+	assert.Equal(t, unitSquare.HausdorffDistance(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")), 1.)
+	assert.Equal(t, unitSquare.HausdorffDistanceDensify(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)"), 0.01), 1.)
 	assert.Equal(t, eastWestLine.ProjectNormalized(mustNewGeomFromWKT(t, c, "Point (0.5 0.5)")), 0.5)
 	assert.Equal(t, eastWestLine.Project(mustNewGeomFromWKT(t, c, "Point (0.5 0.5)")), 0.5)
 	assert.True(t, northSouthLine.Intersects(eastWestLine))
 	assert.False(t, southEastSquare.Intersects(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")))
-	if versionEqualOrGreaterThan(3, 8, 0) {
-		assert.Equal(t, [][]float64{{1, 1}, {2, 2}}, unitSquare.NearestPoints(mustNewGeomFromWKT(t, c, "POLYGON ((2 2, 3 2, 3 3, 2 3, 2 2))")))
-	}
+	assert.Equal(t, [][]float64{{1, 1}, {2, 2}}, unitSquare.NearestPoints(mustNewGeomFromWKT(t, c, "POLYGON ((2 2, 3 2, 3 3, 2 3, 2 2))")))
 	assert.Nil(t, unitSquare.NearestPoints(mustNewGeomFromWKT(t, c, "GEOMETRYCOLLECTION EMPTY")))
 	assert.True(t, middleSquare.Overlaps(southEastSquare))
 	assert.False(t, northWestSquare.Overlaps(southEastSquare))
@@ -186,9 +180,7 @@ func TestGeomMethods(t *testing.T) {
 	assert.True(t, middleSquare.Within(unitSquare))
 	assert.False(t, unitSquare.Within(middleSquare))
 	assert.Equal(t, 1.0, northSouthLine.Buffer(0.5, 4).MinimumWidth().Length())
-	if versionEqualOrGreaterThan(3, 10, 0) {
-		assert.Equal(t, 3, northSouthLine.Densify(0.5).NumPoints())
-	}
+	assert.Equal(t, 3, northSouthLine.Densify(0.5).NumPoints())
 }
 
 func TestPointMethods(t *testing.T) {
@@ -209,7 +201,7 @@ func TestPointMethods(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			defer runtime.GC() // Exercise finalizers.
-			c := NewContext()
+			c := geos.NewContext()
 			g := mustNewGeomFromWKT(t, c, tc.wkt)
 			assert.Equal(t, tc.expectedCoordSeqCoords, g.CoordSeq().ToCoords())
 			assert.Equal(t, tc.expectedX, g.X())
@@ -254,7 +246,7 @@ func TestLineStringMethods(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			defer runtime.GC() // Exercise finalizers.
-			c := NewContext()
+			c := geos.NewContext()
 			g := mustNewGeomFromWKT(t, c, tc.wkt)
 			assert.Equal(t, tc.expectedClosed, g.IsClosed())
 			assert.Equal(t, len(tc.expectedPointWKTs), g.NumPoints())
@@ -270,7 +262,7 @@ func TestLineStringMethods(t *testing.T) {
 
 func TestPolygonMethods(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
-	c := NewContext()
+	c := geos.NewContext()
 	polygon := mustNewGeomFromWKT(t, c, "POLYGON ((0 0, 3 0, 3 3, 0 3, 0 0), (1 1, 1 2, 2 2, 2 1, 1 1))")
 	assert.Nil(t, polygon.CoordSeq())
 	assert.Equal(t, 1, polygon.NumInteriorRings())
@@ -286,14 +278,14 @@ func TestPolygonMethods(t *testing.T) {
 
 func TestGeometryPanics(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
-	c := NewContext()
+	c := geos.NewContext()
 	assert.Panics(t, func() { c.NewEmptyLineString().Point(-1) })
 	assert.Panics(t, func() { c.NewEmptyLineString().Point(0) })
 	assert.NotPanics(t, func() { c.NewEmptyPolygon().ExteriorRing() })
 	assert.Panics(t, func() { c.NewEmptyPolygon().InteriorRing(-1) })
 	assert.Panics(t, func() { c.NewEmptyPolygon().InteriorRing(0) })
 	assert.NotPanics(t, func() {
-		g := NewEmptyPoint()
+		g := geos.NewEmptyPoint()
 		g.Destroy()
 		g.Destroy()
 	})
@@ -301,7 +293,7 @@ func TestGeometryPanics(t *testing.T) {
 
 func TestBinaryMethods(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
-	c := NewContext()
+	c := geos.NewContext()
 	multiPoint1 := mustNewGeomFromWKT(t, c, "MULTIPOINT (0 0,1 1)")
 	multiPoint2 := mustNewGeomFromWKT(t, c, "MULTIPOINT (1 1,2 2)")
 	difference := multiPoint1.Difference(multiPoint2)
@@ -310,7 +302,7 @@ func TestBinaryMethods(t *testing.T) {
 
 func TestGeomInterpolate(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
-	c := NewContext()
+	c := geos.NewContext()
 
 	lineString := mustNewGeomFromWKT(t, c, "LINESTRING (0 0,1 0)")
 	assert.True(t, mustNewGeomFromWKT(t, c, "POINT (0.5 0)").Equals(lineString.Interpolate(0.5)))
@@ -354,7 +346,7 @@ func TestGeomPolygonizeFull(t *testing.T) {
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			c := NewContext()
+			c := geos.NewContext()
 			g := mustNewGeomFromWKT(t, c, tc.wkt)
 			actual, cuts, dangles, invalidRings := g.PolygonizeFull()
 			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedWKT), actual)
@@ -381,7 +373,7 @@ func TestNewGeomFromGeoJSON(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			defer runtime.GC() // Exercise finalizers.
-			context := NewContext()
+			context := geos.NewContext()
 			actualGeom, err := context.NewGeomFromGeoJSON(tc.geoJSON)
 			require.NoError(t, err)
 			assert.True(t, mustNewGeomFromWKT(t, context, tc.expectedWKT).Equals(actualGeom))
@@ -390,23 +382,23 @@ func TestNewGeomFromGeoJSON(t *testing.T) {
 }
 
 func TestNewGeomFromGeoJSONError(t *testing.T) {
-	_, err := NewContext().NewGeomFromGeoJSON(`{"type":`)
+	_, err := geos.NewContext().NewGeomFromGeoJSON(`{"type":`)
 	assert.Error(t, err)
 }
 
 func TestGeomToJSON(t *testing.T) {
-	geom := mustNewGeomFromWKT(t, NewContext(), "POINT (1 2)")
+	geom := mustNewGeomFromWKT(t, geos.NewContext(), "POINT (1 2)")
 	assert.Equal(t, `{"type":"Point","coordinates":[1.0,2.0]}`, geom.ToGeoJSON(-1))
 }
 
 func TestWKBError(t *testing.T) {
-	_, err := NewContext().NewGeomFromWKT("POINT (0 0")
+	_, err := geos.NewContext().NewGeomFromWKT("POINT (0 0")
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "ParseException: Expected word but encountered end of stream")
 }
 
 func TestWKTError(t *testing.T) {
-	_, err := NewContext().NewGeomFromWKB(nil)
+	_, err := geos.NewContext().NewGeomFromWKB(nil)
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "ParseException: Unexpected EOF parsing WKB")
 }
@@ -427,7 +419,7 @@ func TestWKXRoundTrip(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			defer runtime.GC() // Exercise finalizers.
-			c := NewContext()
+			c := geos.NewContext()
 			g := mustNewGeomFromWKT(t, c, tc.wkt)
 			assert.Equal(t, tc.wkt, g.ToWKT())
 			newG, err := c.NewGeomFromWKB(g.ToWKB())
@@ -438,21 +430,21 @@ func TestWKXRoundTrip(t *testing.T) {
 }
 
 func TestGeomRelate(t *testing.T) {
-	c := NewContext()
+	c := geos.NewContext()
 	g1 := mustNewGeomFromWKT(t, c, "POINT (0 0)")
 	g2 := mustNewGeomFromWKT(t, c, "LINESTRING (0 0,1 0)")
 	assert.Equal(t, "F0FFFF102", g1.Relate(g2))
 }
 
 func TestSetPrecision(t *testing.T) {
-	g1 := mustNewGeomFromWKT(t, NewContext(), "POINT (1 2)")
-	g2 := g1.SetPrecision(1, PrecisionRulePointwise)
+	g1 := mustNewGeomFromWKT(t, geos.NewContext(), "POINT (1 2)")
+	g2 := g1.SetPrecision(1, geos.PrecisionRulePointwise)
 	assert.Equal(t, 0., g1.Precision())
 	assert.Equal(t, 1., g2.Precision())
 }
 
 func TestUserData(t *testing.T) {
-	g := mustNewGeomFromWKT(t, NewContext(), "POINT (0 0)")
+	g := mustNewGeomFromWKT(t, geos.NewContext(), "POINT (0 0)")
 	assert.Equal(t, uintptr(0), g.UserData())
 	assert.Equal(t, g, g.SetUserData(1))
 	assert.Equal(t, uintptr(1), g.UserData())

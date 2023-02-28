@@ -1,5 +1,9 @@
-package geometry
+package geometry_test
 
-import "encoding/xml"
+import (
+	"encoding/xml"
 
-var _ xml.Marshaler = &Geometry{}
+	"github.com/twpayne/go-geos/geometry"
+)
+
+var _ xml.Marshaler = &geometry.Geometry{}

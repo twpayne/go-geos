@@ -1,4 +1,4 @@
-package geometry
+package geometry_test
 
 import (
 	"bytes"
@@ -15,23 +15,24 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	geos "github.com/twpayne/go-geos"
+	"github.com/twpayne/go-geos"
+	"github.com/twpayne/go-geos/geometry"
 )
 
 var (
-	_ driver.Value     = &Geometry{}
-	_ gob.GobEncoder   = &Geometry{}
-	_ gob.GobDecoder   = &Geometry{}
-	_ json.Marshaler   = &Geometry{}
-	_ json.Unmarshaler = &Geometry{}
-	_ sql.Scanner      = &Geometry{}
-	_ xml.Marshaler    = &Geometry{}
+	_ driver.Value     = &geometry.Geometry{}
+	_ gob.GobEncoder   = &geometry.Geometry{}
+	_ gob.GobDecoder   = &geometry.Geometry{}
+	_ json.Marshaler   = &geometry.Geometry{}
+	_ json.Unmarshaler = &geometry.Geometry{}
+	_ sql.Scanner      = &geometry.Geometry{}
+	_ xml.Marshaler    = &geometry.Geometry{}
 )
 
 func TestGeometry(t *testing.T) {
 	for _, tc := range []struct {
 		name                 string
-		geometry             *Geometry
+		geometry             *geometry.Geometry
 		skipGeoJSON          bool
 		expectedGeoJSONError bool
 		expectedKML          string
@@ -150,7 +151,7 @@ func TestGeometry(t *testing.T) {
 				defer runtime.GC() // Exercise finalizers.
 				data := &bytes.Buffer{}
 				require.NoError(t, gob.NewEncoder(data).Encode(tc.geometry))
-				var actualG Geometry
+				var actualG geometry.Geometry
 				require.NoError(t, gob.NewDecoder(data).Decode(&actualG))
 				assert.True(t, actualG.Equals(tc.geometry.Geom))
 			})
@@ -164,7 +165,7 @@ func TestGeometry(t *testing.T) {
 					assert.Error(t, err)
 				} else {
 					assert.NoError(t, err)
-					actualG, err := NewGeometryFromGeoJSON(geoJSON)
+					actualG, err := geometry.NewGeometryFromGeoJSON(geoJSON)
 					require.NoError(t, err)
 					assert.True(t, actualG.Equals(tc.geometry.Geom))
 				}
@@ -181,7 +182,7 @@ func TestGeometry(t *testing.T) {
 				defer runtime.GC() // Exercise finalizers.
 				value, err := tc.geometry.Value()
 				require.NoError(t, err)
-				var actualG Geometry
+				var actualG geometry.Geometry
 				require.NoError(t, actualG.Scan(value))
 				assert.True(t, actualG.Equals(tc.geometry.Geom))
 			})
@@ -190,19 +191,19 @@ func TestGeometry(t *testing.T) {
 }
 
 func TestNewGeometry(t *testing.T) {
-	expected := NewGeometry(geos.NewPoint([]float64{1, 2}))
+	expected := geometry.NewGeometry(geos.NewPoint([]float64{1, 2}))
 
-	actual, err := NewGeometryFromGeoJSON([]byte(`{"type":"Point","coordinates":[1,2]}`))
+	actual, err := geometry.NewGeometryFromGeoJSON([]byte(`{"type":"Point","coordinates":[1,2]}`))
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 
 	wkb, err := hex.DecodeString("0101000000000000000000f03f0000000000000040")
 	require.NoError(t, err)
-	actual, err = NewGeometryFromWKB(wkb)
+	actual, err = geometry.NewGeometryFromWKB(wkb)
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 
-	actual, err = NewGeometryFromWKT("POINT (1 2)")
+	actual, err = geometry.NewGeometryFromWKT("POINT (1 2)")
 	require.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }

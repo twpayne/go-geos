@@ -81,21 +81,3 @@ const (
 	PrecisionRulePointwise     PrecisionRule = C.GEOS_PREC_NO_TOPO
 	PrecisionRuleKeepCollapsed PrecisionRule = C.GEOS_PREC_KEEP_COLLAPSED
 )
-
-// versionEqualOrGreaterThan returns true if the GEOS version is at least
-// major.minor.patch.
-func versionEqualOrGreaterThan(major, minor, patch int) bool {
-	switch {
-	case VersionMajor > major:
-		return true
-	case VersionMajor < major:
-		return false
-	}
-	switch {
-	case VersionMinor > minor:
-		return true
-	case VersionMinor < minor:
-		return false
-	}
-	return VersionPatch >= patch
-}
