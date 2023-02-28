@@ -13,15 +13,16 @@ import (
 // A Context is a context.
 type Context struct {
 	sync.Mutex
-	handle           C.GEOSContextHandle_t
-	geoJSONReader    *C.struct_GEOSGeoJSONReader_t
-	geoJSONWriter    *C.struct_GEOSGeoJSONWriter_t
-	wkbReader        *C.struct_GEOSWKBReader_t
-	wkbWriter        *C.struct_GEOSWKBWriter_t
-	wktReader        *C.struct_GEOSWKTReader_t
-	wktWriter        *C.struct_GEOSWKTWriter_t
-	err              error
-	geomFinalizeFunc func(*Geom)
+	handle              C.GEOSContextHandle_t
+	geoJSONReader       *C.struct_GEOSGeoJSONReader_t
+	geoJSONWriter       *C.struct_GEOSGeoJSONWriter_t
+	wkbReader           *C.struct_GEOSWKBReader_t
+	wkbWriter           *C.struct_GEOSWKBWriter_t
+	wktReader           *C.struct_GEOSWKTReader_t
+	wktWriter           *C.struct_GEOSWKTWriter_t
+	err                 error
+	geomFinalizeFunc    func(*Geom)
+	strTreeFinalizeFunc func(*STRtree)
 }
 
 // A ContextOption sets an option on a Context.
@@ -33,6 +34,15 @@ type ContextOption func(*Context)
 func WithGeomFinalizeFunc(geomFinalizeFunc func(*Geom)) ContextOption {
 	return func(c *Context) {
 		c.geomFinalizeFunc = geomFinalizeFunc
+	}
+}
+
+// WithSTRtreeFinalizeFunc sets a function to be called just before an STRtree
+// is finalized. This is typically used to log the STRtree to help debug STRtree
+// leaks.
+func WithSTRtreeFinalizeFunc(strTreeFinalizeFunc func(*STRtree)) ContextOption {
+	return func(c *Context) {
+		c.strTreeFinalizeFunc = strTreeFinalizeFunc
 	}
 }
 
@@ -255,6 +265,20 @@ func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
 		holes = (**C.struct_GEOSGeom_t)(unsafe.Pointer(&holesSlice[0]))
 	}
 	return c.newNonNilGeom(C.GEOSGeom_createPolygon_r(c.handle, shell, holes, C.uint(nholes)), nil)
+}
+
+// NewSTRtree returns a new STRtree.
+func (c *Context) NewSTRtree(nodeCapacity int) *STRtree {
+	c.Lock()
+	defer c.Unlock()
+	t := &STRtree{
+		context:     c,
+		strTree:     C.GEOSSTRtree_create_r(c.handle, C.size_t(nodeCapacity)),
+		itemToValue: make(map[unsafe.Pointer]any),
+		valueToItem: make(map[any]unsafe.Pointer),
+	}
+	runtime.SetFinalizer(t, (*STRtree).finalize)
+	return t
 }
 
 // Polygonize returns a set of geometries which contains linework that
