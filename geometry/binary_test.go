@@ -1,4 +1,4 @@
-package geometry
+package geometry_test
 
 import (
 	"encoding"
@@ -10,20 +10,21 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/twpayne/go-geos"
+	"github.com/twpayne/go-geos/geometry"
 )
 
 var (
-	_ encoding.BinaryMarshaler   = &Geometry{}
-	_ encoding.BinaryUnmarshaler = &Geometry{}
+	_ encoding.BinaryMarshaler   = &geometry.Geometry{}
+	_ encoding.BinaryUnmarshaler = &geometry.Geometry{}
 )
 
 func TestBinary(t *testing.T) {
 	for i, tc := range []struct {
-		geom      *Geometry
+		geom      *geometry.Geometry
 		binaryStr string
 	}{
 		{
-			geom:      NewGeometry(geos.NewPoint([]float64{1, 2})),
+			geom:      geometry.NewGeometry(geos.NewPoint([]float64{1, 2})),
 			binaryStr: "0101000000000000000000f03f0000000000000040",
 		},
 	} {
@@ -32,7 +33,7 @@ func TestBinary(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, tc.binaryStr, hex.EncodeToString(actualBinary))
 
-			var geom Geometry
+			var geom geometry.Geometry
 			binary, err := hex.DecodeString(tc.binaryStr)
 			require.NoError(t, err)
 			require.NoError(t, geom.UnmarshalBinary(binary))

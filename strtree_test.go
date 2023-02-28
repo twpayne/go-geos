@@ -1,4 +1,4 @@
-package geos
+package geos_test
 
 import (
 	"runtime"
@@ -6,11 +6,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/twpayne/go-geos"
 )
 
 func TestSTRtree(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
-	c := NewContext()
+	c := geos.NewContext()
 
 	tree := c.NewSTRtree(4)
 
@@ -62,7 +64,7 @@ func TestSTRtree(t *testing.T) {
 
 func TestSTRtreeNearest(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
-	c := NewContext()
+	c := geos.NewContext()
 
 	tree := c.NewSTRtree(8)
 	g1 := mustNewGeomFromWKT(t, c, "POINT (0 1)")
@@ -72,22 +74,22 @@ func TestSTRtreeNearest(t *testing.T) {
 	g4 := mustNewGeomFromWKT(t, c, "POINT (0 4)")
 	assert.NoError(t, tree.Insert(g4, g4))
 
-	assert.Equal(t, g2, tree.Nearest(g1, g1, func(value any) *Geom {
-		return value.(*Geom) //nolint:forcetypeassert
+	assert.Equal(t, g2, tree.Nearest(g1, g1, func(value any) *geos.Geom {
+		return value.(*geos.Geom) //nolint:forcetypeassert
 	}))
-	assert.Equal(t, g1, tree.Nearest(g2, g2, func(value any) *Geom {
-		return value.(*Geom) //nolint:forcetypeassert
+	assert.Equal(t, g1, tree.Nearest(g2, g2, func(value any) *geos.Geom {
+		return value.(*geos.Geom) //nolint:forcetypeassert
 	}))
-	assert.Equal(t, g2, tree.Nearest(g4, g4, func(value any) *Geom {
-		return value.(*Geom) //nolint:forcetypeassert
+	assert.Equal(t, g2, tree.Nearest(g4, g4, func(value any) *geos.Geom {
+		return value.(*geos.Geom) //nolint:forcetypeassert
 	}))
 }
 
 func TestSTRtreeLoad(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
-	c := NewContext()
+	c := geos.NewContext()
 
-	points := make(map[[2]int]*Geom, 256*256)
+	points := make(map[[2]int]*geos.Geom, 256*256)
 	for x := 0; x < 256; x++ {
 		for y := 0; y < 256; y++ {
 			value := [2]int{x, y}

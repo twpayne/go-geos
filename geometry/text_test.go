@@ -1,4 +1,4 @@
-package geometry
+package geometry_test
 
 import (
 	"encoding"
@@ -9,20 +9,21 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/twpayne/go-geos"
+	"github.com/twpayne/go-geos/geometry"
 )
 
 var (
-	_ encoding.TextMarshaler   = &Geometry{}
-	_ encoding.TextUnmarshaler = &Geometry{}
+	_ encoding.TextMarshaler   = &geometry.Geometry{}
+	_ encoding.TextUnmarshaler = &geometry.Geometry{}
 )
 
 func TestText(t *testing.T) {
 	for i, tc := range []struct {
-		geom    *Geometry
+		geom    *geometry.Geometry
 		textStr string
 	}{
 		{
-			geom:    NewGeometry(geos.NewPoint([]float64{1, 2})),
+			geom:    geometry.NewGeometry(geos.NewPoint([]float64{1, 2})),
 			textStr: "POINT (1.0000000000000000 2.0000000000000000)",
 		},
 	} {
@@ -31,7 +32,7 @@ func TestText(t *testing.T) {
 			require.NoError(t, err)
 			assert.Equal(t, tc.textStr, string(text))
 
-			var geom Geometry
+			var geom geometry.Geometry
 			require.NoError(t, geom.UnmarshalText([]byte(tc.textStr)))
 			assert.True(t, tc.geom.Equals(geom.Geom))
 		})
