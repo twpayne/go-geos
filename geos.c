@@ -177,6 +177,18 @@ GEOSGeometry *c_newGEOSGeomFromBounds_r(GEOSContextHandle_t handle, int *typeID,
   return polygon;
 }
 
+void c_GEOSSTRtree_query_callback(void *elem, void *userdata) {
+  void go_GEOSSTRtree_query_callback(void *, void *);
+  go_GEOSSTRtree_query_callback(elem, userdata);
+}
+
+int c_GEOSSTRtree_distance_callback(const void *item1, const void *item2,
+                                    double *distance, void *userdata) {
+  int go_GEOSSTRtree_distance_callback(const void *, const void *, double *,
+                                       void *);
+  return go_GEOSSTRtree_distance_callback(item1, item2, distance, userdata);
+}
+
 #if GEOS_VERSION_MAJOR < 3 ||                                                  \
     (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 11)
 

@@ -65,7 +65,9 @@ func (e Error) Error() string {
 }
 
 var (
+	errContextMismatch     = Error("context mismatch")
 	errDimensionOutOfRange = Error("dimension out of range")
+	errDuplicateValue      = Error("duplicate value")
 	errIndexOutOfRange     = Error("index out of range")
 )
 
