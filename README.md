@@ -8,8 +8,8 @@ Package `go-geos` provides an interface to [GEOS](https://libgeos.org).
 
 * Fluent Go API.
 
-* Low-level `Context`, `CoordSeq`, `Geom`, and `PrepGeom` types provide access
-  to all GEOS methods.
+* Low-level `Context`, `CoordSeq`, `Geom`, `PrepGeom`, and `STRtree` types
+  provide access to all GEOS methods.
 
 * High-level `geometry.Geometry` type implements all GEOS functionality and
   many standard Go interfaces:
