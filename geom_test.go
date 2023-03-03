@@ -6,8 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/alecthomas/assert/v2"
 
 	"github.com/twpayne/go-geos"
 )
@@ -172,7 +171,7 @@ func TestGeomMethods(t *testing.T) {
 	assert.True(t, northSouthLine.Intersects(eastWestLine))
 	assert.False(t, southEastSquare.Intersects(mustNewGeomFromWKT(t, c, "LINESTRING (0 0, 0 1)")))
 	assert.Equal(t, [][]float64{{1, 1}, {2, 2}}, unitSquare.NearestPoints(mustNewGeomFromWKT(t, c, "POLYGON ((2 2, 3 2, 3 3, 2 3, 2 2))")))
-	assert.Nil(t, unitSquare.NearestPoints(mustNewGeomFromWKT(t, c, "GEOMETRYCOLLECTION EMPTY")))
+	assert.Equal(t, nil, unitSquare.NearestPoints(mustNewGeomFromWKT(t, c, "GEOMETRYCOLLECTION EMPTY")))
 	assert.True(t, middleSquare.Overlaps(southEastSquare))
 	assert.False(t, northWestSquare.Overlaps(southEastSquare))
 	assert.True(t, eastWestLine.Touches(southEastSquare))
@@ -264,16 +263,16 @@ func TestPolygonMethods(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
 	c := geos.NewContext()
 	polygon := mustNewGeomFromWKT(t, c, "POLYGON ((0 0, 3 0, 3 3, 0 3, 0 0), (1 1, 1 2, 2 2, 2 1, 1 1))")
-	assert.Nil(t, polygon.CoordSeq())
+	assert.Equal(t, nil, polygon.CoordSeq())
 	assert.Equal(t, 1, polygon.NumInteriorRings())
 	exteriorRing := polygon.ExteriorRing()
 	expectedExteriorRing := mustNewGeomFromWKT(t, c, "LINEARRING (0 0, 3 0, 3 3, 0 3, 0 0)")
 	assert.True(t, expectedExteriorRing.Equals(exteriorRing))
-	assert.NotNil(t, exteriorRing.CoordSeq())
+	assert.NotEqual(t, nil, exteriorRing.CoordSeq())
 	interiorRing := polygon.InteriorRing(0)
 	expectedInteriorRing := mustNewGeomFromWKT(t, c, "LINEARRING (1 1, 1 2, 2 2, 2 1, 1 1)")
 	assert.True(t, expectedInteriorRing.Equals(interiorRing))
-	assert.NotNil(t, interiorRing.CoordSeq())
+	assert.NotEqual(t, nil, interiorRing.CoordSeq())
 }
 
 func TestGeometryPanics(t *testing.T) {
@@ -308,7 +307,7 @@ func TestGeomInterpolate(t *testing.T) {
 	assert.True(t, mustNewGeomFromWKT(t, c, "POINT (0.5 0)").Equals(lineString.Interpolate(0.5)))
 
 	point := mustNewGeomFromWKT(t, c, "POINT (0 0)")
-	assert.Nil(t, point.Interpolate(0.5))
+	assert.Equal(t, nil, point.Interpolate(0.5))
 }
 
 func TestGeomPolygonizeFull(t *testing.T) {
@@ -375,7 +374,7 @@ func TestNewGeomFromGeoJSON(t *testing.T) {
 			defer runtime.GC() // Exercise finalizers.
 			context := geos.NewContext()
 			actualGeom, err := context.NewGeomFromGeoJSON(tc.geoJSON)
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			assert.True(t, mustNewGeomFromWKT(t, context, tc.expectedWKT).Equals(actualGeom))
 		})
 	}
@@ -423,7 +422,7 @@ func TestWKXRoundTrip(t *testing.T) {
 			g := mustNewGeomFromWKT(t, c, tc.wkt)
 			assert.Equal(t, tc.wkt, g.ToWKT())
 			newG, err := c.NewGeomFromWKB(g.ToWKB())
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.wkt, newG.ToWKT())
 		})
 	}

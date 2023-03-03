@@ -4,8 +4,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/alecthomas/assert/v2"
 
 	"github.com/twpayne/go-geos"
 )
@@ -46,7 +45,7 @@ func TestSTRtree(t *testing.T) {
 		1: {},
 	}, items)
 
-	require.True(t, tree.Remove(g1, 1))
+	assert.True(t, tree.Remove(g1, 1))
 	if false {
 		// Items removed with GEOSSTRtree_remove_r are still returned by
 		// STRtree.Iterate. See https://github.com/libgeos/geos/issues/833.
@@ -74,13 +73,13 @@ func TestSTRtreeNearest(t *testing.T) {
 	g4 := mustNewGeomFromWKT(t, c, "POINT (0 4)")
 	assert.NoError(t, tree.Insert(g4, g4))
 
-	assert.Equal(t, g2, tree.Nearest(g1, g1, func(value any) *geos.Geom {
+	assert.Equal(t, asAny(g2), tree.Nearest(g1, g1, func(value any) *geos.Geom {
 		return value.(*geos.Geom) //nolint:forcetypeassert
 	}))
-	assert.Equal(t, g1, tree.Nearest(g2, g2, func(value any) *geos.Geom {
+	assert.Equal(t, asAny(g1), tree.Nearest(g2, g2, func(value any) *geos.Geom {
 		return value.(*geos.Geom) //nolint:forcetypeassert
 	}))
-	assert.Equal(t, g2, tree.Nearest(g4, g4, func(value any) *geos.Geom {
+	assert.Equal(t, asAny(g2), tree.Nearest(g4, g4, func(value any) *geos.Geom {
 		return value.(*geos.Geom) //nolint:forcetypeassert
 	}))
 }
@@ -99,13 +98,13 @@ func TestSTRtreeLoad(t *testing.T) {
 
 	tree := c.NewSTRtree(8)
 	for value, geom := range points {
-		require.NoError(t, tree.Insert(geom, value))
+		assert.NoError(t, tree.Insert(geom, value))
 	}
 
 	items := make(map[[2]int]struct{})
 	tree.Query(mustNewGeomFromWKT(t, c, "POLYGON ((0 0,256 0,256 256,0 256,0 0))"), func(v any) {
 		value, ok := v.([2]int)
-		require.True(t, ok)
+		assert.True(t, ok)
 		items[value] = struct{}{}
 	})
 	assert.Equal(t, 256*256, len(items))
@@ -114,7 +113,7 @@ func TestSTRtreeLoad(t *testing.T) {
 		for y := 0; y < 256; y++ {
 			if (x+y)%2 == 0 {
 				value := [2]int{x, y}
-				require.True(t, tree.Remove(points[value], value))
+				assert.True(t, tree.Remove(points[value], value))
 			}
 		}
 	}
@@ -124,8 +123,12 @@ func TestSTRtreeLoad(t *testing.T) {
 	itemsAfterRemove := make(map[[2]int]struct{})
 	tree.Query(mustNewGeomFromWKT(t, c, "POLYGON ((0 0,256 0,256 256,0 256,0 0))"), func(value any) {
 		array, ok := value.([2]int)
-		require.True(t, ok)
+		assert.True(t, ok)
 		itemsAfterRemove[array] = struct{}{}
 	})
 	assert.Equal(t, 256*256/2, len(itemsAfterRemove))
+}
+
+func asAny(x any) any {
+	return x
 }

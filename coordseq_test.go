@@ -6,8 +6,7 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/alecthomas/assert/v2"
 
 	"github.com/twpayne/go-geos"
 )
@@ -18,7 +17,7 @@ func TestCoordSeqEmpty(t *testing.T) {
 	s := c.NewCoordSeq(0, 2)
 	assert.Equal(t, 0, s.Size())
 	assert.Equal(t, 2, s.Dimensions())
-	assert.Nil(t, s.ToCoords())
+	assert.Equal(t, nil, s.ToCoords())
 }
 
 func TestCoordSeqIsCCW(t *testing.T) {
@@ -88,7 +87,7 @@ func TestCoordSeqMethods(t *testing.T) {
 	assert.Equal(t, -2.0, clone.Y(0))
 	assert.Equal(t, [][]float64{{-1, -2, 0}, {1, 2, 3}}, clone.ToCoords())
 
-	require.Equal(t, 3, clone.Dimensions())
+	assert.Equal(t, 3, clone.Dimensions())
 	assert.Equal(t, 3.0, clone.Z(1))
 	clone.SetOrdinate(0, 2, -3.0)
 	assert.Equal(t, -3.0, clone.Z(0))

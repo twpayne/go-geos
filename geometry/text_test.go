@@ -5,8 +5,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/alecthomas/assert/v2"
 
 	"github.com/twpayne/go-geos"
 	"github.com/twpayne/go-geos/geometry"
@@ -29,11 +28,11 @@ func TestText(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			text, err := tc.geom.MarshalText()
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.textStr, string(text))
 
 			var geom geometry.Geometry
-			require.NoError(t, geom.UnmarshalText([]byte(tc.textStr)))
+			assert.NoError(t, geom.UnmarshalText([]byte(tc.textStr)))
 			assert.True(t, tc.geom.Equals(geom.Geom))
 		})
 	}

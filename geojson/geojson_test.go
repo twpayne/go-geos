@@ -4,8 +4,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/alecthomas/assert/v2"
 
 	"github.com/twpayne/go-geos"
 	"github.com/twpayne/go-geos/geojson"
@@ -30,11 +29,11 @@ func TestGeoJSON(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			actualGeoJSON, err := tc.feat.MarshalJSON()
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.geoJSONStr, string(actualGeoJSON))
 
 			var feat geojson.Feature
-			require.NoError(t, feat.UnmarshalJSON([]byte(tc.geoJSONStr)))
+			assert.NoError(t, feat.UnmarshalJSON([]byte(tc.geoJSONStr)))
 			assert.True(t, tc.feat.Geometry.Equals(feat.Geometry.Geom))
 		})
 	}

@@ -6,8 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/alecthomas/assert/v2"
 
 	"github.com/twpayne/go-geos"
 	"github.com/twpayne/go-geos/geometry"
@@ -30,13 +29,13 @@ func TestBinary(t *testing.T) {
 	} {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			actualBinary, err := tc.geom.MarshalBinary()
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, tc.binaryStr, hex.EncodeToString(actualBinary))
 
 			var geom geometry.Geometry
 			binary, err := hex.DecodeString(tc.binaryStr)
-			require.NoError(t, err)
-			require.NoError(t, geom.UnmarshalBinary(binary))
+			assert.NoError(t, err)
+			assert.NoError(t, geom.UnmarshalBinary(binary))
 			assert.True(t, tc.geom.Equals(geom.Geom))
 		})
 	}

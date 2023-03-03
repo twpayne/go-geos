@@ -7,8 +7,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/alecthomas/assert/v2"
 
 	"github.com/twpayne/go-geos"
 )
@@ -200,9 +199,9 @@ func TestGeometryConstructors(t *testing.T) {
 			defer runtime.GC() // Exercise finalizers.
 			c := geos.NewContext()
 			g := tc.newGeomFunc(c)
-			require.NotNil(t, g)
+			assert.NotZero(t, g)
 			expectedGeom, err := c.NewGeomFromWKT(tc.expectedWKT)
-			require.NoError(t, err)
+			assert.NoError(t, err)
 			assert.Equal(t, expectedGeom.TypeID(), g.TypeID())
 			assert.True(t, g.Equals(expectedGeom))
 		})
@@ -251,9 +250,9 @@ func TestMultipleContexts(t *testing.T) {
 
 func TestNewPoints(t *testing.T) {
 	c := geos.NewContext()
-	assert.Nil(t, c.NewPoints(nil))
+	assert.Equal(t, nil, c.NewPoints(nil))
 	gs := c.NewPoints([][]float64{{1, 2}, {3, 4}})
-	assert.Len(t, gs, 2)
+	assert.Equal(t, 2, len(gs))
 	assert.True(t, gs[0].Equals(mustNewGeomFromWKT(t, c, "POINT (1 2)")))
 	assert.True(t, gs[1].Equals(mustNewGeomFromWKT(t, c, "POINT (3 4)")))
 }

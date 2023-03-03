@@ -12,8 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/alecthomas/assert/v2"
 
 	"github.com/twpayne/go-geos"
 	"github.com/twpayne/go-geos/geometry"
@@ -150,9 +149,9 @@ func TestGeometry(t *testing.T) {
 			t.Run("gob", func(t *testing.T) {
 				defer runtime.GC() // Exercise finalizers.
 				data := &bytes.Buffer{}
-				require.NoError(t, gob.NewEncoder(data).Encode(tc.geometry))
+				assert.NoError(t, gob.NewEncoder(data).Encode(tc.geometry))
 				var actualG geometry.Geometry
-				require.NoError(t, gob.NewDecoder(data).Decode(&actualG))
+				assert.NoError(t, gob.NewDecoder(data).Decode(&actualG))
 				assert.True(t, actualG.Equals(tc.geometry.Geom))
 			})
 			t.Run("geojson", func(t *testing.T) {
@@ -166,7 +165,7 @@ func TestGeometry(t *testing.T) {
 				} else {
 					assert.NoError(t, err)
 					actualG, err := geometry.NewGeometryFromGeoJSON(geoJSON)
-					require.NoError(t, err)
+					assert.NoError(t, err)
 					assert.True(t, actualG.Equals(tc.geometry.Geom))
 				}
 			})
@@ -174,16 +173,16 @@ func TestGeometry(t *testing.T) {
 				t.Run("kml", func(t *testing.T) {
 					defer runtime.GC() // Exercise finalizers.
 					data := &strings.Builder{}
-					require.NoError(t, xml.NewEncoder(data).Encode(tc.geometry))
+					assert.NoError(t, xml.NewEncoder(data).Encode(tc.geometry))
 					assert.Equal(t, tc.expectedKML, data.String())
 				})
 			}
 			t.Run("sql", func(t *testing.T) {
 				defer runtime.GC() // Exercise finalizers.
 				value, err := tc.geometry.Value()
-				require.NoError(t, err)
+				assert.NoError(t, err)
 				var actualG geometry.Geometry
-				require.NoError(t, actualG.Scan(value))
+				assert.NoError(t, actualG.Scan(value))
 				assert.True(t, actualG.Equals(tc.geometry.Geom))
 			})
 		})
@@ -194,16 +193,16 @@ func TestNewGeometry(t *testing.T) {
 	expected := geometry.NewGeometry(geos.NewPoint([]float64{1, 2}))
 
 	actual, err := geometry.NewGeometryFromGeoJSON([]byte(`{"type":"Point","coordinates":[1,2]}`))
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 
 	wkb, err := hex.DecodeString("0101000000000000000000f03f0000000000000040")
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	actual, err = geometry.NewGeometryFromWKB(wkb)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 
 	actual, err = geometry.NewGeometryFromWKT("POINT (1 2)")
-	require.NoError(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
