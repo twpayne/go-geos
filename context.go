@@ -216,6 +216,11 @@ func (c *Context) NewPoint(coord []float64) *Geom {
 	return c.newNonNilGeom(C.GEOSGeom_createPoint_r(c.handle, s), nil)
 }
 
+// NewPointFromXY returns a new point with a x and y.
+func (c *Context) NewPointFromXY(x, y float64) *Geom {
+	return c.newNonNilGeom(C.GEOSGeom_createPointFromXY_r(c.handle, C.double(x), C.double(y)), nil)
+}
+
 // NewPoints returns a new slice of points populated from coords.
 func (c *Context) NewPoints(coords [][]float64) []*Geom {
 	if coords == nil {

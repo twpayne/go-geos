@@ -78,6 +78,11 @@ func NewPoint(coord []float64) *Geom {
 	return DefaultContext.NewPoint(coord)
 }
 
+// NewPointFromXY returns a new point with x and y.
+func NewPointFromXY(x, y float64) *Geom {
+	return DefaultContext.NewPointFromXY(x, y)
+}
+
 // NewPolygon returns a new point populated with coordss.
 func NewPolygon(coordss [][][]float64) *Geom {
 	return DefaultContext.NewPolygon(coordss)
