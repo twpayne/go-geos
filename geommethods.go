@@ -19,6 +19,14 @@ func (g *Geom) Area() float64 {
 	return area
 }
 
+// Boundary returns the boundary of g.
+func (g *Geom) Boundary() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSBoundary_r(g.context.handle, g.geom), nil)
+}
+
 // Buffer returns g with the given buffer.
 func (g *Geom) Buffer(width float64, quadsegs int) *Geom {
 	g.mustNotBeDestroyed()

@@ -1,6 +1,9 @@
 - name: Area
   comment: returns g's area
   type: float64Property
+- name: Boundary
+  comment: returns the boundary of g
+  type: unary
 - name: Buffer
   comment: returns g with the given buffer
   type: unary
