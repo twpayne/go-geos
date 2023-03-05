@@ -286,6 +286,13 @@ func (c *Context) NewSTRtree(nodeCapacity int) *STRtree {
 	return t
 }
 
+// OrientationIndex returns the orientation index from A to B and then to P.
+func (c *Context) OrientationIndex(Ax, Ay, Bx, By, Px, Py float64) int { //nolint:gocritic
+	c.Lock()
+	defer c.Unlock()
+	return int(C.GEOSOrientationIndex_r(c.handle, C.double(Ax), C.double(Ay), C.double(Bx), C.double(By), C.double(Px), C.double(Py)))
+}
+
 // Polygonize returns a set of geometries which contains linework that
 // represents the edges of a planar graph.
 func (c *Context) Polygonize(geoms []*Geom) *Geom {
