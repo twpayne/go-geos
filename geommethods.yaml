@@ -29,6 +29,10 @@
 - name: BuildArea
   comment: returns the polygonization using all the linework, assuming that rings contained within rings are empty holes, rather than extra PolygonHoleSimplify
   type: unary
+- name: Centroid
+  comment: returns a point at the center of mass of g
+  type: unary
+  geosFunction: GEOSGetCentroid_r
 - name: ClipByRect
   comment: returns g clipped to a rectangular polygon
   type: unary

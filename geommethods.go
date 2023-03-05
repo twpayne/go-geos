@@ -51,6 +51,14 @@ func (g *Geom) BuildArea() *Geom {
 	return g.context.newNonNilGeom(C.GEOSBuildArea_r(g.context.handle, g.geom), nil)
 }
 
+// Centroid returns a point at the center of mass of g.
+func (g *Geom) Centroid() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSGetCentroid_r(g.context.handle, g.geom), nil)
+}
+
 // ClipByRect returns g clipped to a rectangular polygon.
 func (g *Geom) ClipByRect(xMin float64, yMin float64, xMax float64, yMax float64) *Geom {
 	g.mustNotBeDestroyed()
