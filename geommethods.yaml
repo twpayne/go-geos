@@ -180,6 +180,12 @@
   comment: returns true if g is valid
   type: unaryPredicate
   geosFunction: GEOSisValid_r
+- name: LargestEmptyCircle
+  comment: returns the largest empty circle for g, up to a specified tolerance
+  type: binary
+  extraArgs:
+  - name: tolerance
+    type: float64
 - name: Length
   comment: returns g's length
   type: float64Property

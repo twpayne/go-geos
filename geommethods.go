@@ -528,6 +528,18 @@ func (g *Geom) IsValid() bool {
 	}
 }
 
+// LargestEmptyCircle returns the largest empty circle for g, up to a specified tolerance.
+func (g *Geom) LargestEmptyCircle(other *Geom, tolerance float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSLargestEmptyCircle_r(g.context.handle, g.geom, other.geom, C.double(tolerance)), nil)
+}
+
 // Length returns g's length.
 func (g *Geom) Length() float64 {
 	g.mustNotBeDestroyed()
