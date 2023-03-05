@@ -285,6 +285,14 @@ func (g *Geom) DistanceWithin(other *Geom, dist float64) bool {
 	}
 }
 
+// EndPoint returns the last point of a LineString.
+func (g *Geom) EndPoint() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSGeomGetEndPoint_r(g.context.handle, g.geom), nil)
+}
+
 // Envelope returns the envelope of g.
 func (g *Geom) Envelope() *Geom {
 	g.mustNotBeDestroyed()

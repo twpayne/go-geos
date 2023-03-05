@@ -108,6 +108,10 @@
   extraArgs:
   - name: dist
     type: float64
+- name: EndPoint
+  comment: returns the last point of a LineString
+  type: unary
+  geosFunction: GEOSGeomGetEndPoint_r
 - name: Envelope
   comment: returns the envelope of g
   type: unary
