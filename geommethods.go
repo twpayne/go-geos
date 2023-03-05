@@ -592,6 +592,18 @@ func (g *Geom) MaximumInscribedCircle(tolerance float64) *Geom {
 	return g.context.newNonNilGeom(C.GEOSMaximumInscribedCircle_r(g.context.handle, g.geom, C.double(tolerance)), nil)
 }
 
+// MinimumClearance returns the minimum clearance of g.
+func (g *Geom) MinimumClearance() float64 {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	var minimumClearance float64
+	if C.GEOSMinimumClearance_r(g.context.handle, g.geom, (*C.double)(&minimumClearance)) == 0 {
+		panic(g.context.err)
+	}
+	return minimumClearance
+}
+
 // MinimumRotatedRectangle returns the minimum rotated rectangle enclosing g.
 func (g *Geom) MinimumRotatedRectangle() *Geom {
 	g.mustNotBeDestroyed()
