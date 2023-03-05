@@ -297,6 +297,12 @@
   extraArgs:
   - name: tolerance
     type: float64
+- name: Snap
+  comment: returns a geometry with the vertices and segments of g snapped to other within the given tolerance
+  type: binary
+  extraArgs:
+  - name: tolerance
+    type: float64
 - name: SymDifference
   comment: returns the symmetric difference between g and other
   type: binary

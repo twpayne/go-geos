@@ -759,6 +759,18 @@ func (g *Geom) Simplify(tolerance float64) *Geom {
 	return g.context.newNonNilGeom(C.GEOSSimplify_r(g.context.handle, g.geom, C.double(tolerance)), nil)
 }
 
+// Snap returns a geometry with the vertices and segments of g snapped to other within the given tolerance.
+func (g *Geom) Snap(other *Geom, tolerance float64) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	if other.context != g.context {
+		other.context.Lock()
+		defer other.context.Unlock()
+	}
+	return g.context.newGeom(C.GEOSSnap_r(g.context.handle, g.geom, other.geom, C.double(tolerance)), nil)
+}
+
 // SymDifference returns the symmetric difference between g and other.
 func (g *Geom) SymDifference(other *Geom) *Geom {
 	g.mustNotBeDestroyed()
