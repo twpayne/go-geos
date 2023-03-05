@@ -604,6 +604,14 @@ func (g *Geom) MinimumClearance() float64 {
 	return minimumClearance
 }
 
+// MinimumClearanceLine returns a LineString whose endpoints define the minimum clearance of g.
+func (g *Geom) MinimumClearanceLine() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSMinimumClearanceLine_r(g.context.handle, g.geom), nil)
+}
+
 // MinimumRotatedRectangle returns the minimum rotated rectangle enclosing g.
 func (g *Geom) MinimumRotatedRectangle() *Geom {
 	g.mustNotBeDestroyed()

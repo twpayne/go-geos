@@ -211,6 +211,9 @@
 - name: MinimumClearance
   comment: returns the minimum clearance of g
   type: float64Property
+- name: MinimumClearanceLine
+  comment: returns a LineString whose endpoints define the minimum clearance of g
+  type: unary
 - name: MinimumRotatedRectangle
   comment: returns the minimum rotated rectangle enclosing g
   type: unary
