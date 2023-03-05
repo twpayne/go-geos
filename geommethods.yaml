@@ -303,6 +303,10 @@
   extraArgs:
   - name: tolerance
     type: float64
+- name: StartPoint
+  comment: returns the first point of a LineString
+  type: unary
+  geosFunction: GEOSGeomGetStartPoint_r
 - name: SymDifference
   comment: returns the symmetric difference between g and other
   type: binary

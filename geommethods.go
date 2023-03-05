@@ -771,6 +771,14 @@ func (g *Geom) Snap(other *Geom, tolerance float64) *Geom {
 	return g.context.newGeom(C.GEOSSnap_r(g.context.handle, g.geom, other.geom, C.double(tolerance)), nil)
 }
 
+// StartPoint returns the first point of a LineString.
+func (g *Geom) StartPoint() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSGeomGetStartPoint_r(g.context.handle, g.geom), nil)
+}
+
 // SymDifference returns the symmetric difference between g and other.
 func (g *Geom) SymDifference(other *Geom) *Geom {
 	g.mustNotBeDestroyed()
