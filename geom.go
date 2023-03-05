@@ -132,6 +132,18 @@ func (g *Geom) Normalize() *Geom {
 	return g
 }
 
+// NumCoordinates returns the number of coordinates in g.
+func (g *Geom) NumCoordinates() int {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	numCoordinates := C.GEOSGetNumCoordinates_r(g.context.handle, g.geom)
+	if numCoordinates == -1 {
+		panic(g.context.err)
+	}
+	return int(numCoordinates)
+}
+
 // NumGeometries returns the number of geometries in g.
 func (g *Geom) NumGeometries() int {
 	g.mustNotBeDestroyed()

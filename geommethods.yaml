@@ -1,6 +1,9 @@
 - name: Area
   comment: returns g's area
   type: float64Property
+- name: Boundary
+  comment: returns the boundary of g
+  type: unary
 - name: Buffer
   comment: returns g with the given buffer
   type: unary
@@ -26,6 +29,10 @@
 - name: BuildArea
   comment: returns the polygonization using all the linework, assuming that rings contained within rings are empty holes, rather than extra PolygonHoleSimplify
   type: unary
+- name: Centroid
+  comment: returns a point at the center of mass of g
+  type: unary
+  geosFunction: GEOSGetCentroid_r
 - name: ClipByRect
   comment: returns g clipped to a rectangular polygon
   type: unary
@@ -50,6 +57,9 @@
     type: float64
   - name: allowHoles
     type: uint
+- name: ConstrainedDelaunayTriangulation
+  comment: returns the constrained Delaunay triangulation of the vertices of the g
+  type: unary
 - name: Contains
   comment: returns true if g contains other
   type: binaryPredicate
@@ -98,6 +108,10 @@
   extraArgs:
   - name: dist
     type: float64
+- name: EndPoint
+  comment: returns the last point of a LineString
+  type: unary
+  geosFunction: GEOSGeomGetEndPoint_r
 - name: Envelope
   comment: returns the envelope of g
   type: unary
@@ -177,9 +191,18 @@
   comment: returns true if g is valid
   type: unaryPredicate
   geosFunction: GEOSisValid_r
+- name: LargestEmptyCircle
+  comment: returns the largest empty circle for g, up to a specified tolerance
+  type: binary
+  extraArgs:
+  - name: tolerance
+    type: float64
 - name: Length
   comment: returns g's length
   type: float64Property
+- name: LineMerge
+  comment: returns a set of fully noded LineStrings, removing any cardinality 2 nodes in the linework
+  type: unary
 - name: MakeValid
   comment: repairs an invalid geometry, returning a valid output
   type: unary
@@ -189,6 +212,12 @@
   extraArgs:
   - name: tolerance
     type: float64
+- name: MinimumClearance
+  comment: returns the minimum clearance of g
+  type: float64Property
+- name: MinimumClearanceLine
+  comment: returns a LineString whose endpoints define the minimum clearance of g
+  type: unary
 - name: MinimumRotatedRectangle
   comment: returns the minimum rotated rectangle enclosing g
   type: unary
@@ -231,6 +260,9 @@
 #    type: uint
 #  - name: vertexNumFraction
 #    type: float64
+- name: PointOnSurface
+  comment: returns a point that is inside the boundary of a polygonal geometry
+  type: unary
 - name: Project
   comment: returns the distance of other(a point) projected onto g(a line) from the start of the line
   type: float64BinaryProperty
@@ -269,6 +301,16 @@
   extraArgs:
   - name: tolerance
     type: float64
+- name: Snap
+  comment: returns a geometry with the vertices and segments of g snapped to other within the given tolerance
+  type: binary
+  extraArgs:
+  - name: tolerance
+    type: float64
+- name: StartPoint
+  comment: returns the first point of a LineString
+  type: unary
+  geosFunction: GEOSGeomGetStartPoint_r
 - name: SymDifference
   comment: returns the symmetric difference between g and other
   type: binary
