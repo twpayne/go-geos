@@ -196,6 +196,9 @@
 - name: Length
   comment: returns g's length
   type: float64Property
+- name: LineMerge
+  comment: returns a set of fully noded LineStrings, removing any cardinality 2 nodes in the linework
+  type: unary
 - name: MakeValid
   comment: repairs an invalid geometry, returning a valid output
   type: unary

@@ -568,6 +568,14 @@ func (g *Geom) Length() float64 {
 	return length
 }
 
+// LineMerge returns a set of fully noded LineStrings, removing any cardinality 2 nodes in the linework.
+func (g *Geom) LineMerge() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSLineMerge_r(g.context.handle, g.geom), nil)
+}
+
 // MakeValid repairs an invalid geometry, returning a valid output.
 func (g *Geom) MakeValid() *Geom {
 	g.mustNotBeDestroyed()
