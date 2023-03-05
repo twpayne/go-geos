@@ -53,6 +53,9 @@
     type: float64
   - name: allowHoles
     type: uint
+- name: ConstrainedDelaunayTriangulation
+  comment: returns the constrained Delaunay triangulation of the vertices of the g
+  type: unary
 - name: Contains
   comment: returns true if g contains other
   type: binaryPredicate
