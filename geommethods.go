@@ -663,6 +663,14 @@ func (g *Geom) Overlaps(other *Geom) bool {
 	}
 }
 
+// PointOnSurface returns a point that is inside the boundary of a polygonal geometry.
+func (g *Geom) PointOnSurface() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSPointOnSurface_r(g.context.handle, g.geom), nil)
+}
+
 // Project returns the distance of other(a point) projected onto g(a line) from the start of the line.
 func (g *Geom) Project(other *Geom) float64 {
 	g.mustNotBeDestroyed()

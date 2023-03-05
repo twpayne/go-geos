@@ -256,6 +256,9 @@
 #    type: uint
 #  - name: vertexNumFraction
 #    type: float64
+- name: PointOnSurface
+  comment: returns a point that is inside the boundary of a polygonal geometry
+  type: unary
 - name: Project
   comment: returns the distance of other(a point) projected onto g(a line) from the start of the line
   type: float64BinaryProperty
