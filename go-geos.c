@@ -1,4 +1,4 @@
-#include "geos.h"
+#include "go-geos.h"
 
 // Using cgo to call C functions from Go has a high overhead. The functions in
 // this file batch multiple calls to GEOS in C (rather than Go) to increase

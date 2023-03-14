@@ -50,9 +50,9 @@ miss newly-added features. In these cases:
   forward incorrect results from `libgeos` and behave in an undefined manner
   (including crashing the program) when missing features are invoked.
 * For features not present in GEOS 3.10.2, you will need to add stubs in
-  [`geos.c`](https://github.com/twpayne/go-geos/blob/master/geos.c) and
-  [`geos.h`](https://github.com/twpayne/go-geos/blob/master/geos.h) to provide
-  the function when it is not provided.
+  [`go-geos.c`](https://github.com/twpayne/go-geos/blob/master/go-geos.c) and
+  [`go-geos.h`](https://github.com/twpayne/go-geos/blob/master/go-geos.h) to
+  provide the function when it is not provided.
 
 ## C code formatting
 

@@ -1,6 +1,6 @@
 package geos
 
-// #include "geos.h"
+// #include "go-geos.h"
 import "C"
 
 // A CoordSeq is a coordinate sequence.

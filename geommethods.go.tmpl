@@ -2,7 +2,7 @@
 
 package geos
 
-// #include "geos.h"
+// #include "go-geos.h"
 import "C"
 
 import "unsafe"

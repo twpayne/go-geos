@@ -2,7 +2,7 @@
 package geos
 
 // #cgo pkg-config: geos
-// #include "geos.h"
+// #include "go-geos.h"
 import "C"
 
 // Version.
