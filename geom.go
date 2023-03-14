@@ -3,7 +3,7 @@
 package geos
 
 // #include <stdlib.h>
-// #include "geos.h"
+// #include "go-geos.h"
 import "C"
 
 import (
