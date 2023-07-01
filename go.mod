@@ -3,7 +3,7 @@ module github.com/twpayne/go-geos
 go 1.18
 
 require (
-	github.com/alecthomas/assert/v2 v2.2.2
+	github.com/alecthomas/assert/v2 v2.3.0
 	github.com/lib/pq v1.10.9
 	github.com/ory/dockertest/v3 v3.10.0
 	golang.org/x/exp v0.0.0-20230206171751-46f607a40771
