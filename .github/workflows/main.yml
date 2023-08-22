@@ -6,8 +6,6 @@ on:
     - master
     tags:
     - v*
-env:
-  GODEBUG: cgocheck=2
 jobs:
   main:
     strategy:
