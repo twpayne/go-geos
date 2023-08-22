@@ -57,6 +57,14 @@
     type: float64
   - name: allowHoles
     type: uint
+- name: ConcaveHullByLength
+  comment: returns the concave hull of g
+  type: unary
+  extraArgs:
+  - name: ratio
+    type: float64
+  - name: allowHoles
+    type: uint
 - name: ConstrainedDelaunayTriangulation
   comment: returns the constrained Delaunay triangulation of the vertices of the g
   type: unary
