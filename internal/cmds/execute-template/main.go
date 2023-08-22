@@ -44,8 +44,15 @@ func run() error {
 		}
 	}
 
-	if !slices.IsSortedFunc(templateData, func(a, b map[string]any) bool {
-		return a["name"].(string) < b["name"].(string) //nolint:forcetypeassert
+	if !slices.IsSortedFunc(templateData, func(a, b map[string]any) int {
+		switch aName, bName := a["name"].(string), b["name"].(string); { //nolint:forcetypeassert
+		case aName < bName:
+			return -1
+		case aName == bName:
+			return 0
+		default:
+			return 1
+		}
 	}) {
 		return fmt.Errorf("template data not sorted by name")
 	}
