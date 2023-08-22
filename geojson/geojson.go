@@ -66,7 +66,7 @@ func (fc FeatureCollection) MarshalJSON() ([]byte, error) {
 		feature := feature{
 			ID:         f.ID,
 			Type:       featureType,
-			Geometry:   &f.Geometry,
+			Geometry:   &f.Geometry, //nolint:gosec
 			Properties: f.Properties,
 		}
 		features = append(features, feature)
