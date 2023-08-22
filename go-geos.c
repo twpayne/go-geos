@@ -189,6 +189,24 @@ int c_GEOSSTRtree_distance_callback(const void *item1, const void *item2,
   return go_GEOSSTRtree_distance_callback(item1, item2, distance, userdata);
 }
 
+GEOSGeometry *c_GEOSMakeValidWithParams_r(GEOSContextHandle_t handle,
+                                          const GEOSGeometry *g,
+                                          enum GEOSMakeValidMethods method,
+                                          int keepCollapsed) {
+  GEOSGeometry *res;
+  GEOSMakeValidParams *par;
+
+  par = GEOSMakeValidParams_create_r(handle);
+  GEOSMakeValidParams_setKeepCollapsed_r(handle, par, keepCollapsed);
+  GEOSMakeValidParams_setMethod_r(handle, par, method);
+
+  res = GEOSMakeValidWithParams_r(handle, g, par);
+
+  GEOSMakeValidParams_destroy_r(handle, par);
+
+  return res;
+}
+
 #if GEOS_VERSION_MAJOR < 3 ||                                                  \
     (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 11)
 

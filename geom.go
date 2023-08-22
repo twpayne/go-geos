@@ -45,6 +45,15 @@ func (g *Geom) Bounds() *Bounds {
 	return bounds
 }
 
+// MakeValidWithParams returns a new valid geometry using the MakeValidMethods and MakeValidCollapsed parameters.
+func (g *Geom) MakeValidWithParams(method MakeValidMethod, collapse MakeValidCollapsed) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	cRes := C.c_GEOSMakeValidWithParams_r(g.context.handle, g.geom, (C.enum_GEOSMakeValidMethods)(method), (C.int)(collapse))
+	return g.context.newGeom(cRes, nil)
+}
+
 // CoordSeq returns g's coordinate sequence.
 func (g *Geom) CoordSeq() *CoordSeq {
 	g.mustNotBeDestroyed()

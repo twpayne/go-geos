@@ -81,3 +81,19 @@ const (
 	PrecisionRulePointwise     PrecisionRule = C.GEOS_PREC_NO_TOPO
 	PrecisionRuleKeepCollapsed PrecisionRule = C.GEOS_PREC_KEEP_COLLAPSED
 )
+
+type MakeValidMethod int
+
+// MakeValidMethods.
+const (
+	MakeValidLinework  MakeValidMethod = C.GEOS_MAKE_VALID_LINEWORK
+	MakeValidStructure MakeValidMethod = C.GEOS_MAKE_VALID_STRUCTURE
+)
+
+type MakeValidCollapsed int
+
+// MakeValidMethods.
+const (
+	MakeValidDiscardCollapsed MakeValidCollapsed = 0
+	MakeValidKeepCollapsed    MakeValidCollapsed = 1
+)

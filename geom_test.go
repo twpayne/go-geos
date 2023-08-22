@@ -25,6 +25,7 @@ func TestGeometryMethods(t *testing.T) {
 		expectedTypeID         geos.TypeID
 		expectedArea           float64
 		expectedLength         float64
+		expectedValidWkt       string
 	}{
 		{
 			name:                   "point",
@@ -39,6 +40,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedTypeID:         geos.TypeIDPoint,
 			expectedArea:           0,
 			expectedLength:         0,
+			expectedValidWkt:       "POINT (0.0000000000000000 0.0000000000000000)",
 		},
 		{
 			name:                  "point_empty",
@@ -52,6 +54,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedTypeID:        geos.TypeIDPoint,
 			expectedArea:          0,
 			expectedLength:        0,
+			expectedValidWkt:      "POINT EMPTY",
 		},
 		{
 			name:                   "linestring",
@@ -66,6 +69,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedTypeID:         geos.TypeIDLineString,
 			expectedArea:           0,
 			expectedLength:         math.Sqrt(2),
+			expectedValidWkt:       "LINESTRING (0.0000000000000000 0.0000000000000000, 1.0000000000000000 1.0000000000000000)",
 		},
 		{
 			name:                  "linestring_empty",
@@ -79,6 +83,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedTypeID:        geos.TypeIDLineString,
 			expectedArea:          0,
 			expectedLength:        0,
+			expectedValidWkt:      "LINESTRING EMPTY",
 		},
 		{
 			name:                   "polygon",
@@ -93,6 +98,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedTypeID:         geos.TypeIDPolygon,
 			expectedArea:           0.5,
 			expectedLength:         math.Sqrt(2) + 2,
+			expectedValidWkt:       "POLYGON ((0 0, 1 0, 1 1, 0 0))",
 		},
 		{
 			name:                  "polygon_empty",
@@ -106,11 +112,13 @@ func TestGeometryMethods(t *testing.T) {
 			expectedTypeID:        geos.TypeIDPolygon,
 			expectedArea:          0,
 			expectedLength:        0,
+			expectedValidWkt:      "POLYGON EMPTY",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			c := geos.NewContext()
 			g := mustNewGeomFromWKT(t, c, tc.wkt)
+			v := mustNewGeomFromWKT(t, c, tc.expectedValidWkt)
 			assert.Equal(t, tc.expectedBounds, g.Bounds())
 			assert.Equal(t, tc.expectedEmpty, g.IsEmpty())
 			expectedEnvelope := mustNewGeomFromWKT(t, c, tc.expectedEnvelopeWKT)
@@ -133,6 +141,10 @@ func TestGeometryMethods(t *testing.T) {
 			assert.Equal(t, 4326, g.SRID())
 			assert.Equal(t, tc.expectedArea, g.Area())
 			assert.Equal(t, tc.expectedLength, g.Length())
+			assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidDiscardCollapsed))
+			assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidDiscardCollapsed))
+			assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidKeepCollapsed))
+			// assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidKeepCollapsed))
 		})
 	}
 }
@@ -452,4 +464,50 @@ func TestUserData(t *testing.T) {
 	assert.Equal(t, uintptr(0), g.UserData())
 	assert.Equal(t, g, g.SetUserData(1))
 	assert.Equal(t, uintptr(1), g.UserData())
+}
+
+func TestMakeValid(t *testing.T) {
+	for _, tc := range []struct {
+		name                        string
+		wkt                         string
+		expectedWktLineworkDiscard  string
+		expectedWktStructureDiscard string
+		expectedWktLineworkKeep     string
+		expectedWktStructureKeep    string
+	}{
+		{
+			name:                        "LINESTRING",
+			wkt:                         `LINESTRING(0 0, 0 0)`,
+			expectedWktLineworkDiscard:  `POINT (0.0 0.0)`,
+			expectedWktStructureDiscard: `LINESTRING EMPTY`,
+			expectedWktLineworkKeep:     `POINT (0.0 0.0)`,
+			expectedWktStructureKeep:    `POINT (0.0 0.0)`,
+		},
+		{
+			name: "MULTIPOLYGON",
+			wkt: `MULTIPOLYGON(((91 50,79 22,51 10,23 22,11 50,23 78,51 90,79 78,91 50)),
+			((91 100,79 72,51 60,23 72,11 100,23 128,51 140,79 128,91 100)),
+			((91 150,79 122,51 110,23 122,11 150,23 178,51 190,79 178,91 150)),
+			((141 50,129 22,101 10,73 22,61 50,73 78,101 90,129 78,141 50)),
+			((141 100,129 72,101 60,73 72,61 100,73 128,101 140,129 128,141 100)),
+			((141 150,129 122,101 110,73 122,61 150,73 178,101 190,129 178,141 150)))`,
+			expectedWktLineworkDiscard:  `MultiPolygon (((51 110, 68.5 117.5, 61 100, 68.5 82.5, 51 90, 23 78, 21.7142857142857153 75, 11 100, 21.7142857142857153 125, 23 122, 51 110)),((51 190, 76 179.28571428571427759, 73 178, 61 150, 68.5 132.5, 51 140, 23 128, 21.7142857142857153 125, 11 150, 23 178, 51 190)),((141 150, 130.28571428571427759 125, 129 128, 101 140, 83.5 132.5, 91 150, 79 178, 76 179.28571428571427759, 101 190, 129 178, 141 150)),((129 78, 101 90, 83.5 82.5, 91 100, 83.5 117.5, 101 110, 129 122, 130.28571428571427759 125, 141 100, 130.28571428571427759 75, 129 78)),((101 10, 76 20.7142857142857153, 79 22, 91 50, 83.5 67.5, 101 60, 129 72, 130.28571428571427759 75, 141 50, 129 22, 101 10)),((11 50, 21.7142857142857153 75, 23 72, 51 60, 68.5 67.5, 61 50, 73 22, 76 20.7142857142857153, 51 10, 23 22, 11 50)),((83.5 82.5, 80.2857142857142918 75, 79 78, 76 79.2857142857142918, 83.5 82.5)),((83.5 67.5, 76 70.7142857142857082, 79 72, 80.2857142857142918 75, 83.5 67.5)),((68.5 67.5, 71.7142857142857082 75, 73 72, 76 70.7142857142857082, 68.5 67.5)),((68.5 82.5, 76 79.2857142857142918, 73 78, 71.7142857142857082 75, 68.5 82.5)),((83.5 132.5, 80.2857142857142918 125, 79 128, 76 129.28571428571427759, 83.5 132.5)),((83.5 117.5, 76 120.7142857142857082, 79 122, 80.2857142857142918 125, 83.5 117.5)),((68.5 117.5, 71.7142857142857082 125, 73 122, 76 120.7142857142857082, 68.5 117.5)),((68.5 132.5, 76 129.28571428571427759, 73 128, 71.7142857142857082 125, 68.5 132.5)))`,
+			expectedWktStructureDiscard: `Polygon ((23 22, 11 50, 21.7142857142857153 75, 11 100, 21.7142857142857153 125, 11 150, 23 178, 51 190, 76 179.28571428571427759, 101 190, 129 178, 141 150, 130.28571428571427759 125, 141 100, 130.28571428571427759 75, 141 50, 129 22, 101 10, 76 20.7142857142857153, 51 10, 23 22))`,
+			expectedWktLineworkKeep:     `MultiPolygon (((51 110, 68.5 117.5, 61 100, 68.5 82.5, 51 90, 23 78, 21.7142857142857153 75, 11 100, 21.7142857142857153 125, 23 122, 51 110)),((51 190, 76 179.28571428571427759, 73 178, 61 150, 68.5 132.5, 51 140, 23 128, 21.7142857142857153 125, 11 150, 23 178, 51 190)),((141 150, 130.28571428571427759 125, 129 128, 101 140, 83.5 132.5, 91 150, 79 178, 76 179.28571428571427759, 101 190, 129 178, 141 150)),((129 78, 101 90, 83.5 82.5, 91 100, 83.5 117.5, 101 110, 129 122, 130.28571428571427759 125, 141 100, 130.28571428571427759 75, 129 78)),((101 10, 76 20.7142857142857153, 79 22, 91 50, 83.5 67.5, 101 60, 129 72, 130.28571428571427759 75, 141 50, 129 22, 101 10)),((11 50, 21.7142857142857153 75, 23 72, 51 60, 68.5 67.5, 61 50, 73 22, 76 20.7142857142857153, 51 10, 23 22, 11 50)),((83.5 82.5, 80.2857142857142918 75, 79 78, 76 79.2857142857142918, 83.5 82.5)),((83.5 67.5, 76 70.7142857142857082, 79 72, 80.2857142857142918 75, 83.5 67.5)),((68.5 67.5, 71.7142857142857082 75, 73 72, 76 70.7142857142857082, 68.5 67.5)),((68.5 82.5, 76 79.2857142857142918, 73 78, 71.7142857142857082 75, 68.5 82.5)),((83.5 132.5, 80.2857142857142918 125, 79 128, 76 129.28571428571427759, 83.5 132.5)),((83.5 117.5, 76 120.7142857142857082, 79 122, 80.2857142857142918 125, 83.5 117.5)),((68.5 117.5, 71.7142857142857082 125, 73 122, 76 120.7142857142857082, 68.5 117.5)),((68.5 132.5, 76 129.28571428571427759, 73 128, 71.7142857142857082 125, 68.5 132.5)))`,
+			expectedWktStructureKeep:    `Polygon ((23 22, 11 50, 21.7142857142857153 75, 11 100, 21.7142857142857153 125, 11 150, 23 178, 51 190, 76 179.28571428571427759, 101 190, 129 178, 141 150, 130.28571428571427759 125, 141 100, 130.28571428571427759 75, 141 50, 129 22, 101 10, 76 20.7142857142857153, 51 10, 23 22))`,
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			c := geos.NewContext()
+			g := newInvalidGeomFromWKT(t, c, tc.wkt)
+			v1 := mustNewGeomFromWKT(t, c, tc.expectedWktLineworkDiscard)
+			v2 := mustNewGeomFromWKT(t, c, tc.expectedWktStructureDiscard)
+			v3 := mustNewGeomFromWKT(t, c, tc.expectedWktLineworkKeep)
+			v4 := mustNewGeomFromWKT(t, c, tc.expectedWktStructureKeep)
+			assert.Equal(t, v1, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidDiscardCollapsed))
+			assert.Equal(t, v2, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidDiscardCollapsed))
+			assert.Equal(t, v3, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidKeepCollapsed))
+			assert.Equal(t, v4, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidKeepCollapsed))
+		})
+	}
 }
