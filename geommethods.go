@@ -83,6 +83,14 @@ func (g *Geom) ConcaveHull(ratio float64, allowHoles uint) *Geom {
 	return g.context.newNonNilGeom(C.GEOSConcaveHull_r(g.context.handle, g.geom, C.double(ratio), C.unsigned(allowHoles)), nil)
 }
 
+// ConcaveHullByLength returns the concave hull of g.
+func (g *Geom) ConcaveHullByLength(ratio float64, allowHoles uint) *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSConcaveHullByLength_r(g.context.handle, g.geom, C.double(ratio), C.unsigned(allowHoles)), nil)
+}
+
 // ConstrainedDelaunayTriangulation returns the constrained Delaunay triangulation of the vertices of the g.
 func (g *Geom) ConstrainedDelaunayTriangulation() *Geom {
 	g.mustNotBeDestroyed()
