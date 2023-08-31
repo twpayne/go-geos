@@ -50,3 +50,41 @@ jobs:
     - uses: golangci/golangci-lint-action@639cd343e1d3b897ff35927a75193d57cfcba299
       with:
         version: v1.54.2
+  geos-versions:
+    strategy:
+      fail-fast: false
+      matrix:
+        geos-version:
+        - 3.10.5
+        - 3.11.2
+        #- 3.12.0
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8
+      id: cache-geos
+      with:
+        path: ~/work/go-geos/go-geos/geos-${{ matrix.geos-version }}
+        key: ${{ runner.os }}-geos-${{ matrix.geos-version }}-build
+    - name: build-geos
+      if: ${{ steps.cache-geos.outputs.cache-hit != 'true' }}
+      run: |
+        echo $PWD
+        curl https://download.osgeo.org/geos/geos-${{ matrix.geos-version }}.tar.bz2 | tar xjf -
+        cd geos-${{ matrix.geos-version }}
+        mkdir _build
+        cd _build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
+        make -j2
+        ctest
+    - name: install-geos
+      run: |
+        cd geos-${{ matrix.geos-version }}/_build
+        sudo make install
+    - uses: actions/setup-go@fac708d6674e30b6ba41289acaab6d4b75aa0753
+      with:
+        go-version: stable
+    - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9
+    - name: test
+      run: |
+        sudo ldconfig
+        go test ./...
