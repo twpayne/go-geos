@@ -22,7 +22,7 @@ jobs:
     - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe
       with:
         go-version: ${{ matrix.go-version }}
-    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744
+    - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
     - uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
       with:
         path: ~/go/pkg/mod
@@ -46,7 +46,7 @@ jobs:
     - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe
       with:
         go-version: stable
-    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744
+    - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
     - uses: golangci/golangci-lint-action@3a919529898de77ec3da873e3063ca4b10e7f5cc
       with:
         version: v1.54.2
@@ -83,7 +83,7 @@ jobs:
     - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe
       with:
         go-version: stable
-    - uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744
+    - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608
     - name: test
       run: |
         sudo ldconfig
