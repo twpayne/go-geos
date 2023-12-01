@@ -294,7 +294,7 @@ func TestPolygonize(t *testing.T) {
 				"LINESTRING (0 0,1 0,1 1)",
 				"LINESTRING (1 1,0 1,0 0)",
 				"LINESTRING (2 2,3 2,3 3)",
-				"LINESTRING (3 3 2 3,2 2)",
+				"LINESTRING (3 3,2 3,2 2)",
 			},
 			expectedWKT:      "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)),POLYGON ((2 2,3 2,3 3,2 3,2 2)))",
 			expectedValidWKT: "MULTIPOLYGON (((0 0,1 0,1 1,0 1,0 0)),((2 2,3 2,3 3,2 3,2 2)))",

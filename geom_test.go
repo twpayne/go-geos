@@ -421,26 +421,33 @@ func TestWKTError(t *testing.T) {
 
 func TestWKXRoundTrip(t *testing.T) {
 	for _, tc := range []struct {
-		name string
-		wkt  string
+		name       string
+		wkt        string
+		wktPre3_12 string
 	}{
 		{
-			name: "point",
-			wkt:  "POINT (0.0000000000000000 0.0000000000000000)",
+			name:       "point",
+			wkt:        "POINT (0 0)",
+			wktPre3_12: "POINT (0.0000000000000000 0.0000000000000000)",
 		},
 		{
-			name: "line_string",
-			wkt:  "LINESTRING (0.0000000000000000 0.0000000000000000, 1.0000000000000000 0.0000000000000000)",
+			name:       "line_string",
+			wkt:        "LINESTRING (0 0, 1 0)",
+			wktPre3_12: "LINESTRING (0.0000000000000000 0.0000000000000000, 1.0000000000000000 0.0000000000000000)",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			defer runtime.GC() // Exercise finalizers.
 			c := geos.NewContext()
-			g := mustNewGeomFromWKT(t, c, tc.wkt)
-			assert.Equal(t, tc.wkt, g.ToWKT())
+			wkt := tc.wkt
+			if geos.VersionCompare(3, 12, 0) < 0 {
+				wkt = tc.wktPre3_12
+			}
+			g := mustNewGeomFromWKT(t, c, wkt)
+			assert.Equal(t, wkt, g.ToWKT())
 			newG, err := c.NewGeomFromWKB(g.ToWKB())
 			assert.NoError(t, err)
-			assert.Equal(t, tc.wkt, newG.ToWKT())
+			assert.Equal(t, wkt, newG.ToWKT())
 		})
 	}
 }

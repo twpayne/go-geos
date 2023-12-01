@@ -97,3 +97,16 @@ const (
 	MakeValidDiscardCollapsed MakeValidCollapsed = 0
 	MakeValidKeepCollapsed    MakeValidCollapsed = 1
 )
+
+// VersionCompare returns a negative number if the GEOS version is less than the
+// given major.minor.patch version, zero if it is equal, or a positive number
+// otherwise.
+func VersionCompare(major, minor, patch int) int {
+	if majorDelta := VersionMajor - major; majorDelta != 0 {
+		return majorDelta
+	}
+	if minorDelta := VersionMinor - minor; minorDelta != 0 {
+		return minorDelta
+	}
+	return VersionPatch - patch
+}
