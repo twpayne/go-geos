@@ -22,10 +22,10 @@ func TestCoordSeqEmpty(t *testing.T) {
 
 func TestCoordSeqIsCCW(t *testing.T) {
 	for _, tc := range []struct {
-		name        string
-		coords      [][]float64
-		expected    bool
-		expectedErr bool
+		name               string
+		coords             [][]float64
+		expected           bool
+		expectedErrPre13_2 bool
 	}{
 		{
 			name:     "ccw",
@@ -38,15 +38,16 @@ func TestCoordSeqIsCCW(t *testing.T) {
 			expected: false,
 		},
 		{
-			name:        "short",
-			coords:      [][]float64{{0, 0}, {1, 0}, {1, 1}},
-			expectedErr: true,
+			name:               "short",
+			coords:             [][]float64{{0, 0}, {1, 0}, {1, 1}},
+			expected:           false,
+			expectedErrPre13_2: true,
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			defer runtime.GC() // Exercise finalizers.
 			s := geos.NewContext().NewCoordSeqFromCoords(tc.coords)
-			if tc.expectedErr {
+			if geos.VersionCompare(3, 12, 0) < 0 && tc.expectedErrPre13_2 {
 				assert.Panics(t, func() {
 					s.IsCCW()
 				})
