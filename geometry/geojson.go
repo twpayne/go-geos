@@ -24,7 +24,7 @@ var (
 	errUnsupportedEmptyGeometry = errors.New("unsupported empty geometry")
 )
 
-// NewGeometryFromGeoJSON returns a new Geometry parsed from geoJSON.
+// NewGeometryFromGeoJSON returns a new Geometry parsed from GeoJSON.
 func NewGeometryFromGeoJSON(geoJSON []byte) (*Geometry, error) {
 	g := &Geometry{}
 	if err := g.UnmarshalJSON(geoJSON); err != nil {
