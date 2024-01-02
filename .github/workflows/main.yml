@@ -76,9 +76,6 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
         make -j4
         ctest
-    - name: list-geos-files
-      run: |
-        find ~/work/geos-${{ matrix.geos-version }}
     - name: install-geos
       run: |
         cd ~/work/geos-${{ matrix.geos-version }}/_build
