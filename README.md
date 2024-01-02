@@ -12,7 +12,7 @@ $ go get github.com/twpayne/go-geos
 
 You must also install the GEOS development headers and libraries. These are
 typically in the package `libgeos-dev` on Debian-like systems, `geos-devel` on
-RedHat-like systems, and `geos` in Homebrew
+RedHat-like systems, and `geos` in Homebrew.
 
 ## Features
 
