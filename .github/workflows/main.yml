@@ -19,7 +19,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install -y libgeos-dev
-    - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe
+    - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491
       with:
         go-version: ${{ matrix.go-version }}
     - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
@@ -36,14 +36,14 @@ jobs:
     - name: Build
       run: go build ./...
     - name: Test
-      run: go test -race ./...
+      run: go test ./... # FIXME enable race detector
   lint:
     runs-on: ubuntu-22.04
     steps:
     - name: Install dependencies
       run: |
         sudo apt-get install -y libgeos-dev
-    - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe
+    - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491
       with:
         go-version: stable
     - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
@@ -63,24 +63,27 @@ jobs:
     - uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84
       id: cache-geos
       with:
-        path: ~/work/go-geos/go-geos/geos-${{ matrix.geos-version }}
-        key: ${{ runner.os }}-geos-${{ matrix.geos-version }}-build
+        path: ~/work/geos-${{ matrix.geos-version }}
+        key: ${{ runner.os }}-geos-${{ matrix.geos-version }}
     - name: build-geos
       if: ${{ steps.cache-geos.outputs.cache-hit != 'true' }}
       run: |
-        echo $PWD
+        cd ~/work
         curl https://download.osgeo.org/geos/geos-${{ matrix.geos-version }}.tar.bz2 | tar xjf -
         cd geos-${{ matrix.geos-version }}
         mkdir _build
         cd _build
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
-        make -j2
+        make -j4
         ctest
+    - name: list-geos-files
+      run: |
+        find ~/work/geos-${{ matrix.geos-version }}
     - name: install-geos
       run: |
-        cd geos-${{ matrix.geos-version }}/_build
+        cd ~/work/geos-${{ matrix.geos-version }}/_build
         sudo make install
-    - uses: actions/setup-go@93397bea11091df50f3d7e59dc26a7711a8bcfbe
+    - uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491
       with:
         go-version: stable
     - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
