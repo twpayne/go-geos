@@ -402,6 +402,15 @@ func TestNewGeomFromGeoJSONError(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestGeomNearestPointsAliasing(t *testing.T) {
+	c := geos.NewContext()
+	geom1 := mustNewGeomFromWKT(t, c, "POINT (0 1)")
+	geom2 := mustNewGeomFromWKT(t, c, "POINT (2 3)")
+	points := geom1.NearestPoints(geom2)
+	points[0] = append(points[0], 4)
+	assert.Equal(t, []float64{2, 3}, points[1])
+}
+
 func TestGeomToJSON(t *testing.T) {
 	geom := mustNewGeomFromWKT(t, geos.NewContext(), "POINT (1 2)")
 	assert.Equal(t, `{"type":"Point","coordinates":[1.0,2.0]}`, geom.ToGeoJSON(-1))

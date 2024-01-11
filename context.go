@@ -449,7 +449,7 @@ func (c *Context) newCoordsFromGEOSCoordSeq(s *C.struct_GEOSCoordSeq_t) [][]floa
 	}
 	coords := make([][]float64, 0, size)
 	for i := 0; i < int(size); i++ {
-		coord := flatCoords[i*int(dimensions) : (i+1)*int(dimensions)]
+		coord := flatCoords[i*int(dimensions) : (i+1)*int(dimensions) : (i+1)*int(dimensions)]
 		coords = append(coords, coord)
 	}
 	return coords
