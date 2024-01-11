@@ -11,6 +11,12 @@ import (
 	"github.com/twpayne/go-geos"
 )
 
+func TestCoordSeqAliasing(t *testing.T) {
+	coords := geos.NewContext().NewCoordSeqFromCoords([][]float64{{0, 1}, {2, 3}}).ToCoords()
+	coords[0] = append(coords[0], 4)
+	assert.Equal(t, []float64{2, 3}, coords[1])
+}
+
 func TestCoordSeqEmpty(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
 	c := geos.NewContext()
