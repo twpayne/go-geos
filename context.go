@@ -14,7 +14,7 @@ import (
 type Context struct {
 	sync.Mutex
 	handle              C.GEOSContextHandle_t
-	ewkbWriter          *C.struct_GEOSWKBWriter_t
+	ewkbWithSRIDWriter  *C.struct_GEOSWKBWriter_t
 	geoJSONReader       *C.struct_GEOSGeoJSONReader_t
 	geoJSONWriter       *C.struct_GEOSGeoJSONWriter_t
 	wkbReader           *C.struct_GEOSWKBReader_t
@@ -376,6 +376,9 @@ func (c *Context) cGeomsLocked(geoms []*Geom) (**C.struct_GEOSGeom_t, func()) {
 func (c *Context) finish() {
 	c.Lock()
 	defer c.Unlock()
+	if c.ewkbWithSRIDWriter != nil {
+		C.GEOSWKBWriter_destroy_r(c.handle, c.ewkbWithSRIDWriter)
+	}
 	if c.geoJSONReader != nil {
 		C.GEOSGeoJSONReader_destroy_r(c.handle, c.geoJSONReader)
 	}

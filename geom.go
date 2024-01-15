@@ -271,13 +271,13 @@ func (g *Geom) ToEWKBWithSRID() []byte {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	if g.context.ewkbWriter == nil {
-		g.context.ewkbWriter = C.GEOSWKBWriter_create_r(g.context.handle)
-		C.GEOSWKBWriter_setFlavor_r(g.context.handle, g.context.ewkbWriter, C.GEOS_WKB_EXTENDED)
-		C.GEOSWKBWriter_setIncludeSRID_r(g.context.handle, g.context.ewkbWriter, 1)
+	if g.context.ewkbWithSRIDWriter == nil {
+		g.context.ewkbWithSRIDWriter = C.GEOSWKBWriter_create_r(g.context.handle)
+		C.GEOSWKBWriter_setFlavor_r(g.context.handle, g.context.ewkbWithSRIDWriter, C.GEOS_WKB_EXTENDED)
+		C.GEOSWKBWriter_setIncludeSRID_r(g.context.handle, g.context.ewkbWithSRIDWriter, 1)
 	}
 	var size C.size_t
-	ewkbCBuf := C.GEOSWKBWriter_write_r(g.context.handle, g.context.ewkbWriter, g.geom, &size)
+	ewkbCBuf := C.GEOSWKBWriter_write_r(g.context.handle, g.context.ewkbWithSRIDWriter, g.geom, &size)
 	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer(ewkbCBuf))
 	return C.GoBytes(unsafe.Pointer(ewkbCBuf), C.int(size))
 }
