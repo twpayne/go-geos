@@ -20,15 +20,17 @@ linters:
   - forbidigo
   - forcetypeassert
   - gci
+  - ginkgolinter
   - gocheckcompilerdirectives
   - gochecknoinits
-  - goconst
+  - gochecksumtype
   - gocritic
   - godot
   - goerr113
   - gofmt
   - gofumpt
   - goimports
+  - gomoddirectives
   - gomodguard
   - goprintffuncname
   - gosec
@@ -37,10 +39,12 @@ linters:
   - govet
   - grouper
   - importas
+  - inamedparam
   - ineffassign
   - interfacebloat
   - ireturn
   - loggercheck
+  - makezero
   - mirror
   - misspell
   - musttag
@@ -50,11 +54,15 @@ linters:
   - noctx
   - nolintlint
   - nosprintfhostport
+  - perfsprint
   - prealloc
   - predeclared
   - promlinter
+  - protogetter
   - reassign
+  - revive
   - rowserrcheck
+  - sloglint
   - sqlclosecheck
   - staticcheck
   - stylecheck
@@ -62,6 +70,7 @@ linters:
   - tagliatelle
   - tenv
   - testableexamples
+  - testifylint
   - testpackage
   - thelper
   - typecheck
@@ -71,34 +80,30 @@ linters:
   - usestdlibvars
   - wastedassign
   - whitespace
+  - zerologlint
   disable:
   - cyclop
   - depguard
   - dupl
-  - exhaustivestruct
   - exhaustruct
   - funlen
-  - ginkgolinter
   - gochecknoglobals
   - gocognit
+  - goconst
   - gocyclo
   - godox
   - goheader
   - gomnd
-  - gomoddirectives
   - lll
   - maintidx
-  - makezero
   - nestif
   - nlreturn
   - nonamedreturns
   - paralleltest
-  - revive
   - tparallel
   - varnamelen
   - wrapcheck
   - wsl
-  - zerologlint
 
 linters-settings:
   gci:

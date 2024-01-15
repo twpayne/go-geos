@@ -21,7 +21,7 @@ var (
 )
 
 // MarshalXML implements encoding/xml.Marshaler.
-func (g *Geometry) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+func (g *Geometry) MarshalXML(e *xml.Encoder, _ xml.StartElement) error {
 	return kmlEncodeGeom(e, g.Geom)
 }
 
