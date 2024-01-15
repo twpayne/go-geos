@@ -45,5 +45,5 @@ func (g Geometry) Value() (driver.Value, error) {
 	if g.Geom == nil {
 		return nil, nil
 	}
-	return hex.EncodeToString(g.Geom.ToWKB()), nil
+	return hex.EncodeToString(g.Geom.ToEWKBWithSRID()), nil
 }
