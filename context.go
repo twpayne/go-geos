@@ -14,6 +14,7 @@ import (
 type Context struct {
 	sync.Mutex
 	handle              C.GEOSContextHandle_t
+	ewkbWriter          *C.struct_GEOSWKBWriter_t
 	geoJSONReader       *C.struct_GEOSGeoJSONReader_t
 	geoJSONWriter       *C.struct_GEOSGeoJSONWriter_t
 	wkbReader           *C.struct_GEOSWKBReader_t
