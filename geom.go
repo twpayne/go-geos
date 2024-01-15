@@ -54,6 +54,10 @@ func (g *Geom) MakeValidWithParams(method MakeValidMethod, collapse MakeValidCol
 	return g.context.newGeom(cRes, nil)
 }
 
+func (g *Geom) ClipByBounds(bounds *Bounds) *Geom {
+	return g.ClipByRect(bounds.MinX, bounds.MinY, bounds.MaxX, bounds.MaxY)
+}
+
 // CoordSeq returns g's coordinate sequence.
 func (g *Geom) CoordSeq() *CoordSeq {
 	g.mustNotBeDestroyed()
