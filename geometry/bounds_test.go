@@ -11,13 +11,13 @@ import (
 func TestBounds(t *testing.T) {
 	for _, tc := range []struct {
 		name            string
-		bounds          *geos.Bounds
+		bounds          *geos.Box2D
 		expectedEmpty   bool
 		expectedGeomWKT string
 	}{
 		{
 			name:            "NewBoundsEmpty",
-			bounds:          geos.NewBoundsEmpty(),
+			bounds:          geos.NewBox2DEmpty(),
 			expectedEmpty:   true,
 			expectedGeomWKT: "POINT EMPTY",
 		},

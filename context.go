@@ -140,9 +140,9 @@ func (c *Context) NewEmptyPolygon() *Geom {
 }
 
 // NewGeomFromBounds returns a new polygon constructed from bounds.
-func (c *Context) NewGeomFromBounds(bounds *Bounds) *Geom {
+func (c *Context) NewGeomFromBounds(minX, minY, maxX, maxY float64) *Geom {
 	var typeID C.int
-	geom := C.c_newGEOSGeomFromBounds_r(c.handle, &typeID, C.double(bounds.MinX), C.double(bounds.MinY), C.double(bounds.MaxX), C.double(bounds.MaxY))
+	geom := C.c_newGEOSGeomFromBounds_r(c.handle, &typeID, C.double(minX), C.double(minY), C.double(maxX), C.double(maxY))
 	if geom == nil {
 		panic(c.err)
 	}

@@ -25,7 +25,7 @@ func NewGeometry(geom *geos.Geom) *Geometry {
 }
 
 // Bounds returns g's bounds.
-func (g *Geometry) Bounds() *geos.Bounds {
+func (g *Geometry) Bounds() *geos.Box2D {
 	return g.Geom.Bounds()
 }
 

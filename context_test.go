@@ -117,21 +117,21 @@ func TestGeometryConstructors(t *testing.T) {
 		{
 			name: "NewGeomFromBounds_polygon",
 			newGeomFunc: func(c *geos.Context) *geos.Geom {
-				return c.NewGeomFromBounds(&geos.Bounds{MinX: 0, MinY: 1, MaxX: 2, MaxY: 3})
+				return c.NewGeomFromBounds(0, 1, 2, 3)
 			},
 			expectedWKT: "POLYGON ((0 1, 2 1, 2 3, 0 3, 0 1))",
 		},
 		{
 			name: "NewGeomFromBounds_empty",
 			newGeomFunc: func(c *geos.Context) *geos.Geom {
-				return c.NewGeomFromBounds(&geos.Bounds{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)})
+				return c.NewGeomFromBounds(math.Inf(1), math.Inf(1), math.Inf(-1), math.Inf(-1))
 			},
 			expectedWKT: "POINT EMPTY",
 		},
 		{
 			name: "NewGeomFromBounds_point",
 			newGeomFunc: func(c *geos.Context) *geos.Geom {
-				return c.NewGeomFromBounds(&geos.Bounds{MinX: 0, MinY: 1, MaxX: 0, MaxY: 1})
+				return c.NewGeomFromBounds(0, 1, 0, 1)
 			},
 			expectedWKT: "POINT (0 1)",
 		},

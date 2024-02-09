@@ -15,7 +15,7 @@ func TestGeometryMethods(t *testing.T) {
 	for _, tc := range []struct {
 		name                   string
 		wkt                    string
-		expectedBounds         *geos.Bounds
+		expectedBounds         *geos.Box2D
 		expectedEmpty          bool
 		expectedEnvelopeWKT    string
 		expectedNumCoordinates int
@@ -30,7 +30,7 @@ func TestGeometryMethods(t *testing.T) {
 		{
 			name:                   "point",
 			wkt:                    "POINT (0.0000000000000000 0.0000000000000000)",
-			expectedBounds:         &geos.Bounds{MinX: 0, MinY: 0, MaxX: 0, MaxY: 0},
+			expectedBounds:         &geos.Box2D{MinX: 0, MinY: 0, MaxX: 0, MaxY: 0},
 			expectedEmpty:          false,
 			expectedEnvelopeWKT:    "POINT (0 0)",
 			expectedNumCoordinates: 1,
@@ -45,7 +45,7 @@ func TestGeometryMethods(t *testing.T) {
 		{
 			name:                  "point_empty",
 			wkt:                   "POINT EMPTY",
-			expectedBounds:        &geos.Bounds{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
+			expectedBounds:        &geos.Box2D{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
 			expectedEmpty:         true,
 			expectedEnvelopeWKT:   "POINT EMPTY",
 			expectedNumGeometries: 1,
@@ -59,7 +59,7 @@ func TestGeometryMethods(t *testing.T) {
 		{
 			name:                   "linestring",
 			wkt:                    "LINESTRING (0.0000000000000000 0.0000000000000000, 1.0000000000000000 1.0000000000000000)",
-			expectedBounds:         &geos.Bounds{MinX: 0, MinY: 0, MaxX: 1, MaxY: 1},
+			expectedBounds:         &geos.Box2D{MinX: 0, MinY: 0, MaxX: 1, MaxY: 1},
 			expectedEmpty:          false,
 			expectedEnvelopeWKT:    "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))",
 			expectedNumCoordinates: 2,
@@ -74,7 +74,7 @@ func TestGeometryMethods(t *testing.T) {
 		{
 			name:                  "linestring_empty",
 			wkt:                   "LINESTRING EMPTY",
-			expectedBounds:        &geos.Bounds{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
+			expectedBounds:        &geos.Box2D{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
 			expectedEmpty:         true,
 			expectedEnvelopeWKT:   "POLYGON EMPTY",
 			expectedNumGeometries: 1,
@@ -88,7 +88,7 @@ func TestGeometryMethods(t *testing.T) {
 		{
 			name:                   "polygon",
 			wkt:                    "POLYGON ((0 0, 1 0, 1 1, 0 0))",
-			expectedBounds:         &geos.Bounds{MinX: 0, MinY: 0, MaxX: 1, MaxY: 1},
+			expectedBounds:         &geos.Box2D{MinX: 0, MinY: 0, MaxX: 1, MaxY: 1},
 			expectedEmpty:          false,
 			expectedEnvelopeWKT:    "POLYGON ((0 0, 1 0, 1 1, 0 1, 0 0))",
 			expectedNumCoordinates: 4,
@@ -103,7 +103,7 @@ func TestGeometryMethods(t *testing.T) {
 		{
 			name:                  "polygon_empty",
 			wkt:                   "POLYGON EMPTY",
-			expectedBounds:        &geos.Bounds{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
+			expectedBounds:        &geos.Box2D{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
 			expectedEmpty:         true,
 			expectedEnvelopeWKT:   "POLYGON EMPTY",
 			expectedNumGeometries: 1,

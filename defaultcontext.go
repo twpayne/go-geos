@@ -9,8 +9,8 @@ func Clone(g *Geom) *Geom {
 }
 
 // NewGeomFromBounds returns a new polygon populated with bounds.
-func NewGeomFromBounds(bounds *Bounds) *Geom {
-	return DefaultContext.NewGeomFromBounds(bounds)
+func NewGeomFromBounds(minX, minY, maxX, maxY float64) *Geom {
+	return DefaultContext.NewGeomFromBounds(minX, minY, maxX, maxY)
 }
 
 // NewCollection returns a new collection.
