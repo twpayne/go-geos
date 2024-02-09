@@ -48,7 +48,7 @@ func (b *Box2D) ContainsPoint(x, y float64) bool {
 
 // ContextGeom returns b as a Geom.
 func (b *Box2D) ContextGeom(context *Context) *Geom {
-	return context.NewGeomFromBounds(b)
+	return context.NewGeomFromBounds(b.MinX, b.MinY, b.MaxX, b.MaxY)
 }
 
 // Equals returns true if b equals other.
