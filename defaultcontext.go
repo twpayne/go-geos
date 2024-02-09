@@ -9,7 +9,7 @@ func Clone(g *Geom) *Geom {
 }
 
 // NewGeomFromBounds returns a new polygon populated with bounds.
-func NewGeomFromBounds(bounds *Bounds) *Geom {
+func NewGeomFromBounds(bounds *Box2D) *Geom {
 	return DefaultContext.NewGeomFromBounds(bounds)
 }
 

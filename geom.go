@@ -36,9 +36,9 @@ func (g *Geom) Destroy() {
 }
 
 // Bounds returns g's bounds.
-func (g *Geom) Bounds() *Bounds {
+func (g *Geom) Bounds() *Box2D {
 	g.mustNotBeDestroyed()
-	bounds := NewBoundsEmpty()
+	bounds := NewBox2DEmpty()
 	g.context.Lock()
 	defer g.context.Unlock()
 	C.c_GEOSGeomBounds_r(g.context.handle, g.geom, (*C.double)(&bounds.MinX), (*C.double)(&bounds.MinY), (*C.double)(&bounds.MaxX), (*C.double)(&bounds.MaxY))
@@ -54,8 +54,8 @@ func (g *Geom) MakeValidWithParams(method MakeValidMethod, collapse MakeValidCol
 	return g.context.newGeom(cRes, nil)
 }
 
-func (g *Geom) ClipByBounds(bounds *Bounds) *Geom {
-	return g.ClipByRect(bounds.MinX, bounds.MinY, bounds.MaxX, bounds.MaxY)
+func (g *Geom) ClipByBox2D(box2d *Box2D) *Geom {
+	return g.ClipByRect(box2d.MinX, box2d.MinY, box2d.MaxX, box2d.MaxY)
 }
 
 // CoordSeq returns g's coordinate sequence.
