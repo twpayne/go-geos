@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"errors"
 	"flag"
 	"fmt"
 	"go/format"
@@ -54,11 +55,11 @@ func run() error {
 			return 1
 		}
 	}) {
-		return fmt.Errorf("template data not sorted by name")
+		return errors.New("template data not sorted by name")
 	}
 
 	if flag.NArg() == 0 {
-		return fmt.Errorf("no arguments")
+		return errors.New("no arguments")
 	}
 
 	templateName := path.Base(flag.Arg(0))
@@ -67,7 +68,7 @@ func run() error {
 		"cType": func(goType string) string {
 			cType, ok := cTypes[goType]
 			if !ok {
-				panic(fmt.Sprintf("%s: unknown C type for Go type", goType))
+				panic(errors.New(goType + ": unknown C type for Go type"))
 			}
 			return cType
 		},

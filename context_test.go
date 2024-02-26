@@ -212,7 +212,7 @@ func TestFinalizeFunc(t *testing.T) {
 	var wg sync.WaitGroup
 	finalizeHookCalled := false
 	wg.Add(1)
-	c := geos.NewContext(geos.WithGeomFinalizeFunc(func(g *geos.Geom) {
+	c := geos.NewContext(geos.WithGeomFinalizeFunc(func(_ *geos.Geom) {
 		defer wg.Done()
 		finalizeHookCalled = true
 	}))
