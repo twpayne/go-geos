@@ -537,7 +537,7 @@ func (c *Context) newNonNilCoordSeq(s *C.struct_GEOSCoordSeq_t) *CoordSeq {
 	if s == nil {
 		panic(c.err)
 	}
-	return c.newCoordSeq(s, (*CoordSeq).destroy)
+	return c.newCoordSeq(s, (*CoordSeq).Destroy)
 }
 
 func (c *Context) newNonNilGeom(geom *C.struct_GEOSGeom_t, parent *Geom) *Geom {

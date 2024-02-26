@@ -11,6 +11,14 @@ type PrepGeom struct {
 	pgeom  *C.struct_GEOSPrepGeom_t
 }
 
+// Destroy destroys pg and all resources associated with s.
+func (pg *PrepGeom) Destroy() {
+	pg.parent.context.Lock()
+	defer pg.parent.context.Unlock()
+	C.GEOSPreparedGeom_destroy_r(pg.parent.context.handle, pg.pgeom)
+	*pg = PrepGeom{} // Clear all references.
+}
+
 // Prepare prepares g.
 func (g *Geom) Prepare() *PrepGeom {
 	g.context.Lock()
@@ -19,7 +27,7 @@ func (g *Geom) Prepare() *PrepGeom {
 		parent: g,
 		pgeom:  C.GEOSPrepare_r(g.context.handle, g.geom),
 	}
-	runtime.SetFinalizer(pg, (*PrepGeom).destroy)
+	runtime.SetFinalizer(pg, (*PrepGeom).Destroy)
 	return pg
 }
 
@@ -201,11 +209,4 @@ func (pg *PrepGeom) Within(g *Geom) bool {
 	default:
 		panic(pg.parent.context.err)
 	}
-}
-
-func (pg *PrepGeom) destroy() {
-	pg.parent.context.Lock()
-	defer pg.parent.context.Unlock()
-	C.GEOSPreparedGeom_destroy_r(pg.parent.context.handle, pg.pgeom)
-	*pg = PrepGeom{} // Clear all references.
 }
