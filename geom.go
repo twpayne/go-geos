@@ -54,6 +54,17 @@ func (g *Geom) MakeValidWithParams(method MakeValidMethod, collapse MakeValidCol
 	return g.context.newGeom(cRes, nil)
 }
 
+// BufferWithParams returns g buffered with bufferParams.
+func (g *Geom) BufferWithParams(bufferParams *BufferParams, width float64) *Geom {
+	g.context.Lock()
+	defer g.context.Unlock()
+	if bufferParams.context != g.context {
+		bufferParams.context.Lock()
+		defer bufferParams.context.Unlock()
+	}
+	return g.context.newNonNilGeom(C.GEOSBufferWithParams_r(g.context.handle, g.geom, bufferParams.bufferParams, C.double(width)), nil)
+}
+
 func (g *Geom) ClipByBox2D(box2d *Box2D) *Geom {
 	return g.ClipByRect(box2d.MinX, box2d.MinY, box2d.MaxX, box2d.MaxY)
 }
