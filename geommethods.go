@@ -60,11 +60,11 @@ func (g *Geom) Centroid() *Geom {
 }
 
 // ClipByRect returns g clipped to a rectangular polygon.
-func (g *Geom) ClipByRect(xMin float64, yMin float64, xMax float64, yMax float64) *Geom {
+func (g *Geom) ClipByRect(minX float64, minY float64, maxX float64, maxY float64) *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	return g.context.newNonNilGeom(C.GEOSClipByRect_r(g.context.handle, g.geom, C.double(xMin), C.double(yMin), C.double(xMax), C.double(yMax)), nil)
+	return g.context.newNonNilGeom(C.GEOSClipByRect_r(g.context.handle, g.geom, C.double(minX), C.double(minY), C.double(maxX), C.double(maxY)), nil)
 }
 
 // Clone returns a clone of g.
