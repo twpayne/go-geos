@@ -37,13 +37,13 @@
   comment: returns g clipped to a rectangular polygon
   type: unary
   extraArgs:
-  - name: xMin
+  - name: minX
     type: float64
-  - name: yMin
+  - name: minY
     type: float64
-  - name: xMax
+  - name: maxX
     type: float64
-  - name: yMax
+  - name: maxY
     type: float64
 - name: Clone
   comment: returns a clone of g
