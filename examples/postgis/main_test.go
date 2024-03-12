@@ -4,51 +4,60 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
-	"fmt"
 	"os/exec"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/alecthomas/assert/v2"
 	_ "github.com/lib/pq"
-	"github.com/ory/dockertest/v3"
+	"github.com/testcontainers/testcontainers-go"
+	"github.com/testcontainers/testcontainers-go/modules/postgres"
+	"github.com/testcontainers/testcontainers-go/wait"
 )
 
-func TestMain(t *testing.T) {
+func TestIntegration(t *testing.T) {
+	ctx := context.Background()
+
 	if _, err := exec.LookPath("docker"); err != nil {
 		t.Skip("docker not found in $PATH")
 	}
 
 	var (
-		dbName   = "testdb"
+		database = "testdb"
 		user     = "testuser"
 		password = "testpassword"
 	)
 
-	pool, err := dockertest.NewPool("")
+	pgContainer, err := postgres.RunContainer(ctx,
+		testcontainers.WithImage("docker.io/postgis/postgis:16-3.4"),
+		postgres.WithDatabase(database),
+		postgres.WithUsername(user),
+		postgres.WithPassword(password),
+		testcontainers.WithWaitStrategy(
+			wait.ForLog("database system is ready to accept connections").
+				WithOccurrence(2).
+				WithStartupTimeout(5*time.Second),
+		),
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Cleanup(func() {
+		assert.NoError(t, pgContainer.Terminate(ctx))
+	})
+
+	connStr, err := pgContainer.ConnectionString(ctx, "sslmode=disable")
 	assert.NoError(t, err)
 
-	resource, err := pool.Run("postgis/postgis", "13-3.1-alpine", []string{
-		"POSTGRES_DB=" + dbName,
-		"POSTGRES_PASSWORD=" + password,
-		"POSTGRES_USER=" + user,
-	})
+	db, err := sql.Open("postgres", connStr)
 	assert.NoError(t, err)
 	defer func() {
-		assert.NoError(t, pool.Purge(resource))
+		assert.NoError(t, db.Close())
 	}()
-
-	var db *sql.DB
-	assert.NoError(t, pool.Retry(func() error {
-		dsn := fmt.Sprintf("postgres://%s:%s@localhost:%s/%s?binary_parameters=yes&sslmode=disable", user, password, resource.GetPort("5432/tcp"), dbName)
-		var err error
-		db, err = sql.Open("postgres", dsn)
-		if err != nil {
-			return err
-		}
-		return db.Ping()
-	}))
 
 	assert.NoError(t, createDB(db))
 
