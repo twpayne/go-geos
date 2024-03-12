@@ -9,10 +9,10 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"slices"
 	"text/template"
 	"unicode"
 
-	"golang.org/x/exp/slices"
 	"gopkg.in/yaml.v3"
 )
 
