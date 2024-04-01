@@ -5,7 +5,7 @@ go 1.21
 toolchain go1.22.1
 
 require (
-	github.com/alecthomas/assert/v2 v2.6.0
+	github.com/alecthomas/assert/v2 v2.7.0
 	github.com/lib/pq v1.10.9
 	github.com/testcontainers/testcontainers-go v0.29.1
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.29.1
