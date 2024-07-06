@@ -86,8 +86,9 @@ func (fc *FeatureCollection) UnmarshalJSON(data []byte) error {
 	if geoJSONFeatureCollection.Type != featureCollectionType {
 		return fmt.Errorf("not a FeatureCollection: %s", geoJSONFeatureCollection.Type)
 	}
-	featureCollection := make([]*Feature, 0, len(geoJSONFeatureCollection.Features))
-	for _, feature := range geoJSONFeatureCollection.Features {
+	featureCollection := make([]*Feature, len(geoJSONFeatureCollection.Features))
+	for i := range featureCollection {
+		feature := geoJSONFeatureCollection.Features[i]
 		if feature.Type != featureType {
 			return fmt.Errorf("not a Feature: %s", feature.Type)
 		}
@@ -96,7 +97,7 @@ func (fc *FeatureCollection) UnmarshalJSON(data []byte) error {
 			Geometry:   *feature.Geometry,
 			Properties: feature.Properties,
 		}
-		featureCollection = append(featureCollection, f)
+		featureCollection[i] = f
 	}
 	*fc = featureCollection
 	return nil
