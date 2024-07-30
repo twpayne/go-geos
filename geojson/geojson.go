@@ -61,15 +61,14 @@ func (f *Feature) UnmarshalJSON(data []byte) error {
 
 // MarshalJSON implements json.Marshaler.
 func (fc FeatureCollection) MarshalJSON() ([]byte, error) {
-	features := make([]feature, 0, len(fc))
-	for _, f := range fc {
-		feature := feature{
+	features := make([]feature, len(fc))
+	for i, f := range fc {
+		features[i] = feature{
 			ID:         f.ID,
 			Type:       featureType,
 			Geometry:   &f.Geometry,
 			Properties: f.Properties,
 		}
-		features = append(features, feature)
 	}
 	return json.Marshal(featureCollection{
 		Type:     featureCollectionType,
@@ -86,17 +85,16 @@ func (fc *FeatureCollection) UnmarshalJSON(data []byte) error {
 	if geoJSONFeatureCollection.Type != featureCollectionType {
 		return fmt.Errorf("not a FeatureCollection: %s", geoJSONFeatureCollection.Type)
 	}
-	featureCollection := make([]*Feature, 0, len(geoJSONFeatureCollection.Features))
-	for _, feature := range geoJSONFeatureCollection.Features {
+	featureCollection := make([]*Feature, len(geoJSONFeatureCollection.Features))
+	for i, feature := range geoJSONFeatureCollection.Features {
 		if feature.Type != featureType {
 			return fmt.Errorf("not a Feature: %s", feature.Type)
 		}
-		f := &Feature{
+		featureCollection[i] = &Feature{
 			ID:         feature.ID,
 			Geometry:   *feature.Geometry,
 			Properties: feature.Properties,
 		}
-		featureCollection = append(featureCollection, f)
 	}
 	*fc = featureCollection
 	return nil

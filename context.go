@@ -238,10 +238,9 @@ func (c *Context) NewPoints(coords [][]float64) []*Geom {
 	if coords == nil {
 		return nil
 	}
-	geoms := make([]*Geom, 0, len(coords))
-	for _, coord := range coords {
-		geom := c.NewPoint(coord)
-		geoms = append(geoms, geom)
+	geoms := make([]*Geom, len(coords))
+	for i, coord := range coords {
+		geoms[i] = c.NewPoint(coord)
 	}
 	return geoms
 }
@@ -271,13 +270,12 @@ func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
 	var holes **C.struct_GEOSGeom_t
 	nholes := len(coordss) - 1
 	if nholes > 0 {
-		holesSlice = make([]*C.struct_GEOSGeom_t, 0, nholes)
+		holesSlice = make([]*C.struct_GEOSGeom_t, nholes)
 		for i := 0; i < nholes; i++ {
-			hole := C.GEOSGeom_createLinearRing_r(c.handle, c.newGEOSCoordSeqFromCoords(coordss[i+1]))
-			if hole == nil {
+			holesSlice[i] = C.GEOSGeom_createLinearRing_r(c.handle, c.newGEOSCoordSeqFromCoords(coordss[i+1]))
+			if holesSlice[i] == nil {
 				panic(c.err)
 			}
-			holesSlice = append(holesSlice, hole)
 		}
 		holes = (**C.struct_GEOSGeom_t)(unsafe.Pointer(&holesSlice[0]))
 	}
@@ -367,15 +365,15 @@ func (c *Context) cGeomsLocked(geoms []*Geom) (**C.struct_GEOSGeom_t, func()) {
 	}
 	uniqueContexts := map[*Context]struct{}{c: {}}
 	var extraContexts []*Context
-	cGeoms := make([]*C.struct_GEOSGeom_t, 0, len(geoms))
-	for _, geom := range geoms {
+	cGeoms := make([]*C.struct_GEOSGeom_t, len(geoms))
+	for i, geom := range geoms {
 		geom.mustNotBeDestroyed()
 		if _, ok := uniqueContexts[geom.context]; !ok {
 			geom.context.Lock()
 			uniqueContexts[geom.context] = struct{}{}
 			extraContexts = append(extraContexts, geom.context)
 		}
-		cGeoms = append(cGeoms, geom.geom)
+		cGeoms[i] = geom.geom
 	}
 	return &cGeoms[0], func() {
 		for i := len(extraContexts) - 1; i >= 0; i-- {
@@ -474,10 +472,9 @@ func (c *Context) newCoordsFromGEOSCoordSeq(s *C.struct_GEOSCoordSeq_t) [][]floa
 	if C.GEOSCoordSeq_copyToBuffer_r(c.handle, s, (*C.double)(&flatCoords[0]), hasZ, hasM) == 0 {
 		panic(c.err)
 	}
-	coords := make([][]float64, 0, size)
+	coords := make([][]float64, size)
 	for i := 0; i < int(size); i++ {
-		coord := flatCoords[i*int(dimensions) : (i+1)*int(dimensions) : (i+1)*int(dimensions)]
-		coords = append(coords, coord)
+		coords[i] = flatCoords[i*int(dimensions) : (i+1)*int(dimensions) : (i+1)*int(dimensions)]
 	}
 	return coords
 }
@@ -493,9 +490,10 @@ func (c *Context) newGEOSCoordSeqFromCoords(coords [][]float64) *C.struct_GEOSCo
 		hasM = 1
 	}
 
-	flatCoords := make([]float64, 0, len(coords)*len(coords[0]))
-	for _, coord := range coords {
-		flatCoords = append(flatCoords, coord...)
+	dimensions := len(coords[0])
+	flatCoords := make([]float64, dimensions*len(coords))
+	for i, coord := range coords {
+		copy(flatCoords[dimensions*i:dimensions*(i+1)], coord)
 	}
 	return C.GEOSCoordSeq_copyFromBuffer_r(c.handle, (*C.double)(unsafe.Pointer(&flatCoords[0])), C.uint(len(coords)), hasZ, hasM)
 }
