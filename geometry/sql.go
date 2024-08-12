@@ -43,7 +43,7 @@ func (g *Geometry) scanWKB(wkb []byte) error {
 // Value implements database/sql/driver.Value.
 func (g Geometry) Value() (driver.Value, error) {
 	if g.Geom == nil {
-		return nil, nil
+		return nil, nil //nolint:nilnil
 	}
 	return hex.EncodeToString(g.Geom.ToEWKBWithSRID()), nil
 }
