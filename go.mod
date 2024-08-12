@@ -2,8 +2,6 @@ module github.com/twpayne/go-geos
 
 go 1.21
 
-toolchain go1.22.1
-
 require (
 	github.com/alecthomas/assert/v2 v2.10.0
 	github.com/lib/pq v1.10.9
