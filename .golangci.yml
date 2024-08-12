@@ -4,19 +4,21 @@ linters:
   - asciicheck
   - bidichk
   - bodyclose
+  - canonicalheader
   - containedctx
   - contextcheck
   - decorder
   - dogsled
   - dupword
   - durationcheck
+  - err113
   - errcheck
   - errchkjson
   - errname
   - errorlint
-  - execinquery
   - exhaustive
   - exportloopref
+  - fatcontext
   - forbidigo
   - forcetypeassert
   - gci
@@ -26,7 +28,6 @@ linters:
   - gochecksumtype
   - gocritic
   - godot
-  - goerr113
   - gofmt
   - gofumpt
   - goimports
@@ -63,6 +64,7 @@ linters:
   - revive
   - rowserrcheck
   - sloglint
+  - spancheck
   - sqlclosecheck
   - staticcheck
   - stylecheck
@@ -117,5 +119,5 @@ linters-settings:
 issues:
   exclude-rules:
   - linters:
-    - goerr113
+    - err113
     text: "do not define dynamic errors, use wrapped static errors instead"
