@@ -89,8 +89,8 @@ func TestSTRtreeLoad(t *testing.T) {
 	c := geos.NewContext()
 
 	points := make(map[[2]int]*geos.Geom, 256*256)
-	for x := 0; x < 256; x++ {
-		for y := 0; y < 256; y++ {
+	for x := range 256 {
+		for y := range 256 {
 			value := [2]int{x, y}
 			points[value] = c.NewPoint([]float64{float64(x), float64(y)})
 		}
@@ -109,8 +109,8 @@ func TestSTRtreeLoad(t *testing.T) {
 	})
 	assert.Equal(t, 256*256, len(items))
 
-	for x := 0; x < 256; x++ {
-		for y := 0; y < 256; y++ {
+	for x := range 256 {
+		for y := range 256 {
 			if (x+y)%2 == 0 {
 				value := [2]int{x, y}
 				assert.True(t, tree.Remove(points[value], value))

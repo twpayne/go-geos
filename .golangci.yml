@@ -7,6 +7,7 @@ linters:
   - canonicalheader
   - containedctx
   - contextcheck
+  - copyloopvar
   - decorder
   - dogsled
   - dupword
@@ -17,7 +18,6 @@ linters:
   - errname
   - errorlint
   - exhaustive
-  - exportloopref
   - fatcontext
   - forbidigo
   - forcetypeassert
@@ -43,6 +43,7 @@ linters:
   - inamedparam
   - ineffassign
   - interfacebloat
+  - intrange
   - ireturn
   - loggercheck
   - makezero
@@ -95,9 +96,9 @@ linters:
   - gocyclo
   - godox
   - goheader
-  - gomnd
   - lll
   - maintidx
+  - mnd
   - nestif
   - nlreturn
   - nonamedreturns

@@ -148,7 +148,7 @@ func (s *CoordSeq) ToCoords() [][]float64 {
 	}
 	coords := make([][]float64, s.size)
 	j := 0
-	for i := 0; i < s.size; i++ {
+	for i := range s.size {
 		coords[i] = flatCoords[j : j+s.dimensions : j+s.dimensions]
 		j += s.dimensions
 	}
