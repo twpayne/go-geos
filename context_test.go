@@ -316,7 +316,7 @@ func TestPolygonize(t *testing.T) {
 func TestPolygonizeMultiContext(t *testing.T) {
 	c1 := geos.NewContext()
 	c2 := geos.NewContext()
-	for i := 0; i < 4; i++ {
+	for range 4 {
 		assert.Equal(t,
 			mustNewGeomFromWKT(t, c1, "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))"),
 			c1.Polygonize([]*geos.Geom{
