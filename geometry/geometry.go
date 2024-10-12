@@ -31,6 +31,9 @@ func (g *Geometry) Bounds() *geos.Box2D {
 
 // Destroy destroys g's geom.
 func (g *Geometry) Destroy() {
+	if g == nil || g.Geom == nil {
+		return
+	}
 	g.Geom.Destroy()
 	g.Geom = nil
 }

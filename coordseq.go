@@ -21,6 +21,9 @@ func (s *CoordSeq) Clone() *CoordSeq {
 
 // Destroy destroys s and all resources associated with s.
 func (s *CoordSeq) Destroy() {
+	if s == nil || s.context == nil {
+		return
+	}
 	s.context.Lock()
 	defer s.context.Unlock()
 	C.GEOSCoordSeq_destroy_r(s.context.handle, s.s)
