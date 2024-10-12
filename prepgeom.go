@@ -129,6 +129,9 @@ func (pg *PrepGeom) Crosses(g *Geom) bool {
 
 // Destroy destroys pg and all resources associated with s.
 func (pg *PrepGeom) Destroy() {
+	if pg == nil || pg.parent == nil || pg.parent.context == nil {
+		return
+	}
 	pg.parent.context.Lock()
 	defer pg.parent.context.Unlock()
 	C.GEOSPreparedGeom_destroy_r(pg.parent.context.handle, pg.pgeom)
