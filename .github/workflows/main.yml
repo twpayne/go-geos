@@ -24,8 +24,8 @@ jobs:
     - uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32
       with:
         go-version: ${{ matrix.go-version }}
-    - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938
-    - uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
+    - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
+    - uses: actions/cache@3624ceb22c1c5a301c8db4169662070a689d9ea8
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
@@ -48,8 +48,8 @@ jobs:
     - uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32
       with:
         go-version: stable
-    - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938
-    - uses: golangci/golangci-lint-action@aaa42aa0628b4ae2578232a66b541047968fac86
+    - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
+    - uses: golangci/golangci-lint-action@971e284b6050e8a5849b72094c50ab08da042db8
       with:
         version: v1.60.3
   geos-versions:
@@ -64,7 +64,7 @@ jobs:
         - 3.12.2 # Latest 3.12.x
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9
+    - uses: actions/cache@3624ceb22c1c5a301c8db4169662070a689d9ea8
       id: cache-geos
       with:
         path: ~/work/geos-${{ matrix.geos-version }}
@@ -87,7 +87,7 @@ jobs:
     - uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32
       with:
         go-version: stable
-    - uses: actions/checkout@d632683dd7b4114ad314bca15554477dd762a938
+    - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
     - name: test
       run: |
         sudo ldconfig
