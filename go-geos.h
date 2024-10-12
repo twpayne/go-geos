@@ -47,6 +47,14 @@ GEOSGeometry *GEOSConcaveHullByLength_r(GEOSContextHandle_t handle,
                                         const GEOSGeometry *g, double ratio,
                                         unsigned int allowHoles);
 
+char GEOSPreparedContainsXY_r(GEOSContextHandle_t handle,
+                              const GEOSPreparedGeometry *pg1, double x,
+                              double y);
+
+char GEOSPreparedIntersectsXY_r(GEOSContextHandle_t handle,
+                                const GEOSPreparedGeometry *pg1, double x,
+                                double y);
+
 #endif
 
 #endif

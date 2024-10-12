@@ -11,14 +11,6 @@ type PrepGeom struct {
 	pgeom  *C.struct_GEOSPrepGeom_t
 }
 
-// Destroy destroys pg and all resources associated with s.
-func (pg *PrepGeom) Destroy() {
-	pg.parent.context.Lock()
-	defer pg.parent.context.Unlock()
-	C.GEOSPreparedGeom_destroy_r(pg.parent.context.handle, pg.pgeom)
-	*pg = PrepGeom{} // Clear all references.
-}
-
 // Prepare prepares g.
 func (g *Geom) Prepare() *PrepGeom {
 	g.context.Lock()
@@ -58,6 +50,20 @@ func (pg *PrepGeom) ContainsProperly(g *Geom) bool {
 		defer g.context.Unlock()
 	}
 	switch C.GEOSPreparedContainsProperly_r(pg.parent.context.handle, pg.pgeom, g.geom) {
+	case 0:
+		return false
+	case 1:
+		return true
+	default:
+		panic(pg.parent.context.err)
+	}
+}
+
+// ContainsXY returns if pg contains the point (x, y).
+func (pg *PrepGeom) ContainsXY(x, y float64) bool {
+	pg.parent.context.Lock()
+	defer pg.parent.context.Unlock()
+	switch C.GEOSPreparedContainsXY_r(pg.parent.context.handle, pg.pgeom, C.double(x), C.double(y)) {
 	case 0:
 		return false
 	case 1:
@@ -121,6 +127,14 @@ func (pg *PrepGeom) Crosses(g *Geom) bool {
 	}
 }
 
+// Destroy destroys pg and all resources associated with s.
+func (pg *PrepGeom) Destroy() {
+	pg.parent.context.Lock()
+	defer pg.parent.context.Unlock()
+	C.GEOSPreparedGeom_destroy_r(pg.parent.context.handle, pg.pgeom)
+	*pg = PrepGeom{} // Clear all references.
+}
+
 // Disjoint returns if pg is disjoint from g.
 func (pg *PrepGeom) Disjoint(g *Geom) bool {
 	pg.parent.context.Lock()
@@ -130,6 +144,24 @@ func (pg *PrepGeom) Disjoint(g *Geom) bool {
 		defer g.context.Unlock()
 	}
 	switch C.GEOSPreparedDisjoint_r(pg.parent.context.handle, pg.pgeom, g.geom) {
+	case 0:
+		return false
+	case 1:
+		return true
+	default:
+		panic(pg.parent.context.err)
+	}
+}
+
+// DistanceWithin returns if pg is within dist g.
+func (pg *PrepGeom) DistanceWithin(g *Geom, dist float64) bool {
+	pg.parent.context.Lock()
+	defer pg.parent.context.Unlock()
+	if g.context != pg.parent.context {
+		g.context.Lock()
+		defer g.context.Unlock()
+	}
+	switch C.GEOSPreparedDistanceWithin_r(pg.parent.context.handle, pg.pgeom, g.geom, C.double(dist)) {
 	case 0:
 		return false
 	case 1:
@@ -155,6 +187,31 @@ func (pg *PrepGeom) Intersects(g *Geom) bool {
 	default:
 		panic(pg.parent.context.err)
 	}
+}
+
+// IntersectsXY returns if pg intersects the point at (x, y).
+func (pg *PrepGeom) IntersectsXY(x, y float64) bool {
+	pg.parent.context.Lock()
+	defer pg.parent.context.Unlock()
+	switch C.GEOSPreparedIntersectsXY_r(pg.parent.context.handle, pg.pgeom, C.double(x), C.double(y)) {
+	case 0:
+		return false
+	case 1:
+		return true
+	default:
+		panic(pg.parent.context.err)
+	}
+}
+
+// NearestPoints returns if pg overlaps g.
+func (pg *PrepGeom) NearestPoints(g *Geom) *CoordSeq {
+	pg.parent.context.Lock()
+	defer pg.parent.context.Unlock()
+	if g.context != pg.parent.context {
+		g.context.Lock()
+		defer g.context.Unlock()
+	}
+	return pg.parent.context.newNonNilCoordSeq(C.GEOSPreparedNearestPoints_r(pg.parent.context.handle, pg.pgeom, g.geom))
 }
 
 // Overlaps returns if pg overlaps g.
