@@ -227,4 +227,16 @@ GEOSGeometry *GEOSConcaveHullByLength_r(GEOSContextHandle_t handle,
   return NULL;
 }
 
+char GEOSPreparedContainsXY_r(GEOSContextHandle_t handle,
+                              const GEOSPreparedGeometry *pg1, double x,
+                              double y) {
+  return 0;
+}
+
+char GEOSPreparedIntersectsXY_r(GEOSContextHandle_t handle,
+                                const GEOSPreparedGeometry *pg1, double x,
+                                double y) {
+  return 0;
+}
+
 #endif
