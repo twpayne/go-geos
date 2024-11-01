@@ -21,7 +21,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install -y libgeos-dev
-    - uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32
+    - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed
       with:
         go-version: ${{ matrix.go-version }}
     - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
@@ -45,7 +45,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install -y libgeos-dev
-    - uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32
+    - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed
       with:
         go-version: stable
     - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
@@ -84,7 +84,7 @@ jobs:
       run: |
         cd ~/work/geos-${{ matrix.geos-version }}/_build
         sudo make install
-    - uses: actions/setup-go@0a12ed9d6a96ab950c8f026ed9f722fe0da7ef32
+    - uses: actions/setup-go@41dfa10bad2bb2ae585af6ee5bb4d7d973ad74ed
       with:
         go-version: stable
     - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871
