@@ -51,7 +51,7 @@ jobs:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
     - uses: golangci/golangci-lint-action@971e284b6050e8a5849b72094c50ab08da042db8
       with:
-        version: v1.60.3
+        version: v1.62.2
   geos-versions:
     strategy:
       fail-fast: false

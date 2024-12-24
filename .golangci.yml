@@ -1,3 +1,6 @@
+run:
+  go: '1.22'
+
 linters:
   enable:
   - asasalint
@@ -39,6 +42,7 @@ linters:
   - gosmopolitan
   - govet
   - grouper
+  - iface
   - importas
   - inamedparam
   - ineffassign
@@ -103,6 +107,7 @@ linters:
   - nlreturn
   - nonamedreturns
   - paralleltest
+  - recvcheck
   - tparallel
   - varnamelen
   - wrapcheck
