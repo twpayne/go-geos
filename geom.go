@@ -134,10 +134,6 @@ func (g *Geom) NearestPoints(other *Geom) [][]float64 {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	if other.context != g.context {
-		other.context.Lock()
-		defer other.context.Unlock()
-	}
 	s := C.GEOSNearestPoints_r(g.context.handle, g.geom, other.geom)
 	if s == nil {
 		return nil
@@ -227,10 +223,6 @@ func (g *Geom) RelatePattern(other *Geom, pat string) bool {
 	defer C.free(unsafe.Pointer(patCStr))
 	g.context.Lock()
 	defer g.context.Unlock()
-	if other.context != g.context {
-		other.context.Lock()
-		defer other.context.Unlock()
-	}
 	switch C.GEOSRelatePattern_r(g.context.handle, g.geom, other.geom, patCStr) {
 	case 0:
 		return false
