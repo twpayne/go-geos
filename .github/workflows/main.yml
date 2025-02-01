@@ -38,7 +38,7 @@ jobs:
     - name: Build
       run: go build ./...
     - name: Test
-      run: go test ./... # FIXME enable race detector
+      run: go test -race ./...
   lint:
     runs-on: ubuntu-22.04
     steps:
