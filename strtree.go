@@ -19,8 +19,8 @@ type STRtree struct {
 
 // NewSTRtree returns a new STRtree.
 func (c *Context) NewSTRtree(nodeCapacity int) *STRtree {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	t := &STRtree{
 		context:     c,
 		cSTRtree:    C.GEOSSTRtree_create_r(c.cHandle, C.size_t(nodeCapacity)),
@@ -38,8 +38,8 @@ func (t *STRtree) Insert(g *Geom, value any) error {
 	if g.context != t.context {
 		panic(errContextMismatch)
 	}
-	t.context.Lock()
-	defer t.context.Unlock()
+	t.context.mutex.Lock()
+	defer t.context.mutex.Unlock()
 	if _, ok := t.valueToItem[value]; ok {
 		return errDuplicateValue
 	}
@@ -56,8 +56,8 @@ func (t *STRtree) Iterate(callback func(any)) {
 		callback(t.itemToValue[item])
 	})
 	defer handle.Delete()
-	t.context.Lock()
-	defer t.context.Unlock()
+	t.context.mutex.Lock()
+	defer t.context.mutex.Unlock()
 	C.GEOSSTRtree_iterate_r(
 		t.context.cHandle,
 		t.cSTRtree,
@@ -83,8 +83,8 @@ func (t *STRtree) Nearest(value any, valueEnvelope *Geom, geomfn func(any) *Geom
 		return C.GEOSDistance_r(t.context.cHandle, geom1.cGeom, geom2.cGeom, distance)
 	})
 	defer handle.Delete()
-	t.context.Lock()
-	defer t.context.Unlock()
+	t.context.mutex.Lock()
+	defer t.context.mutex.Unlock()
 	nearestItem := C.GEOSSTRtree_nearest_generic_r(
 		t.context.cHandle,
 		t.cSTRtree,
@@ -102,8 +102,8 @@ func (t *STRtree) Query(g *Geom, callback func(any)) {
 		callback(t.itemToValue[elem])
 	})
 	defer handle.Delete()
-	t.context.Lock()
-	defer t.context.Unlock()
+	t.context.mutex.Lock()
+	defer t.context.mutex.Unlock()
 	C.GEOSSTRtree_query_r(
 		t.context.cHandle,
 		t.cSTRtree,
@@ -119,8 +119,8 @@ func (t *STRtree) Remove(g *Geom, value any) bool {
 		panic(errContextMismatch)
 	}
 	item := t.valueToItem[value]
-	t.context.Lock()
-	defer t.context.Unlock()
+	t.context.mutex.Lock()
+	defer t.context.mutex.Unlock()
 	switch C.GEOSSTRtree_remove_r(t.context.cHandle, t.cSTRtree, g.cGeom, item) {
 	case 0:
 		return false

@@ -11,7 +11,7 @@ import (
 
 // A Context is a context.
 type Context struct {
-	sync.Mutex
+	mutex         sync.Mutex
 	cHandle       C.GEOSContextHandle_t
 	geoJSONReader *GeoJSONReader
 	geoJSONWriter *GeoJSONWriter
@@ -46,8 +46,8 @@ func NewContext(options ...ContextOption) *Context {
 
 // NewGeomFromGeoJSON returns a new geometry in JSON format from json.
 func (c *Context) NewGeomFromGeoJSON(geoJSON string) (*Geom, error) {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	c.err = nil
 	if c.geoJSONReader == nil {
 		c.geoJSONReader = c.NewGeoJSONReader()
@@ -57,8 +57,8 @@ func (c *Context) NewGeomFromGeoJSON(geoJSON string) (*Geom, error) {
 
 // NewGeomFromWKB parses a geometry in WKB format from wkb.
 func (c *Context) NewGeomFromWKB(wkb []byte) (*Geom, error) {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	c.err = nil
 	if c.wkbReader == nil {
 		c.wkbReader = c.NewWKBReader()
@@ -68,8 +68,8 @@ func (c *Context) NewGeomFromWKB(wkb []byte) (*Geom, error) {
 
 // NewGeomFromWKT parses a geometry in WKT format from wkt.
 func (c *Context) NewGeomFromWKT(wkt string) (*Geom, error) {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	c.err = nil
 	if c.wktReader == nil {
 		c.wktReader = c.NewWKTReader()
@@ -79,16 +79,16 @@ func (c *Context) NewGeomFromWKT(wkt string) (*Geom, error) {
 
 // OrientationIndex returns the orientation index from A to B and then to P.
 func (c *Context) OrientationIndex(Ax, Ay, Bx, By, Px, Py float64) int { //nolint:gocritic
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return int(C.GEOSOrientationIndex_r(c.cHandle, C.double(Ax), C.double(Ay), C.double(Bx), C.double(By), C.double(Px), C.double(Py)))
 }
 
 // Polygonize returns a set of geometries which contains linework that
 // represents the edges of a planar graph.
 func (c *Context) Polygonize(geoms []*Geom) *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	cGeoms, unlockFunc := c.cGeomsLocked(geoms)
 	defer unlockFunc()
 	return c.newNonNilGeom(C.GEOSPolygonize_r(c.cHandle, cGeoms, C.uint(len(geoms))), nil)
@@ -97,8 +97,8 @@ func (c *Context) Polygonize(geoms []*Geom) *Geom {
 // PolygonizeValid returns a set of polygons which contains linework that
 // represents the edges of a planar graph.
 func (c *Context) PolygonizeValid(geoms []*Geom) *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	cGeoms, unlockFunc := c.cGeomsLocked(geoms)
 	defer unlockFunc()
 	return c.newNonNilGeom(C.GEOSPolygonize_valid_r(c.cHandle, cGeoms, C.uint(len(geoms))), nil)
@@ -110,8 +110,8 @@ func (c *Context) RelatePatternMatch(mat, pat string) bool {
 	defer C.free(unsafe.Pointer(matCStr))
 	patCStr := C.CString(pat)
 	defer C.free(unsafe.Pointer(patCStr))
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	switch C.GEOSRelatePatternMatch_r(c.cHandle, matCStr, patCStr) {
 	case 0:
 		return false
@@ -124,8 +124,8 @@ func (c *Context) RelatePatternMatch(mat, pat string) bool {
 
 // SegmentIntersection returns the coordinate where two lines intersect.
 func (c *Context) SegmentIntersection(ax0, ay0, ax1, ay1, bx0, by0, bx1, by1 float64) (float64, float64, bool) {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	var cx, cy float64
 	switch C.GEOSSegmentIntersection_r(c.cHandle,
 		C.double(ax0), C.double(ay0), C.double(ax1), C.double(ay1),
@@ -150,7 +150,7 @@ func (c *Context) cGeomsLocked(geoms []*Geom) (**C.struct_GEOSGeom_t, func()) {
 	for i := range cGeoms {
 		geom := geoms[i]
 		if _, ok := uniqueContexts[geom.context]; !ok {
-			geom.context.Lock()
+			geom.context.mutex.Lock()
 			uniqueContexts[geom.context] = struct{}{}
 			extraContexts = append(extraContexts, geom.context)
 		}
@@ -158,7 +158,7 @@ func (c *Context) cGeomsLocked(geoms []*Geom) (**C.struct_GEOSGeom_t, func()) {
 	}
 	return &cGeoms[0], func() {
 		for i := len(extraContexts) - 1; i >= 0; i-- {
-			extraContexts[i].Unlock()
+			extraContexts[i].mutex.Unlock()
 		}
 	}
 }

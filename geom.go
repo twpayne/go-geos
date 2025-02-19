@@ -41,8 +41,8 @@ func (c *Context) NewCollection(typeID TypeID, geoms []*Geom) *Geom {
 	if len(geoms) == 0 {
 		return c.NewEmptyCollection(typeID)
 	}
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	cGeoms := make([]*C.GEOSGeometry, len(geoms))
 	for i, geom := range geoms {
 		cGeoms[i] = geom.cGeom
@@ -56,29 +56,29 @@ func (c *Context) NewCollection(typeID TypeID, geoms []*Geom) *Geom {
 
 // NewEmptyCollection returns a new empty collection.
 func (c *Context) NewEmptyCollection(typeID TypeID) *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilGeom(C.GEOSGeom_createEmptyCollection_r(c.cHandle, C.int(typeID)), nil)
 }
 
 // NewEmptyLineString returns a new empty line string.
 func (c *Context) NewEmptyLineString() *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilGeom(C.GEOSGeom_createEmptyLineString_r(c.cHandle), nil)
 }
 
 // NewEmptyPoint returns a new empty point.
 func (c *Context) NewEmptyPoint() *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilGeom(C.GEOSGeom_createEmptyPoint_r(c.cHandle), nil)
 }
 
 // NewEmptyPolygon returns a new empty polygon.
 func (c *Context) NewEmptyPolygon() *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilGeom(C.GEOSGeom_createEmptyPolygon_r(c.cHandle), nil)
 }
 
@@ -103,16 +103,16 @@ func (c *Context) NewGeomFromBounds(minX, minY, maxX, maxY float64) *Geom {
 
 // NewLinearRing returns a new linear ring populated with coords.
 func (c *Context) NewLinearRing(coords [][]float64) *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	s := c.newGEOSCoordSeqFromCoords(coords)
 	return c.newNonNilGeom(C.GEOSGeom_createLinearRing_r(c.cHandle, s), nil)
 }
 
 // NewLineString returns a new line string populated with coords.
 func (c *Context) NewLineString(coords [][]float64) *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	s := c.newGEOSCoordSeqFromCoords(coords)
 	return c.newNonNilGeom(C.GEOSGeom_createLineString_r(c.cHandle, s), nil)
 }
@@ -181,27 +181,27 @@ func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
 // Bounds returns g's bounds.
 func (g *Geom) Bounds() *Box2D {
 	bounds := NewBox2DEmpty()
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	C.c_GEOSGeomBounds_r(g.context.cHandle, g.cGeom, (*C.double)(&bounds.MinX), (*C.double)(&bounds.MinY), (*C.double)(&bounds.MaxX), (*C.double)(&bounds.MaxY))
 	return bounds
 }
 
 // MakeValidWithParams returns a new valid geometry using the MakeValidMethods and MakeValidCollapsed parameters.
 func (g *Geom) MakeValidWithParams(method MakeValidMethod, collapse MakeValidCollapsed) *Geom {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	cRes := C.c_GEOSMakeValidWithParams_r(g.context.cHandle, g.cGeom, (C.enum_GEOSMakeValidMethods)(method), C.int(collapse))
 	return g.context.newGeom(cRes, nil)
 }
 
 // BufferWithParams returns g buffered with bufferParams.
 func (g *Geom) BufferWithParams(bufferParams *BufferParams, width float64) *Geom {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	if bufferParams.context != g.context {
-		bufferParams.context.Lock()
-		defer bufferParams.context.Unlock()
+		bufferParams.context.mutex.Lock()
+		defer bufferParams.context.mutex.Unlock()
 	}
 	return g.context.newNonNilGeom(C.GEOSBufferWithParams_r(g.context.cHandle, g.cGeom, bufferParams.cBufParams, C.double(width)), nil)
 }
@@ -212,8 +212,8 @@ func (g *Geom) ClipByBox2D(box2d *Box2D) *Geom {
 
 // CoordSeq returns g's coordinate sequence.
 func (g *Geom) CoordSeq() *CoordSeq {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	s := C.GEOSGeom_getCoordSeq_r(g.context.cHandle, g.cGeom)
 	// Don't set a finalizer as coordSeq is owned by g and will be finalized when g is
 	// finalized.
@@ -227,15 +227,15 @@ func (g *Geom) CoordSeq() *CoordSeq {
 
 // ExteriorRing returns the exterior ring.
 func (g *Geom) ExteriorRing() *Geom {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSGetExteriorRing_r(g.context.cHandle, g.cGeom), g)
 }
 
 // Geometry returns the nth geometry of g.
 func (g *Geom) Geometry(n int) *Geom {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	if n < 0 || g.numGeometries <= n {
 		panic(errIndexOutOfRange)
 	}
@@ -244,8 +244,8 @@ func (g *Geom) Geometry(n int) *Geom {
 
 // InteriorRing returns the nth interior ring.
 func (g *Geom) InteriorRing(n int) *Geom {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	if n < 0 || g.numInteriorRings <= n {
 		panic(errIndexOutOfRange)
 	}
@@ -254,8 +254,8 @@ func (g *Geom) InteriorRing(n int) *Geom {
 
 // IsValidReason returns the reason that g is invalid.
 func (g *Geom) IsValidReason() string {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	reason := C.GEOSisValidReason_r(g.context.cHandle, g.cGeom)
 	if reason == nil {
 		panic(g.context.err)
@@ -267,8 +267,8 @@ func (g *Geom) IsValidReason() string {
 // NearestPoints returns the nearest coordinates of g and other. If the nearest
 // coordinates do not exist (e.g., when either geom is empty), it returns nil.
 func (g *Geom) NearestPoints(other *Geom) [][]float64 {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	s := C.GEOSNearestPoints_r(g.context.cHandle, g.cGeom, other.cGeom)
 	if s == nil {
 		return nil
@@ -278,8 +278,8 @@ func (g *Geom) NearestPoints(other *Geom) [][]float64 {
 }
 
 func (g *Geom) Normalize() *Geom {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	if C.GEOSNormalize_r(g.context.cHandle, g.cGeom) != 0 {
 		panic(g.context.err)
 	}
@@ -288,8 +288,8 @@ func (g *Geom) Normalize() *Geom {
 
 // NumCoordinates returns the number of coordinates in g.
 func (g *Geom) NumCoordinates() int {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	numCoordinates := C.GEOSGetNumCoordinates_r(g.context.cHandle, g.cGeom)
 	if numCoordinates == -1 {
 		panic(g.context.err)
@@ -314,8 +314,8 @@ func (g *Geom) NumPoints() int {
 
 // Point returns the g's nth point.
 func (g *Geom) Point(n int) *Geom {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	if n < 0 || g.numPoints <= n {
 		panic(errIndexOutOfRange)
 	}
@@ -325,8 +325,8 @@ func (g *Geom) Point(n int) *Geom {
 // PolygonizeFull returns a set of geometries which contains linework that
 // represents the edge of a planar graph.
 func (g *Geom) PolygonizeFull() (geom, cuts, dangles, invalidRings *Geom) {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	var cCuts, cDangles, cInvalidRings *C.struct_GEOSGeom_t
 	cGeom := C.GEOSPolygonize_full_r(g.context.cHandle, g.cGeom, &cCuts, &cDangles, &cInvalidRings) //nolint:gocritic
 	geom = g.context.newNonNilGeom(cGeom, nil)
@@ -338,8 +338,8 @@ func (g *Geom) PolygonizeFull() (geom, cuts, dangles, invalidRings *Geom) {
 
 // Precision returns g's precision.
 func (g *Geom) Precision() float64 {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	return float64(C.GEOSGeom_getPrecision_r(g.context.cHandle, g.cGeom))
 }
 
@@ -347,8 +347,8 @@ func (g *Geom) Precision() float64 {
 func (g *Geom) RelatePattern(other *Geom, pat string) bool {
 	patCStr := C.CString(pat)
 	defer C.free(unsafe.Pointer(patCStr))
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	switch C.GEOSRelatePattern_r(g.context.cHandle, g.cGeom, other.cGeom, patCStr) {
 	case 0:
 		return false
@@ -361,8 +361,8 @@ func (g *Geom) RelatePattern(other *Geom, pat string) bool {
 
 // SRID returns g's SRID.
 func (g *Geom) SRID() int {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	srid := C.GEOSGetSRID_r(g.context.cHandle, g.cGeom)
 	// geos_c.h states that GEOSGetSRID_r "Return 0 on exception" but 0 is also
 	// returned if the SRID is not set, so we can't rely on it to propagate
@@ -372,16 +372,16 @@ func (g *Geom) SRID() int {
 
 // SetSRID sets g's SRID to srid.
 func (g *Geom) SetSRID(srid int) *Geom {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	C.GEOSSetSRID_r(g.context.cHandle, g.cGeom, C.int(srid))
 	return g
 }
 
 // SetUserData sets g's userdata and returns g.
 func (g *Geom) SetUserData(userdata uintptr) *Geom {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	C.c_GEOSGeom_setUserData_r(g.context.cHandle, g.cGeom, C.uintptr_t(userdata))
 	return g
 }
@@ -393,8 +393,8 @@ func (g *Geom) String() string {
 
 // ToGeoJSON returns g in GeoJSON format.
 func (g *Geom) ToGeoJSON(indent int) string {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	if g.context.geoJSONWriter == nil {
 		g.context.geoJSONWriter = g.context.NewGeoJSONWriter()
 	}
@@ -403,8 +403,8 @@ func (g *Geom) ToGeoJSON(indent int) string {
 
 // ToWKB returns g in WKB format.
 func (g *Geom) ToWKB() []byte {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	if g.context.wkbWriter == nil {
 		g.context.wkbWriter = g.context.NewWKBWriter(
 			WithFlavor(WKBFlavorExtended),
@@ -416,8 +416,8 @@ func (g *Geom) ToWKB() []byte {
 
 // ToWKT returns g in WKT format.
 func (g *Geom) ToWKT() string {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	if g.context.wktWriter == nil {
 		g.context.wktWriter = g.context.NewWKTWriter()
 	}
@@ -426,8 +426,8 @@ func (g *Geom) ToWKT() string {
 
 // Type returns g's type.
 func (g *Geom) Type() string {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	typeCStr := C.GEOSGeomType_r(g.context.cHandle, g.cGeom)
 	if typeCStr == nil {
 		panic(g.context.err)
@@ -443,7 +443,7 @@ func (g *Geom) TypeID() TypeID {
 
 // UserData returns g's userdata.
 func (g *Geom) UserData() uintptr {
-	g.context.Lock()
-	defer g.context.Unlock()
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
 	return uintptr(C.c_GEOSGeom_getUserData_r(g.context.cHandle, g.cGeom))
 }

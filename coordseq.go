@@ -14,22 +14,22 @@ type CoordSeq struct {
 
 // NewCoordSeq returns a new CoordSeq.
 func (c *Context) NewCoordSeq(size, dims int) *CoordSeq {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilCoordSeq(C.GEOSCoordSeq_create_r(c.cHandle, C.uint(size), C.uint(dims)))
 }
 
 // NewCoordSeqFromCoords returns a new CoordSeq populated with coords.
 func (c *Context) NewCoordSeqFromCoords(coords [][]float64) *CoordSeq {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilCoordSeq(c.newGEOSCoordSeqFromCoords(coords))
 }
 
 // Clone returns a clone of s.
 func (s *CoordSeq) Clone() *CoordSeq {
-	s.context.Lock()
-	defer s.context.Unlock()
+	s.context.mutex.Lock()
+	defer s.context.mutex.Unlock()
 	return s.context.newNonNilCoordSeq(C.GEOSCoordSeq_clone_r(s.context.cHandle, s.cCoordSeq))
 }
 
@@ -40,8 +40,8 @@ func (s *CoordSeq) Dimensions() int {
 
 // IsCCW returns if s is counter-clockwise.
 func (s *CoordSeq) IsCCW() bool {
-	s.context.Lock()
-	defer s.context.Unlock()
+	s.context.mutex.Lock()
+	defer s.context.mutex.Unlock()
 	var cIsCCW C.char
 	switch C.GEOSCoordSeq_isCCW_r(s.context.cHandle, s.cCoordSeq, &cIsCCW) {
 	case 1:
@@ -53,8 +53,8 @@ func (s *CoordSeq) IsCCW() bool {
 
 // Ordinate returns the idx-th dim coordinate of s.
 func (s *CoordSeq) Ordinate(idx, dim int) float64 {
-	s.context.Lock()
-	defer s.context.Unlock()
+	s.context.mutex.Lock()
+	defer s.context.mutex.Unlock()
 	if idx < 0 || s.size <= idx {
 		panic(errIndexOutOfRange)
 	}
@@ -70,8 +70,8 @@ func (s *CoordSeq) Ordinate(idx, dim int) float64 {
 
 // SetOrdinate sets the idx-th dim coordinate of s to val.
 func (s *CoordSeq) SetOrdinate(idx, dim int, val float64) {
-	s.context.Lock()
-	defer s.context.Unlock()
+	s.context.mutex.Lock()
+	defer s.context.mutex.Unlock()
 	if idx < 0 || s.size <= idx {
 		panic(errIndexOutOfRange)
 	}
@@ -85,8 +85,8 @@ func (s *CoordSeq) SetOrdinate(idx, dim int, val float64) {
 
 // SetX sets the idx-th X coordinate of s to val.
 func (s *CoordSeq) SetX(idx int, val float64) {
-	s.context.Lock()
-	defer s.context.Unlock()
+	s.context.mutex.Lock()
+	defer s.context.mutex.Unlock()
 	if idx < 0 || s.size <= idx {
 		panic(errIndexOutOfRange)
 	}
@@ -100,8 +100,8 @@ func (s *CoordSeq) SetX(idx int, val float64) {
 
 // SetY sets the idx-th Y coordinate of s to val.
 func (s *CoordSeq) SetY(idx int, val float64) {
-	s.context.Lock()
-	defer s.context.Unlock()
+	s.context.mutex.Lock()
+	defer s.context.mutex.Unlock()
 	if idx < 0 || s.size <= idx {
 		panic(errIndexOutOfRange)
 	}
@@ -115,8 +115,8 @@ func (s *CoordSeq) SetY(idx int, val float64) {
 
 // SetZ sets the idx-th Z coordinate of s to val.
 func (s *CoordSeq) SetZ(idx int, val float64) {
-	s.context.Lock()
-	defer s.context.Unlock()
+	s.context.mutex.Lock()
+	defer s.context.mutex.Unlock()
 	if idx < 0 || s.size <= idx {
 		panic(errIndexOutOfRange)
 	}
@@ -135,8 +135,8 @@ func (s *CoordSeq) Size() int {
 
 // ToCoords returns s as a [][]float64.
 func (s *CoordSeq) ToCoords() [][]float64 {
-	s.context.Lock()
-	defer s.context.Unlock()
+	s.context.mutex.Lock()
+	defer s.context.mutex.Unlock()
 	if s.size == 0 || s.dimensions == 0 {
 		return nil
 	}
@@ -163,8 +163,8 @@ func (s *CoordSeq) ToCoords() [][]float64 {
 
 // X returns the idx-th X coordinate of s.
 func (s *CoordSeq) X(idx int) float64 {
-	s.context.Lock()
-	defer s.context.Unlock()
+	s.context.mutex.Lock()
+	defer s.context.mutex.Unlock()
 	if idx < 0 || s.size <= idx {
 		panic(errIndexOutOfRange)
 	}
@@ -180,8 +180,8 @@ func (s *CoordSeq) X(idx int) float64 {
 
 // Y returns the idx-th Y coordinate of s.
 func (s *CoordSeq) Y(idx int) float64 {
-	s.context.Lock()
-	defer s.context.Unlock()
+	s.context.mutex.Lock()
+	defer s.context.mutex.Unlock()
 	if idx < 0 || s.size <= idx {
 		panic(errIndexOutOfRange)
 	}
@@ -197,8 +197,8 @@ func (s *CoordSeq) Y(idx int) float64 {
 
 // Z returns the idx-th Z coordinate of s.
 func (s *CoordSeq) Z(idx int) float64 {
-	s.context.Lock()
-	defer s.context.Unlock()
+	s.context.mutex.Lock()
+	defer s.context.mutex.Unlock()
 	if idx < 0 || s.size <= idx {
 		panic(errIndexOutOfRange)
 	}
