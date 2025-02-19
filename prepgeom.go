@@ -7,8 +7,8 @@ import "runtime"
 
 // A PrepGeom is a prepared geometry.
 type PrepGeom struct {
-	parent *Geom
-	pgeom  *C.struct_GEOSPrepGeom_t
+	parent    *Geom
+	cPrepGeom *C.struct_GEOSPrepGeom_t
 }
 
 // Prepare prepares g.
@@ -16,10 +16,12 @@ func (g *Geom) Prepare() *PrepGeom {
 	g.context.Lock()
 	defer g.context.Unlock()
 	pg := &PrepGeom{
-		parent: g,
-		pgeom:  C.GEOSPrepare_r(g.context.handle, g.geom),
+		parent:    g,
+		cPrepGeom: C.GEOSPrepare_r(g.context.cHandle, g.cGeom),
 	}
-	runtime.SetFinalizer(pg, (*PrepGeom).Destroy)
+	runtime.AddCleanup(pg, func(cPrepGeom *C.struct_GEOSPrepGeom_t) {
+		C.GEOSPreparedGeom_destroy_r(pg.parent.context.cHandle, cPrepGeom)
+	}, pg.cPrepGeom)
 	return pg
 }
 
@@ -31,7 +33,7 @@ func (pg *PrepGeom) Contains(g *Geom) bool {
 		g.context.Lock()
 		defer g.context.Unlock()
 	}
-	switch C.GEOSPreparedContains_r(pg.parent.context.handle, pg.pgeom, g.geom) {
+	switch C.GEOSPreparedContains_r(pg.parent.context.cHandle, pg.cPrepGeom, g.cGeom) {
 	case 0:
 		return false
 	case 1:
@@ -49,7 +51,7 @@ func (pg *PrepGeom) ContainsProperly(g *Geom) bool {
 		g.context.Lock()
 		defer g.context.Unlock()
 	}
-	switch C.GEOSPreparedContainsProperly_r(pg.parent.context.handle, pg.pgeom, g.geom) {
+	switch C.GEOSPreparedContainsProperly_r(pg.parent.context.cHandle, pg.cPrepGeom, g.cGeom) {
 	case 0:
 		return false
 	case 1:
@@ -63,7 +65,7 @@ func (pg *PrepGeom) ContainsProperly(g *Geom) bool {
 func (pg *PrepGeom) ContainsXY(x, y float64) bool {
 	pg.parent.context.Lock()
 	defer pg.parent.context.Unlock()
-	switch C.GEOSPreparedContainsXY_r(pg.parent.context.handle, pg.pgeom, C.double(x), C.double(y)) {
+	switch C.GEOSPreparedContainsXY_r(pg.parent.context.cHandle, pg.cPrepGeom, C.double(x), C.double(y)) {
 	case 0:
 		return false
 	case 1:
@@ -81,7 +83,7 @@ func (pg *PrepGeom) CoveredBy(g *Geom) bool {
 		g.context.Lock()
 		defer g.context.Unlock()
 	}
-	switch C.GEOSPreparedCoveredBy_r(pg.parent.context.handle, pg.pgeom, g.geom) {
+	switch C.GEOSPreparedCoveredBy_r(pg.parent.context.cHandle, pg.cPrepGeom, g.cGeom) {
 	case 0:
 		return false
 	case 1:
@@ -99,7 +101,7 @@ func (pg *PrepGeom) Covers(g *Geom) bool {
 		g.context.Lock()
 		defer g.context.Unlock()
 	}
-	switch C.GEOSPreparedCovers_r(pg.parent.context.handle, pg.pgeom, g.geom) {
+	switch C.GEOSPreparedCovers_r(pg.parent.context.cHandle, pg.cPrepGeom, g.cGeom) {
 	case 0:
 		return false
 	case 1:
@@ -117,7 +119,7 @@ func (pg *PrepGeom) Crosses(g *Geom) bool {
 		g.context.Lock()
 		defer g.context.Unlock()
 	}
-	switch C.GEOSPreparedCrosses_r(pg.parent.context.handle, pg.pgeom, g.geom) {
+	switch C.GEOSPreparedCrosses_r(pg.parent.context.cHandle, pg.cPrepGeom, g.cGeom) {
 	case 0:
 		return false
 	case 1:
@@ -125,17 +127,6 @@ func (pg *PrepGeom) Crosses(g *Geom) bool {
 	default:
 		panic(pg.parent.context.err)
 	}
-}
-
-// Destroy destroys pg and all resources associated with s.
-func (pg *PrepGeom) Destroy() {
-	if pg == nil || pg.parent == nil || pg.parent.context == nil {
-		return
-	}
-	pg.parent.context.Lock()
-	defer pg.parent.context.Unlock()
-	C.GEOSPreparedGeom_destroy_r(pg.parent.context.handle, pg.pgeom)
-	*pg = PrepGeom{} // Clear all references.
 }
 
 // Disjoint returns if pg is disjoint from g.
@@ -146,7 +137,7 @@ func (pg *PrepGeom) Disjoint(g *Geom) bool {
 		g.context.Lock()
 		defer g.context.Unlock()
 	}
-	switch C.GEOSPreparedDisjoint_r(pg.parent.context.handle, pg.pgeom, g.geom) {
+	switch C.GEOSPreparedDisjoint_r(pg.parent.context.cHandle, pg.cPrepGeom, g.cGeom) {
 	case 0:
 		return false
 	case 1:
@@ -164,7 +155,7 @@ func (pg *PrepGeom) DistanceWithin(g *Geom, dist float64) bool {
 		g.context.Lock()
 		defer g.context.Unlock()
 	}
-	switch C.GEOSPreparedDistanceWithin_r(pg.parent.context.handle, pg.pgeom, g.geom, C.double(dist)) {
+	switch C.GEOSPreparedDistanceWithin_r(pg.parent.context.cHandle, pg.cPrepGeom, g.cGeom, C.double(dist)) {
 	case 0:
 		return false
 	case 1:
@@ -182,7 +173,7 @@ func (pg *PrepGeom) Intersects(g *Geom) bool {
 		g.context.Lock()
 		defer g.context.Unlock()
 	}
-	switch C.GEOSPreparedIntersects_r(pg.parent.context.handle, pg.pgeom, g.geom) {
+	switch C.GEOSPreparedIntersects_r(pg.parent.context.cHandle, pg.cPrepGeom, g.cGeom) {
 	case 0:
 		return false
 	case 1:
@@ -196,7 +187,7 @@ func (pg *PrepGeom) Intersects(g *Geom) bool {
 func (pg *PrepGeom) IntersectsXY(x, y float64) bool {
 	pg.parent.context.Lock()
 	defer pg.parent.context.Unlock()
-	switch C.GEOSPreparedIntersectsXY_r(pg.parent.context.handle, pg.pgeom, C.double(x), C.double(y)) {
+	switch C.GEOSPreparedIntersectsXY_r(pg.parent.context.cHandle, pg.cPrepGeom, C.double(x), C.double(y)) {
 	case 0:
 		return false
 	case 1:
@@ -214,7 +205,7 @@ func (pg *PrepGeom) NearestPoints(g *Geom) *CoordSeq {
 		g.context.Lock()
 		defer g.context.Unlock()
 	}
-	return pg.parent.context.newNonNilCoordSeq(C.GEOSPreparedNearestPoints_r(pg.parent.context.handle, pg.pgeom, g.geom))
+	return pg.parent.context.newNonNilCoordSeq(C.GEOSPreparedNearestPoints_r(pg.parent.context.cHandle, pg.cPrepGeom, g.cGeom))
 }
 
 // Overlaps returns if pg overlaps g.
@@ -225,7 +216,7 @@ func (pg *PrepGeom) Overlaps(g *Geom) bool {
 		g.context.Lock()
 		defer g.context.Unlock()
 	}
-	switch C.GEOSPreparedOverlaps_r(pg.parent.context.handle, pg.pgeom, g.geom) {
+	switch C.GEOSPreparedOverlaps_r(pg.parent.context.cHandle, pg.cPrepGeom, g.cGeom) {
 	case 0:
 		return false
 	case 1:
@@ -243,7 +234,7 @@ func (pg *PrepGeom) Touches(g *Geom) bool {
 		g.context.Lock()
 		defer g.context.Unlock()
 	}
-	switch C.GEOSPreparedTouches_r(pg.parent.context.handle, pg.pgeom, g.geom) {
+	switch C.GEOSPreparedTouches_r(pg.parent.context.cHandle, pg.cPrepGeom, g.cGeom) {
 	case 0:
 		return false
 	case 1:
@@ -261,7 +252,7 @@ func (pg *PrepGeom) Within(g *Geom) bool {
 		g.context.Lock()
 		defer g.context.Unlock()
 	}
-	switch C.GEOSPreparedWithin_r(pg.parent.context.handle, pg.pgeom, g.geom) {
+	switch C.GEOSPreparedWithin_r(pg.parent.context.cHandle, pg.cPrepGeom, g.cGeom) {
 	case 0:
 		return false
 	case 1:

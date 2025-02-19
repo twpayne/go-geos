@@ -300,11 +300,6 @@ func TestGeometryPanics(t *testing.T) {
 	assert.NotPanics(t, func() { c.NewEmptyPolygon().ExteriorRing() })
 	assert.Panics(t, func() { c.NewEmptyPolygon().InteriorRing(-1) })
 	assert.Panics(t, func() { c.NewEmptyPolygon().InteriorRing(0) })
-	assert.NotPanics(t, func() {
-		g := geos.NewEmptyPoint()
-		g.Destroy()
-		g.Destroy()
-	})
 }
 
 func TestBinaryMethods(t *testing.T) {

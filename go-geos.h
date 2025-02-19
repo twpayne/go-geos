@@ -2,6 +2,7 @@
 #define GEOS_H
 
 #include <stdint.h>
+#include <stdlib.h>
 
 #define GEOS_USE_ONLY_R_API
 #include <geos_c.h>

@@ -5,27 +5,26 @@ import "C"
 
 // A BufferParams contains parameters for BufferWithParams.
 type BufferParams struct {
-	context      *Context
-	bufferParams *C.struct_GEOSBufParams_t
+	context    *Context
+	cBufParams *C.struct_GEOSBufParams_t
 }
 
-// Destroy destroys all resources associated with p.
-func (p *BufferParams) Destroy() {
-	// Protect against Destroy being called more than once.
-	if p == nil || p.context == nil {
-		return
+// NewBufferParams returns a new BufferParams.
+func (c *Context) NewBufferParams() *BufferParams {
+	c.Lock()
+	defer c.Unlock()
+	cBufferParams := C.GEOSBufferParams_create_r(c.cHandle)
+	if cBufferParams == nil {
+		panic(c.err)
 	}
-	p.context.Lock()
-	defer p.context.Unlock()
-	C.GEOSBufferParams_destroy_r(p.context.handle, p.bufferParams)
-	*p = BufferParams{} // Clear all references.
+	return c.newBufParams(cBufferParams)
 }
 
 // SetEndCapStyle sets p's end cap style.
 func (p *BufferParams) SetEndCapStyle(style BufCapStyle) *BufferParams {
 	p.context.Lock()
 	defer p.context.Unlock()
-	if C.GEOSBufferParams_setEndCapStyle_r(p.context.handle, p.bufferParams, C.int(style)) != 1 {
+	if C.GEOSBufferParams_setEndCapStyle_r(p.context.cHandle, p.cBufParams, C.int(style)) != 1 {
 		panic(p.context.err)
 	}
 	return p
@@ -35,7 +34,7 @@ func (p *BufferParams) SetEndCapStyle(style BufCapStyle) *BufferParams {
 func (p *BufferParams) SetJoinStyle(style BufJoinStyle) *BufferParams {
 	p.context.Lock()
 	defer p.context.Unlock()
-	if C.GEOSBufferParams_setJoinStyle_r(p.context.handle, p.bufferParams, C.int(style)) != 1 {
+	if C.GEOSBufferParams_setJoinStyle_r(p.context.cHandle, p.cBufParams, C.int(style)) != 1 {
 		panic(p.context.err)
 	}
 	return p
@@ -45,7 +44,7 @@ func (p *BufferParams) SetJoinStyle(style BufJoinStyle) *BufferParams {
 func (p *BufferParams) SetMitreLimit(mitreLimit float64) *BufferParams {
 	p.context.Lock()
 	defer p.context.Unlock()
-	if C.GEOSBufferParams_setMitreLimit_r(p.context.handle, p.bufferParams, C.double(mitreLimit)) != 1 {
+	if C.GEOSBufferParams_setMitreLimit_r(p.context.cHandle, p.cBufParams, C.double(mitreLimit)) != 1 {
 		panic(p.context.err)
 	}
 	return p
@@ -56,7 +55,7 @@ func (p *BufferParams) SetMitreLimit(mitreLimit float64) *BufferParams {
 func (p *BufferParams) SetQuadrantSegments(quadSegs int) *BufferParams {
 	p.context.Lock()
 	defer p.context.Unlock()
-	if C.GEOSBufferParams_setQuadrantSegments_r(p.context.handle, p.bufferParams, C.int(quadSegs)) != 1 {
+	if C.GEOSBufferParams_setQuadrantSegments_r(p.context.cHandle, p.cBufParams, C.int(quadSegs)) != 1 {
 		panic(p.context.err)
 	}
 	return p
@@ -66,22 +65,8 @@ func (p *BufferParams) SetQuadrantSegments(quadSegs int) *BufferParams {
 func (p *BufferParams) SetSingleSided(singleSided bool) *BufferParams {
 	p.context.Lock()
 	defer p.context.Unlock()
-	if C.GEOSBufferParams_setSingleSided_r(p.context.handle, p.bufferParams, C.int(intFromBool(singleSided))) != 1 {
+	if C.GEOSBufferParams_setSingleSided_r(p.context.cHandle, p.cBufParams, toInt[C.int](singleSided)) != 1 {
 		panic(p.context.err)
 	}
 	return p
-}
-
-func (p *BufferParams) finalize() {
-	if p.context == nil {
-		return
-	}
-	p.Destroy()
-}
-
-func intFromBool(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
 }

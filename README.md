@@ -43,27 +43,15 @@ RedHat-like systems, and `geos` in Homebrew.
 
 * Optimized GeoJSON encoder.
 
-* Automatic finalization of GEOS objects.
+* Automatic cleanup of GEOS objects.
 
 ## Memory management
 
-`go-geos` objects live mostly on the C heap. `go-geos` sets finalizers on the
-objects it creates that free the associated C memory. However, the C heap is not
-visible to the Go runtime. The can result in significant memory pressure as
-memory is consumed by large, non-finalized geometries, of which the Go runtime
-is unaware. Consequently, if it is known that a geometry will no longer be used,
-it should be explicitly freed by calling its `Destroy()` method. Periodic calls
-to `runtime.GC()` can also help, but the Go runtime makes no guarantees about
-when or if finalizers will be called.
-
-You can set a function to be called whenever a geometry's finalizer is invoked
-with the `WithGeomFinalizeFunc` option to `NewContext()`. This can be helpful
-for tracking down geometry leaks.
-
-For more information, see the [documentation for
-`runtime.SetFinalizer()`](https://pkg.go.dev/runtime#SetFinalizer) and [this
-thread on
-`golang-nuts`](https://groups.google.com/g/golang-nuts/c/XnV16PxXBfA/m/W8VEzIvHBAAJ).
+`go-geos` objects live mostly on the C heap. `go-geos` sets cleanup functions on
+the objects it creates that free the associated C memory. However, the C heap is
+not visible to the Go runtime. The can result in significant memory pressure as
+memory is consumed by large, un-freed geometries, of which the Go runtime is
+unaware.
 
 ## Errors, exceptions, and panics
 
