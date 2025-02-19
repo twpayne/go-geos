@@ -12,15 +12,14 @@ import (
 // A Context is a context.
 type Context struct {
 	sync.Mutex
-	cHandle            C.GEOSContextHandle_t
-	ewkbWithSRIDWriter *WKBWriter
-	geoJSONReader      *GeoJSONReader
-	geoJSONWriter      *GeoJSONWriter
-	wkbReader          *WKBReader
-	wkbWriter          *WKBWriter
-	wktReader          *WKTReader
-	wktWriter          *WKTWriter
-	err                error
+	cHandle       C.GEOSContextHandle_t
+	geoJSONReader *GeoJSONReader
+	geoJSONWriter *GeoJSONWriter
+	wkbReader     *WKBReader
+	wkbWriter     *WKBWriter
+	wktReader     *WKTReader
+	wktWriter     *WKTWriter
+	err           error
 }
 
 // A ContextOption sets an option on a Context.

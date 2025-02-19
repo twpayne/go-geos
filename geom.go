@@ -391,19 +391,6 @@ func (g *Geom) String() string {
 	return g.ToWKT()
 }
 
-// ToEWKB returns g in Extended WKB format with its SRID.
-func (g *Geom) ToEWKBWithSRID() []byte {
-	g.context.Lock()
-	defer g.context.Unlock()
-	if g.context.ewkbWithSRIDWriter == nil {
-		g.context.ewkbWithSRIDWriter = g.context.NewWKBWriter(
-			WithFlavor(WKBFlavorExtended),
-			WithIncludeSRID(true),
-		)
-	}
-	return g.context.ewkbWithSRIDWriter.Write(g)
-}
-
 // ToGeoJSON returns g in GeoJSON format.
 func (g *Geom) ToGeoJSON(indent int) string {
 	g.context.Lock()
@@ -419,7 +406,10 @@ func (g *Geom) ToWKB() []byte {
 	g.context.Lock()
 	defer g.context.Unlock()
 	if g.context.wkbWriter == nil {
-		g.context.wkbWriter = g.context.NewWKBWriter()
+		g.context.wkbWriter = g.context.NewWKBWriter(
+			WithFlavor(WKBFlavorExtended),
+			WithIncludeSRID(true),
+		)
 	}
 	return g.context.wkbWriter.Write(g)
 }

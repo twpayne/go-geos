@@ -13,7 +13,7 @@ func NewGeometryFromWKB(wkb []byte) (*Geometry, error) {
 
 // MarshalBinary implements encoding.BinaryMarshaler.
 func (g *Geometry) MarshalBinary() ([]byte, error) {
-	return g.Geom.ToEWKBWithSRID(), nil
+	return g.Geom.ToWKB(), nil
 }
 
 // UnmarshalBinary implements encoding.BinaryUnmarshaler.
