@@ -29,15 +29,6 @@ func (g *Geometry) Bounds() *geos.Box2D {
 	return g.Geom.Bounds()
 }
 
-// Destroy destroys g's geom.
-func (g *Geometry) Destroy() {
-	if g == nil || g.Geom == nil {
-		return
-	}
-	g.Geom.Destroy()
-	g.Geom = nil
-}
-
 // SetSRID sets g's SRID.
 func (g *Geometry) SetSRID(srid int) *Geometry {
 	g.Geom.SetSRID(srid)

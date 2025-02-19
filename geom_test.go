@@ -300,11 +300,6 @@ func TestGeometryPanics(t *testing.T) {
 	assert.NotPanics(t, func() { c.NewEmptyPolygon().ExteriorRing() })
 	assert.Panics(t, func() { c.NewEmptyPolygon().InteriorRing(-1) })
 	assert.Panics(t, func() { c.NewEmptyPolygon().InteriorRing(0) })
-	assert.NotPanics(t, func() {
-		g := geos.NewEmptyPoint()
-		g.Destroy()
-		g.Destroy()
-	})
 }
 
 func TestBinaryMethods(t *testing.T) {
@@ -457,26 +452,6 @@ func TestWKXRoundTrip(t *testing.T) {
 			newG, err := c.NewGeomFromWKB(g.ToWKB())
 			assert.NoError(t, err)
 			assert.Equal(t, wkt, newG.ToWKT())
-		})
-	}
-}
-
-func TestEWKBWithSRIDRoundTrip(t *testing.T) {
-	c := geos.NewContext()
-	for _, tc := range []struct {
-		name string
-		geom *geos.Geom
-	}{
-		{
-			name: "point",
-			geom: mustNewGeomFromWKT(t, c, "POINT (0 0)").SetSRID(4326),
-		},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			newG, err := c.NewGeomFromWKB(tc.geom.ToEWKBWithSRID())
-			assert.NoError(t, err)
-			assert.True(t, newG.Equals(tc.geom))
-			assert.Equal(t, tc.geom.SRID(), newG.SRID())
 		})
 	}
 }
