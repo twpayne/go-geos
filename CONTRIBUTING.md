@@ -53,6 +53,8 @@ miss newly-added features. In these cases:
   [`go-geos.c`](https://github.com/twpayne/go-geos/blob/master/go-geos.c) and
   [`go-geos.h`](https://github.com/twpayne/go-geos/blob/master/go-geos.h) to
   provide the function when it is not provided.
+* [`VersionCompare`](https://pkg.go.dev/github.com/twpayne/go-geos#VersionCompare)
+  can be used in tests for the CI to pass on all versions.
 
 ## C code formatting
 
@@ -61,4 +63,13 @@ format C code. You can run this with:
 
 ```console
 $ clang-format -i *.c *.h
+```
+
+## Go code linting
+
+`go-geos` uses [`golangci-lint`](https://golangci-lint.run/) to lint Go code.
+You can run it with:
+
+```
+$ golangci-lint run
 ```
