@@ -55,6 +55,9 @@ char GEOSPreparedIntersectsXY_r(GEOSContextHandle_t handle,
                                 const GEOSPreparedGeometry *pg1, double x,
                                 double y);
 
+GEOSGeometry *GEOSDisjointSubsetUnion_r(GEOSContextHandle_t handle,
+                                        const GEOSGeometry *g);
+
 #endif
 
 #endif

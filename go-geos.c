@@ -239,4 +239,9 @@ char GEOSPreparedIntersectsXY_r(GEOSContextHandle_t handle,
   return 0;
 }
 
+GEOSGeometry *GEOSDisjointSubsetUnion_r(GEOSContextHandle_t handle,
+                                        const GEOSGeometry *g) {
+  return NULL;
+}
+
 #endif

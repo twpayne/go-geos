@@ -292,6 +292,51 @@ func TestPolygonMethods(t *testing.T) {
 	assert.NotEqual(t, nil, interiorRing.CoordSeq())
 }
 
+func TestPolygonUnion(t *testing.T) {
+	for _, tc := range []struct {
+		name        string
+		wkt         string
+		expectedWKT string
+	}{
+		{
+			name:        "only one",
+			wkt:         "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))",
+			expectedWKT: "POLYGON ((0 0,1 0,1 1,0 1,0 0))",
+		},
+		{
+			name:        "two identical polygons",
+			wkt:         "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)), POLYGON ((0 0,1 0,1 1,0 1,0 0)))",
+			expectedWKT: "POLYGON ((0 0,1 0,1 1,0 1,0 0))",
+		},
+		{
+			name:        "two disjoint polygons",
+			wkt:         "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)), POLYGON ((10 10,11 10,11 11,10 11,10 10)))",
+			expectedWKT: "MULTIPOLYGON(((0 0,1 0,1 1,0 1,0 0)), ((10 10,11 10,11 11,10 11,10 10)))",
+		},
+		{
+			name:        "two intersecting polygons",
+			wkt:         "GEOMETRYCOLLECTION (POLYGON ((0 0,10 0,10 10,0 10,0 0)), POLYGON ((5 0,15 0,15 10,5 10,5 0)))",
+			expectedWKT: "POLYGON((0 0,5 0,10 0,15 0,15 10,10 10,5 10,0 10,0 0))",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			defer runtime.GC() // Exercise finalizers.
+			c := geos.NewContext()
+			polygons := mustNewGeomFromWKT(t, c, tc.wkt)
+			expectedUnion := mustNewGeomFromWKT(t, c, tc.expectedWKT)
+
+			// Test different union methods
+			union1 := polygons.UnaryUnion()
+			assert.True(t, expectedUnion.Equals(union1))
+
+			if geos.VersionCompare(3, 12, 0) >= 0 {
+				union2 := polygons.DisjointSubsetUnion()
+				assert.True(t, expectedUnion.Equals(union2))
+			}
+		})
+	}
+}
+
 func TestGeometryPanics(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
 	c := geos.NewContext()
