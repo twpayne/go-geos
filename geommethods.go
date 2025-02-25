@@ -214,6 +214,14 @@ func (g *Geom) Disjoint(other *Geom) bool {
 	}
 }
 
+// DisjointSubsetUnion returns the union of all components of a single geometry (optimized for inputs that can be divided into subsets that do not intersect).
+func (g *Geom) DisjointSubsetUnion() *Geom {
+	g.mustNotBeDestroyed()
+	g.context.Lock()
+	defer g.context.Unlock()
+	return g.context.newNonNilGeom(C.GEOSDisjointSubsetUnion_r(g.context.handle, g.geom), nil)
+}
+
 // Distance returns the distance between the closes points on g and other.
 func (g *Geom) Distance(other *Geom) float64 {
 	g.mustNotBeDestroyed()

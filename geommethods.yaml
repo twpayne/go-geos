@@ -104,6 +104,9 @@
 - name: Disjoint
   comment: returns true if g is disjoint from other
   type: binaryPredicate
+- name: DisjointSubsetUnion
+  comment: returns the union of all components of a single geometry (optimized for inputs that can be divided into subsets that do not intersect)
+  type: unary
 - name: Distance
   comment: returns the distance between the closes points on g and other
   type: float64BinaryProperty
