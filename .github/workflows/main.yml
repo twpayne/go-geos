@@ -25,7 +25,7 @@ jobs:
       with:
         go-version: ${{ matrix.go-version }}
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-    - uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57
+    - uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
@@ -64,7 +64,7 @@ jobs:
         - 3.12.2 # Latest 3.12.x
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57
+    - uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf
       id: cache-geos
       with:
         path: ~/work/geos-${{ matrix.geos-version }}
