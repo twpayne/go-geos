@@ -58,10 +58,11 @@ jobs:
       matrix:
         geos-version:
         - 3.10.2 # Used in Ubuntu 22.04 LTS
-        - 3.10.6 # Latest 3.10.x
-        - 3.11.4 # Latest 3.11.x
+        - 3.10.7 # Latest 3.10.x
+        - 3.11.5 # Latest 3.11.x
         - 3.12.1 # Used in Ubuntu 24.04 LTS
-        - 3.12.2 # Latest 3.12.x
+        - 3.12.3 # Latest 3.12.x
+        - 3.13.1 # Latest
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf
