@@ -97,13 +97,8 @@ requirements.
 
 ## GEOS version compatibility
 
-`go-geos` is tested to work with the following versions of `GEOS`:
-
-* `3.10.2`
-* `3.10.6`
-* `3.11.4`
-* `3.12.1`
-* `3.12.2`
+`go-geos` is tested to work with the versions of `GEOS` tested on CI.
+See [here](.github/workflows/main.yml).
 
 Calling functions unsupported by the underlying `GEOS` library will result in a panic.
 Users can use [`VersionCompare`](https://pkg.go.dev/github.com/twpayne/go-geos#VersionCompare)
