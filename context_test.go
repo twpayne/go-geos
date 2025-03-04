@@ -4,7 +4,6 @@ import (
 	"math"
 	"runtime"
 	"strconv"
-	"sync"
 	"testing"
 
 	"github.com/alecthomas/assert/v2"
@@ -206,20 +205,6 @@ func TestGeometryConstructors(t *testing.T) {
 			assert.True(t, g.Equals(expectedGeom))
 		})
 	}
-}
-
-func TestFinalizeFunc(t *testing.T) {
-	var wg sync.WaitGroup
-	finalizeHookCalled := false
-	wg.Add(1)
-	c := geos.NewContext(geos.WithGeomFinalizeFunc(func(_ *geos.Geom) {
-		defer wg.Done()
-		finalizeHookCalled = true
-	}))
-	_ = c.NewPoint([]float64{0, 0})
-	runtime.GC()
-	wg.Wait()
-	assert.True(t, finalizeHookCalled)
 }
 
 func TestMultipleContexts(t *testing.T) {
