@@ -1,4 +1,4 @@
-module github.com/twpayne/go-geos
+module github.com/linlexing/go-geos
 
 go 1.22
 
