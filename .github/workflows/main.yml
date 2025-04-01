@@ -21,11 +21,11 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install -y libgeos-dev
-    - uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34
+    - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
       with:
         go-version: ${{ matrix.go-version }}
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-    - uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf
+    - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
       with:
         path: ~/go/pkg/mod
         key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
@@ -45,11 +45,11 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get install -y libgeos-dev
-    - uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34
+    - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
       with:
         go-version: stable
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-    - uses: golangci/golangci-lint-action@2226d7cb06a077cd73e56eedd38eecad18e5d837
+    - uses: golangci/golangci-lint-action@1481404843c368bc19ca9406f87d6e0fc97bdcfd
       with:
         version: v1.63.4
   geos-versions:
@@ -65,7 +65,7 @@ jobs:
         - 3.13.1 # Latest
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/cache@d4323d4df104b026a6aa633fdb11d772146be0bf
+    - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
       id: cache-geos
       with:
         path: ~/work/geos-${{ matrix.geos-version }}
@@ -85,7 +85,7 @@ jobs:
       run: |
         cd ~/work/geos-${{ matrix.geos-version }}/_build
         sudo make install
-    - uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34
+    - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
       with:
         go-version: stable
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
