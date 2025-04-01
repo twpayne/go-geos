@@ -78,7 +78,7 @@ jobs:
         cd geos-${{ matrix.geos-version }}
         mkdir _build
         cd _build
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local ..
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..
         make -j4
         ctest
     - name: install-geos
