@@ -18,5 +18,5 @@ func (g *Geometry) GobEncode() ([]byte, error) {
 	if g.Geom == nil {
 		return nil, nil
 	}
-	return g.Geom.ToEWKBWithSRID(), nil
+	return g.ToEWKBWithSRID(), nil
 }

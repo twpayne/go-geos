@@ -15,5 +15,5 @@ func TestGob(t *testing.T) {
 	assert.NoError(t, err)
 	var geom geometry.Geometry
 	assert.NoError(t, geom.GobDecode(data))
-	assert.True(t, g.Geom.Equals(geom.Geom))
+	assert.True(t, g.Equals(geom.Geom))
 }
