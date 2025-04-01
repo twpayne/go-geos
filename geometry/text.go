@@ -13,7 +13,7 @@ func NewGeometryFromWKT(wkt string) (*Geometry, error) {
 
 // MarshalText implements encoding.TextMarshaler.
 func (g *Geometry) MarshalText() ([]byte, error) {
-	return []byte(g.Geom.ToWKT()), nil
+	return []byte(g.ToWKT()), nil
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
