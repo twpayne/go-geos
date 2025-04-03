@@ -15,7 +15,6 @@ jobs:
       matrix:
         go-version:
         - stable
-        - oldstable
     runs-on: ubuntu-22.04
     steps:
     - name: Install dependencies
