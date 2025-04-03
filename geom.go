@@ -1,4 +1,4 @@
-//go:generate go run ./internal/cmds/execute-template -data geommethods.yaml -output geommethods.go geommethods.go.tmpl
+//go:generate go tool execute-template -data geommethods.yaml -output geommethods.go geommethods.go.tmpl
 
 package geos
 
