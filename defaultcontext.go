@@ -48,7 +48,7 @@ func NewEmptyPolygon() *Geom {
 	return DefaultContext.NewEmptyPolygon()
 }
 
-// NewGEOMFromGeoJSON parses a geometry in GeoJSON format from GeoJSON.
+// NewGeomFromGeoJSON parses a geometry in GeoJSON format from GeoJSON.
 func NewGeomFromGeoJSON(geoJSON string) (*Geom, error) {
 	return DefaultContext.NewGeomFromGeoJSON(geoJSON)
 }

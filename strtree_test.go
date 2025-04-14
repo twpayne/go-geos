@@ -74,13 +74,13 @@ func TestSTRtreeNearest(t *testing.T) {
 	assert.NoError(t, tree.Insert(g4, g4))
 
 	assert.Equal(t, asAny(g2), tree.Nearest(g1, g1, func(value any) *geos.Geom {
-		return value.(*geos.Geom) //nolint:forcetypeassert
+		return value.(*geos.Geom) //nolint:revive
 	}))
 	assert.Equal(t, asAny(g1), tree.Nearest(g2, g2, func(value any) *geos.Geom {
-		return value.(*geos.Geom) //nolint:forcetypeassert
+		return value.(*geos.Geom) //nolint:revive
 	}))
 	assert.Equal(t, asAny(g2), tree.Nearest(g4, g4, func(value any) *geos.Geom {
-		return value.(*geos.Geom) //nolint:forcetypeassert
+		return value.(*geos.Geom) //nolint:revive
 	}))
 }
 

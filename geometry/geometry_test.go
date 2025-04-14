@@ -92,7 +92,7 @@ func TestGeometry(t *testing.T) {
 		{
 			name:        "multipoint_empty",
 			geometry:    mustNewGeometryFromWKT(t, "MULTIPOINT EMPTY"),
-			skipGeoJSON: true, // FIXME
+			skipGeoJSON: true, // FIXME re-enable
 			expectedKML: "<MultiGeometry></MultiGeometry>",
 		},
 		{
@@ -140,7 +140,7 @@ func TestGeometry(t *testing.T) {
 		{
 			name:        "geometrycollection_empty",
 			geometry:    mustNewGeometryFromWKT(t, "GEOMETRYCOLLECTION EMPTY"),
-			skipGeoJSON: true, // FIXME
+			skipGeoJSON: true, // FIXME re-enable
 			expectedKML: "<MultiGeometry></MultiGeometry>",
 		},
 		// FIXME geometrycollection

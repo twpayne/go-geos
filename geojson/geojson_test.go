@@ -20,7 +20,7 @@ func TestFeature(t *testing.T) {
 			feat: &geojson.Feature{
 				ID:       "testID",
 				Geometry: *geometry.NewGeometry(geos.NewPoint([]float64{1, 2})),
-				Properties: map[string]interface{}{
+				Properties: map[string]any{
 					"key": "value",
 				},
 			},
@@ -53,7 +53,7 @@ func TestFeatureCollection(t *testing.T) {
 				{
 					ID:       "point",
 					Geometry: *geometry.NewGeometry(geos.NewPoint([]float64{1, 2})),
-					Properties: map[string]interface{}{
+					Properties: map[string]any{
 						"key": "value",
 					},
 				},
@@ -65,14 +65,14 @@ func TestFeatureCollection(t *testing.T) {
 				{
 					ID:       "point",
 					Geometry: *geometry.NewGeometry(geos.NewPoint([]float64{1, 2})),
-					Properties: map[string]interface{}{
+					Properties: map[string]any{
 						"key": "value",
 					},
 				},
 				{
 					ID:       "linestring",
 					Geometry: *geometry.NewGeometry(geos.NewLineString([][]float64{{1, 2}, {3, 4}})),
-					Properties: map[string]interface{}{
+					Properties: map[string]any{
 						"key": "value",
 					},
 				},

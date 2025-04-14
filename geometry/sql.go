@@ -9,7 +9,7 @@ import (
 )
 
 // Scan implements database/sql.Scanner.
-func (g *Geometry) Scan(src interface{}) error {
+func (g *Geometry) Scan(src any) error {
 	switch src := src.(type) {
 	case nil:
 		g.Geom = nil

@@ -1,3 +1,4 @@
+// Package geometry provides a GEOS-backed geometry type.
 package geometry
 
 import geos "github.com/twpayne/go-geos"
