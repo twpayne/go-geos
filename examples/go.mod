@@ -1,17 +1,20 @@
 module github.com/twpayne/go-geos/examples
 
-go 1.23.4
+go 1.24.0
+
+toolchain go1.24.2
 
 require (
 	github.com/alecthomas/assert/v2 v2.11.0
 	github.com/lib/pq v1.10.9
 	github.com/testcontainers/testcontainers-go v0.35.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.35.0
-	github.com/twpayne/go-geos v0.0.0-00010101000000-000000000000
+	github.com/twpayne/go-geos v0.20.0
 )
 
 require (
 	dario.cat/mergo v1.0.1 // indirect
+	github.com/AdaLogics/go-fuzz-headers v0.0.0-20240806141605-e8a1dd7889d6 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/alecthomas/repr v0.4.0 // indirect
@@ -55,15 +58,14 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.56.0 // indirect
-	go.opentelemetry.io/otel v1.33.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.33.0 // indirect
-	go.opentelemetry.io/otel/metric v1.33.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.33.0 // indirect
-	go.opentelemetry.io/otel/trace v1.33.0 // indirect
-	go.opentelemetry.io/proto/otlp v1.5.0 // indirect
-	golang.org/x/crypto v0.31.0 // indirect
-	golang.org/x/sys v0.29.0 // indirect
-	google.golang.org/protobuf v1.36.1 // indirect
+	go.opentelemetry.io/otel v1.35.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.35.0 // indirect
+	go.opentelemetry.io/otel/metric v1.35.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.35.0 // indirect
+	go.opentelemetry.io/otel/trace v1.35.0 // indirect
+	golang.org/x/crypto v0.35.0 // indirect
+	golang.org/x/sys v0.30.0 // indirect
+	golang.org/x/time v0.11.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
