@@ -13,19 +13,20 @@ import (
 
 func TestGeometryMethods(t *testing.T) {
 	for _, tc := range []struct {
-		name                   string
-		wkt                    string
-		expectedBounds         *geos.Box2D
-		expectedEmpty          bool
-		expectedEnvelopeWKT    string
-		expectedNumCoordinates int
-		expectedNumGeometries  int
-		expectedSRID           int
-		expectedType           string
-		expectedTypeID         geos.TypeID
-		expectedArea           float64
-		expectedLength         float64
-		expectedValidWkt       string
+		name                                   string
+		wkt                                    string
+		expectedBounds                         *geos.Box2D
+		expectedEmpty                          bool
+		expectedEnvelopeWKT                    string
+		expectedNumCoordinates                 int
+		expectedNumGeometries                  int
+		expectedSRID                           int
+		expectedType                           string
+		expectedTypeID                         geos.TypeID
+		expectedArea                           float64
+		expectedLength                         float64
+		expectedValidWKT                       string
+		expectedValidWKTStructureKeepCollapsed string
 	}{
 		{
 			name:                   "point",
@@ -40,7 +41,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedTypeID:         geos.TypeIDPoint,
 			expectedArea:           0,
 			expectedLength:         0,
-			expectedValidWkt:       "POINT (0.0000000000000000 0.0000000000000000)",
+			expectedValidWKT:       "POINT (0.0000000000000000 0.0000000000000000)",
 		},
 		{
 			name:                  "point_empty",
@@ -54,7 +55,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedTypeID:        geos.TypeIDPoint,
 			expectedArea:          0,
 			expectedLength:        0,
-			expectedValidWkt:      "POINT EMPTY",
+			expectedValidWKT:      "POINT EMPTY",
 		},
 		{
 			name:                   "linestring",
@@ -69,7 +70,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedTypeID:         geos.TypeIDLineString,
 			expectedArea:           0,
 			expectedLength:         math.Sqrt(2),
-			expectedValidWkt:       "LINESTRING (0.0000000000000000 0.0000000000000000, 1.0000000000000000 1.0000000000000000)",
+			expectedValidWKT:       "LINESTRING (0.0000000000000000 0.0000000000000000, 1.0000000000000000 1.0000000000000000)",
 		},
 		{
 			name:                  "linestring_empty",
@@ -83,7 +84,7 @@ func TestGeometryMethods(t *testing.T) {
 			expectedTypeID:        geos.TypeIDLineString,
 			expectedArea:          0,
 			expectedLength:        0,
-			expectedValidWkt:      "LINESTRING EMPTY",
+			expectedValidWKT:      "LINESTRING EMPTY",
 		},
 		{
 			name:                   "polygon",
@@ -98,27 +99,28 @@ func TestGeometryMethods(t *testing.T) {
 			expectedTypeID:         geos.TypeIDPolygon,
 			expectedArea:           0.5,
 			expectedLength:         math.Sqrt(2) + 2,
-			expectedValidWkt:       "POLYGON ((0 0, 1 0, 1 1, 0 0))",
+			expectedValidWKT:       "POLYGON ((0 0, 1 0, 1 1, 0 0))",
 		},
 		{
-			name:                  "polygon_empty",
-			wkt:                   "POLYGON EMPTY",
-			expectedBounds:        &geos.Box2D{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
-			expectedEmpty:         true,
-			expectedEnvelopeWKT:   "POLYGON EMPTY",
-			expectedNumGeometries: 1,
-			expectedSRID:          0,
-			expectedType:          "Polygon",
-			expectedTypeID:        geos.TypeIDPolygon,
-			expectedArea:          0,
-			expectedLength:        0,
-			expectedValidWkt:      "POLYGON EMPTY",
+			name:                                   "polygon_empty",
+			wkt:                                    "POLYGON EMPTY",
+			expectedBounds:                         &geos.Box2D{MinX: math.Inf(1), MinY: math.Inf(1), MaxX: math.Inf(-1), MaxY: math.Inf(-1)},
+			expectedEmpty:                          true,
+			expectedEnvelopeWKT:                    "POLYGON EMPTY",
+			expectedNumGeometries:                  1,
+			expectedSRID:                           0,
+			expectedType:                           "Polygon",
+			expectedTypeID:                         geos.TypeIDPolygon,
+			expectedArea:                           0,
+			expectedLength:                         0,
+			expectedValidWKT:                       "POLYGON EMPTY",
+			expectedValidWKTStructureKeepCollapsed: "LINESTRING EMPTY",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			c := geos.NewContext()
 			g := mustNewGeomFromWKT(t, c, tc.wkt)
-			v := mustNewGeomFromWKT(t, c, tc.expectedValidWkt)
+			v := mustNewGeomFromWKT(t, c, tc.expectedValidWKT)
 			assert.Equal(t, tc.expectedBounds, g.Bounds())
 			assert.Equal(t, tc.expectedEmpty, g.IsEmpty())
 			expectedEnvelope := mustNewGeomFromWKT(t, c, tc.expectedEnvelopeWKT)
@@ -144,7 +146,13 @@ func TestGeometryMethods(t *testing.T) {
 			assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidDiscardCollapsed))
 			assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidDiscardCollapsed))
 			assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidKeepCollapsed))
-			// assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidKeepCollapsed))
+			var expectedValidStructureKeepCollapsed *geos.Geom
+			if tc.expectedValidWKTStructureKeepCollapsed != "" {
+				expectedValidStructureKeepCollapsed = mustNewGeomFromWKT(t, c, tc.expectedValidWKTStructureKeepCollapsed)
+			} else {
+				expectedValidStructureKeepCollapsed = v
+			}
+			assert.Equal(t, expectedValidStructureKeepCollapsed, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidKeepCollapsed))
 		})
 	}
 }

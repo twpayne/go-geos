@@ -1,3 +1,4 @@
+// Package geojson implements GEOS-backed GeoJSON.
 package geojson
 
 import (
@@ -14,19 +15,19 @@ const (
 
 // A Feature is a feature.
 type Feature struct {
-	ID         interface{}
+	ID         any
 	Geometry   geometry.Geometry
-	Properties map[string]interface{}
+	Properties map[string]any
 }
 
 // A FeatureCollection is a feature collection.
 type FeatureCollection []*Feature
 
 type feature struct {
-	ID         interface{}            `json:"id,omitempty"`
-	Type       string                 `json:"type"`
-	Geometry   *geometry.Geometry     `json:"geometry"`
-	Properties map[string]interface{} `json:"properties,omitempty"`
+	ID         any                `json:"id,omitempty"`
+	Type       string             `json:"type"`
+	Geometry   *geometry.Geometry `json:"geometry"`
+	Properties map[string]any     `json:"properties,omitempty"`
 }
 
 type featureCollection struct {

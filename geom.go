@@ -50,7 +50,7 @@ func (g *Geom) MakeValidWithParams(method MakeValidMethod, collapse MakeValidCol
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	cRes := C.c_GEOSMakeValidWithParams_r(g.context.handle, g.geom, (C.enum_GEOSMakeValidMethods)(method), (C.int)(collapse))
+	cRes := C.c_GEOSMakeValidWithParams_r(g.context.handle, g.geom, C.enum_GEOSMakeValidMethods(method), C.int(collapse))
 	return g.context.newGeom(cRes, nil)
 }
 
@@ -77,7 +77,7 @@ func (g *Geom) CoordSeq() *CoordSeq {
 	s := C.GEOSGeom_getCoordSeq_r(g.context.handle, g.geom)
 	// Don't set a finalizer as coordSeq is owned by g and will be finalized when g is
 	// finalized.
-	coordSeq := g.context.newCoordSeq(s, nil)
+	coordSeq := g.context.newCoordSeqInternal(s, nil)
 	if coordSeq == nil {
 		return nil
 	}
@@ -205,7 +205,7 @@ func (g *Geom) PolygonizeFull() (geom, cuts, dangles, invalidRings *Geom) {
 	cuts = g.context.newGeom(cCuts, nil)
 	dangles = g.context.newGeom(cDangles, nil)
 	invalidRings = g.context.newGeom(cInvalidRings, nil)
-	return
+	return geom, cuts, dangles, invalidRings
 }
 
 // Precision returns g's precision.
@@ -269,7 +269,7 @@ func (g *Geom) String() string {
 	return g.ToWKT()
 }
 
-// ToEWKB returns g in Extended WKB format with its SRID.
+// ToEWKBWithSRID returns g in Extended WKB format with its SRID.
 func (g *Geom) ToEWKBWithSRID() []byte {
 	g.mustNotBeDestroyed()
 	g.context.Lock()

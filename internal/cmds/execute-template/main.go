@@ -1,3 +1,4 @@
+// execute-template executes a Go template with data.
 package main
 
 import (
@@ -113,7 +114,6 @@ func run() error {
 
 func main() {
 	if err := run(); err != nil {
-		//nolint:forbidigo
 		fmt.Println(err)
 		os.Exit(1)
 	}

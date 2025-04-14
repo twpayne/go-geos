@@ -145,7 +145,8 @@ func (t *STRtree) finalize() {
 //export go_GEOSSTRtree_distance_callback
 func go_GEOSSTRtree_distance_callback(item1, item2 unsafe.Pointer, distance *C.double, userdata unsafe.Pointer) C.int {
 	handle := *(*cgo.Handle)(userdata)
-	return handle.Value().(func(unsafe.Pointer, unsafe.Pointer, *C.double) C.int)(item1, item2, distance) //nolint:forcetypeassert
+	f := handle.Value().(func(unsafe.Pointer, unsafe.Pointer, *C.double) C.int) //nolint:forcetypeassert,revive
+	return f(item1, item2, distance)
 }
 
 //export go_GEOSSTRtree_query_callback

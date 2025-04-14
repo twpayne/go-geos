@@ -27,7 +27,7 @@ const (
 	TypeIDGeometryCollection TypeID = C.GEOS_GEOMETRYCOLLECTION
 )
 
-// A BoundaryNodeRule is a boundary node rule.
+// A RelateBoundaryNodeRule is a relate boundary node rule.
 type RelateBoundaryNodeRule int
 
 // Boundary node rules.

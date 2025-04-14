@@ -190,7 +190,7 @@ func (c *Context) NewGeomFromWKB(wkb []byte) (*Geom, error) {
 	}
 	wkbCBuf := C.CBytes(wkb)
 	defer C.free(wkbCBuf)
-	return c.newGeom(C.GEOSWKBReader_read_r(c.handle, c.wkbReader, (*C.uchar)(wkbCBuf), (C.ulong)(len(wkb))), nil), c.err
+	return c.newGeom(C.GEOSWKBReader_read_r(c.handle, c.wkbReader, (*C.uchar)(wkbCBuf), C.ulong(len(wkb))), nil), c.err
 }
 
 // NewGeomFromWKT parses a geometry in WKT format from wkt.
@@ -298,10 +298,10 @@ func (c *Context) NewSTRtree(nodeCapacity int) *STRtree {
 }
 
 // OrientationIndex returns the orientation index from A to B and then to P.
-func (c *Context) OrientationIndex(Ax, Ay, Bx, By, Px, Py float64) int { //nolint:gocritic
+func (c *Context) OrientationIndex(ax, ay, bx, by, px, py float64) int {
 	c.Lock()
 	defer c.Unlock()
-	return int(C.GEOSOrientationIndex_r(c.handle, C.double(Ax), C.double(Ay), C.double(Bx), C.double(By), C.double(Px), C.double(Py)))
+	return int(C.GEOSOrientationIndex_r(c.handle, C.double(ax), C.double(ay), C.double(bx), C.double(by), C.double(px), C.double(py)))
 }
 
 // Polygonize returns a set of geometries which contains linework that
@@ -343,7 +343,7 @@ func (c *Context) RelatePatternMatch(mat, pat string) bool {
 }
 
 // SegmentIntersection returns the coordinate where two lines intersect.
-func (c *Context) SegmentIntersection(ax0, ay0, ax1, ay1, bx0, by0, bx1, by1 float64) (float64, float64, bool) {
+func (c *Context) SegmentIntersection(ax0, ay0, ax1, ay1, bx0, by0, bx1, by1 float64) (x, y float64, intersection bool) {
 	c.Lock()
 	defer c.Unlock()
 	var cx, cy float64
@@ -423,7 +423,7 @@ func (c *Context) newBufParams(p *C.struct_GEOSBufParams_t) *BufferParams {
 	return bufParams
 }
 
-func (c *Context) newCoordSeq(gs *C.struct_GEOSCoordSeq_t, finalizer func(*CoordSeq)) *CoordSeq {
+func (c *Context) newCoordSeqInternal(gs *C.struct_GEOSCoordSeq_t, finalizer func(*CoordSeq)) *CoordSeq {
 	if gs == nil {
 		return nil
 	}
@@ -538,7 +538,7 @@ func (c *Context) newNonNilCoordSeq(s *C.struct_GEOSCoordSeq_t) *CoordSeq {
 	if s == nil {
 		panic(c.err)
 	}
-	return c.newCoordSeq(s, (*CoordSeq).Destroy)
+	return c.newCoordSeqInternal(s, (*CoordSeq).Destroy)
 }
 
 func (c *Context) newNonNilGeom(geom *C.struct_GEOSGeom_t, parent *Geom) *Geom {

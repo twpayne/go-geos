@@ -114,7 +114,7 @@ func (g *Geometry) UnmarshalJSON(data []byte) error {
 		g.Geom = geos.NewCollection(geos.TypeIDMultiPolygon, geoms)
 		return nil
 	case "MultiGeometry":
-		fallthrough // FIXME
+		fallthrough // FIXME handle MultiGeometry
 	default:
 		return fmt.Errorf("unsupported type: %s", geoJSON.Type)
 	}
@@ -265,10 +265,7 @@ func geojsonWriteGeom(sb *strings.Builder, geom *geos.Geom) error {
 			return err
 		}
 	}
-	if err := sb.WriteByte('}'); err != nil {
-		return err
-	}
-	return nil
+	return sb.WriteByte('}')
 }
 
 func geojsonWritePolygonCoordinates(sb *strings.Builder, geom *geos.Geom) error {

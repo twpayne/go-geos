@@ -10,47 +10,38 @@ env:
   GOTOOLCHAIN: local
 jobs:
   main:
-    strategy:
-      fail-fast: false
-      matrix:
-        go-version:
-        - stable
     runs-on: ubuntu-22.04
     steps:
-    - name: Install dependencies
+    - name: install-dependencies
       run: |
         sudo apt-get install -y libgeos-dev
-    - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
-      with:
-        go-version: ${{ matrix.go-version }}
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-    - uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684
-      with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ matrix.go-version }}-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-    - name: Generate
-      run: |
-        go generate ./...
-        git diff --exit-code
-    - name: Build
-      run: go build ./...
-    - name: Test
-      run: go test -race ./...
-  lint:
-    runs-on: ubuntu-22.04
-    steps:
-    - name: Install dependencies
-      run: |
-        sudo apt-get install -y libgeos-dev
     - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
       with:
         go-version: stable
+    - name: generate
+      run: |
+        go generate ./...
+        git diff --exit-code
+    - name: build
+      run: go build ./...
+    - name: test
+      run: go test -race ./...
+    - name: test-examples
+      run: ( cd examples && go test -race ./... )
+  lint:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: install-dependencies
+      run: |
+        sudo apt-get install -y libgeos-dev
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+    - uses: actions/setup-go@0aaccfd150d50ccaeb58ebd88d36e91967a5f35b
+      with:
+        go-version: stable
     - uses: golangci/golangci-lint-action@1481404843c368bc19ca9406f87d6e0fc97bdcfd
       with:
-        version: v2.0.2
+        version: v2.1.1
   geos-versions:
     strategy:
       fail-fast: false
