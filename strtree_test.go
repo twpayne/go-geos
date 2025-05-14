@@ -1,6 +1,7 @@
 package geos_test
 
 import (
+	"fmt"
 	"runtime"
 	"testing"
 
@@ -73,15 +74,9 @@ func TestSTRtreeNearest(t *testing.T) {
 	g4 := mustNewGeomFromWKT(t, c, "POINT (0 4)")
 	assert.NoError(t, tree.Insert(g4, g4))
 
-	assert.Equal(t, asAny(g2), tree.Nearest(g1, g1, func(value any) *geos.Geom {
-		return value.(*geos.Geom) //nolint:revive
-	}))
-	assert.Equal(t, asAny(g1), tree.Nearest(g2, g2, func(value any) *geos.Geom {
-		return value.(*geos.Geom) //nolint:revive
-	}))
-	assert.Equal(t, asAny(g2), tree.Nearest(g4, g4, func(value any) *geos.Geom {
-		return value.(*geos.Geom) //nolint:revive
-	}))
+	assert.Equal(t, asAny(g2), tree.Nearest(g1, g1, asGeom))
+	assert.Equal(t, asAny(g1), tree.Nearest(g2, g2, asGeom))
+	assert.Equal(t, asAny(g2), tree.Nearest(g4, g4, asGeom))
 }
 
 func TestSTRtreeLoad(t *testing.T) {
@@ -127,6 +122,14 @@ func TestSTRtreeLoad(t *testing.T) {
 		itemsAfterRemove[array] = struct{}{}
 	})
 	assert.Equal(t, 256*256/2, len(itemsAfterRemove))
+}
+
+func asGeom(x any) *geos.Geom {
+	g, ok := x.(*geos.Geom)
+	if !ok {
+		panic(fmt.Sprintf("%v is not a *geos.Geom", x))
+	}
+	return g
 }
 
 func asAny(x any) any {
