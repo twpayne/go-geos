@@ -6,7 +6,7 @@ tool github.com/twpayne/go-geos/internal/cmds/execute-template
 
 require (
 	github.com/alecthomas/assert/v2 v2.11.0
-	github.com/goccy/go-yaml v1.17.1
+	github.com/goccy/go-yaml v1.18.0
 )
 
 require (
