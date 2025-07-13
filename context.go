@@ -78,17 +78,6 @@ func (c *Context) Clone(g *Geom) *Geom {
 	return clone
 }
 
-// NewBufferParams returns a new BufferParams.
-func (c *Context) NewBufferParams() *BufferParams {
-	c.mutex.Lock()
-	defer c.mutex.Unlock()
-	cBufferParams := C.GEOSBufferParams_create_r(c.cHandle)
-	if cBufferParams == nil {
-		panic(c.err)
-	}
-	return c.newBufParams(cBufferParams)
-}
-
 // NewCollection returns a new collection.
 func (c *Context) NewCollection(typeID TypeID, geoms []*Geom) *Geom {
 	if len(geoms) == 0 {
@@ -407,18 +396,6 @@ func (c *Context) finish() {
 	C.finishGEOS_r(c.cHandle)
 }
 
-func (c *Context) newBufParams(p *C.struct_GEOSBufParams_t) *BufferParams {
-	if p == nil {
-		return nil
-	}
-	bufParams := &BufferParams{
-		context:    c,
-		cBufParams: p,
-	}
-	runtime.SetFinalizer(bufParams, (*BufferParams).finalize)
-	return bufParams
-}
-
 func (c *Context) newCoordSeqInternal(gs *C.struct_GEOSCoordSeq_t, finalizer func(*CoordSeq)) *CoordSeq {
 	if gs == nil {
 		return nil
@@ -521,13 +498,6 @@ func (c *Context) newGeom(geom *C.struct_GEOSGeom_t, parent *Geom) *Geom {
 	}
 	runtime.SetFinalizer(g, (*Geom).finalize)
 	return g
-}
-
-func (c *Context) newNonNilBufferParams(p *C.struct_GEOSBufParams_t) *BufferParams {
-	if p == nil {
-		panic(c.err)
-	}
-	return c.newBufParams(p)
 }
 
 func (c *Context) newNonNilCoordSeq(s *C.struct_GEOSCoordSeq_t) *CoordSeq {
