@@ -18,7 +18,6 @@ type Context struct {
 	cGeoJSONReader      *C.struct_GEOSGeoJSONReader_t
 	cGeoJSONWriter      *C.struct_GEOSGeoJSONWriter_t
 	cWKBReader          *C.struct_GEOSWKBReader_t
-	cWKBWriter          *C.struct_GEOSWKBWriter_t
 	cWKTReader          *C.struct_GEOSWKTReader_t
 	cWKTWriter          *C.struct_GEOSWKTWriter_t
 	err                 error
@@ -72,7 +71,7 @@ func (c *Context) Clone(g *Geom) *Geom {
 	// FIXME use a more intelligent method than a WKB roundtrip (although a WKB
 	// roundtrip might actually be quite fast if the cgo overhead is
 	// significant)
-	clone, err := c.NewGeomFromWKB(g.ToWKB())
+	clone, err := c.NewGeomFromWKB(g.ToEWKBWithSRID())
 	if err != nil {
 		panic(err)
 	}
@@ -398,9 +397,6 @@ func (c *Context) finish() {
 	}
 	if c.cWKBReader != nil {
 		C.GEOSWKBReader_destroy_r(c.cHandle, c.cWKBReader)
-	}
-	if c.cWKBWriter != nil {
-		C.GEOSWKBWriter_destroy_r(c.cHandle, c.cWKBWriter)
 	}
 	if c.cWKTReader != nil {
 		C.GEOSWKTReader_destroy_r(c.cHandle, c.cWKTReader)

@@ -280,9 +280,9 @@ func (g *Geom) ToEWKBWithSRID() []byte {
 		C.GEOSWKBWriter_setIncludeSRID_r(g.context.cHandle, g.context.cEWKBWithSRIDWriter, 1)
 	}
 	var size C.size_t
-	cEWKBBuf := C.GEOSWKBWriter_write_r(g.context.cHandle, g.context.cEWKBWithSRIDWriter, g.cGeom, &size)
-	defer C.GEOSFree_r(g.context.cHandle, unsafe.Pointer(cEWKBBuf))
-	return C.GoBytes(unsafe.Pointer(cEWKBBuf), C.int(size))
+	cWKBBuf := C.GEOSWKBWriter_write_r(g.context.cHandle, g.context.cEWKBWithSRIDWriter, g.cGeom, &size)
+	defer C.GEOSFree_r(g.context.cHandle, unsafe.Pointer(cWKBBuf))
+	return C.GoBytes(unsafe.Pointer(cWKBBuf), C.int(size))
 }
 
 // ToGeoJSON returns g in GeoJSON format.
@@ -296,20 +296,6 @@ func (g *Geom) ToGeoJSON(indent int) string {
 	cGeoJSONStr := C.GEOSGeoJSONWriter_writeGeometry_r(g.context.cHandle, g.context.cGeoJSONWriter, g.cGeom, C.int(indent))
 	defer C.GEOSFree_r(g.context.cHandle, unsafe.Pointer(cGeoJSONStr))
 	return C.GoString(cGeoJSONStr)
-}
-
-// ToWKB returns g in WKB format.
-func (g *Geom) ToWKB() []byte {
-	g.mustNotBeDestroyed()
-	g.context.mutex.Lock()
-	defer g.context.mutex.Unlock()
-	if g.context.cWKBWriter == nil {
-		g.context.cWKBWriter = C.GEOSWKBWriter_create_r(g.context.cHandle)
-	}
-	var size C.size_t
-	cWKBBuf := C.GEOSWKBWriter_write_r(g.context.cHandle, g.context.cWKBWriter, g.cGeom, &size)
-	defer C.GEOSFree_r(g.context.cHandle, unsafe.Pointer(cWKBBuf))
-	return C.GoBytes(unsafe.Pointer(cWKBBuf), C.int(size))
 }
 
 // ToWKT returns g in WKT format.

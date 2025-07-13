@@ -507,7 +507,7 @@ func TestWKXRoundTrip(t *testing.T) {
 			}
 			g := mustNewGeomFromWKT(t, c, wkt)
 			assert.Equal(t, wkt, g.ToWKT())
-			newG, err := c.NewGeomFromWKB(g.ToWKB())
+			newG, err := c.NewGeomFromWKB(g.ToEWKBWithSRID())
 			assert.NoError(t, err)
 			assert.Equal(t, wkt, newG.ToWKT())
 		})
