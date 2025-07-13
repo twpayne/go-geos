@@ -23,6 +23,7 @@ func (c *Context) NewBufParams() *BufParams {
 		context:    c,
 		cBufParams: cBufParams,
 	}
+	c.ref()
 	runtime.AddCleanup(bufParams, c.destroyBufParams, cBufParams)
 	return bufParams
 }
@@ -82,4 +83,5 @@ func (c *Context) destroyBufParams(cBufParams *C.struct_GEOSBufParams_t) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	C.GEOSBufferParams_destroy_r(c.cHandle, cBufParams)
+	c.unref()
 }

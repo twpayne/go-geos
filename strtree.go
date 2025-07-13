@@ -5,6 +5,7 @@ package geos
 import "C"
 
 import (
+	"runtime"
 	"runtime/cgo"
 	"unsafe"
 )
@@ -17,18 +18,20 @@ type STRtree struct {
 	valueToItem map[any]unsafe.Pointer
 }
 
-// Destroy frees all resources associated with t.
-func (t *STRtree) Destroy() {
-	if t == nil || t.context == nil {
-		return
+// NewSTRtree returns a new STRtree.
+func (c *Context) NewSTRtree(nodeCapacity int) *STRtree {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	cSTRTree := C.GEOSSTRtree_create_r(c.cHandle, C.size_t(nodeCapacity))
+	strTree := &STRtree{
+		context:     c,
+		cSTRTree:    cSTRTree,
+		itemToValue: make(map[unsafe.Pointer]any),
+		valueToItem: make(map[any]unsafe.Pointer),
 	}
-	t.context.mutex.Lock()
-	defer t.context.mutex.Unlock()
-	C.GEOSSTRtree_destroy_r(t.context.cHandle, t.cSTRTree)
-	for item := range t.itemToValue {
-		C.free(item)
-	}
-	*t = STRtree{} // Clear all references.
+	c.ref()
+	runtime.AddCleanup(strTree, c.destroySTRTree, cSTRTree)
+	return strTree
 }
 
 // Insert inserts value with geometry g.
@@ -132,14 +135,11 @@ func (t *STRtree) Remove(g *Geom, value any) bool {
 	}
 }
 
-func (t *STRtree) finalize() {
-	if t.context == nil {
-		return
-	}
-	if t.context.strTreeFinalizeFunc != nil {
-		t.context.strTreeFinalizeFunc(t)
-	}
-	t.Destroy()
+func (c *Context) destroySTRTree(cSTRTree *C.struct_GEOSSTRtree_t) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	C.GEOSSTRtree_destroy_r(c.cHandle, cSTRTree)
+	c.unref()
 }
 
 //export go_GEOSSTRtree_distance_callback

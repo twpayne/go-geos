@@ -3,13 +3,32 @@ package geos
 // #include "go-geos.h"
 import "C"
 
+import (
+	"runtime"
+	"unsafe"
+)
+
 // A CoordSeq is a coordinate sequence.
 type CoordSeq struct {
 	context    *Context
 	s          *C.struct_GEOSCoordSeq_t
-	parent     *Geom
+	owner      *Geom
 	dimensions int
 	size       int
+}
+
+// NewCoordSeq returns a new CoordSeq.
+func (c *Context) NewCoordSeq(size, dims int) *CoordSeq {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	return c.newNonNilCoordSeq(C.GEOSCoordSeq_create_r(c.cHandle, C.uint(size), C.uint(dims)))
+}
+
+// NewCoordSeqFromCoords returns a new CoordSeq populated with coords.
+func (c *Context) NewCoordSeqFromCoords(coords [][]float64) *CoordSeq {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	return c.newNonNilCoordSeq(c.newGEOSCoordSeqFromCoords(coords))
 }
 
 // Clone returns a clone of s.
@@ -17,17 +36,6 @@ func (s *CoordSeq) Clone() *CoordSeq {
 	s.context.mutex.Lock()
 	defer s.context.mutex.Unlock()
 	return s.context.newNonNilCoordSeq(C.GEOSCoordSeq_clone_r(s.context.cHandle, s.s))
-}
-
-// Destroy destroys s and all resources associated with s.
-func (s *CoordSeq) Destroy() {
-	if s == nil || s.context == nil {
-		return
-	}
-	s.context.mutex.Lock()
-	defer s.context.mutex.Unlock()
-	C.GEOSCoordSeq_destroy_r(s.context.cHandle, s.s)
-	*s = CoordSeq{} // Clear all references.
 }
 
 // Dimensions returns the dimensions of s.
@@ -207,4 +215,98 @@ func (s *CoordSeq) Z(idx int) float64 {
 		panic(s.context.err)
 	}
 	return val
+}
+
+func (c *Context) newCoordSeqInternal(cCoordSeq *C.struct_GEOSCoordSeq_t, owner *Geom) *CoordSeq {
+	if cCoordSeq == nil {
+		return nil
+	}
+	var (
+		dimensions C.uint
+		size       C.uint
+	)
+	if C.GEOSCoordSeq_getDimensions_r(c.cHandle, cCoordSeq, &dimensions) == 0 {
+		panic(c.err)
+	}
+	if C.GEOSCoordSeq_getSize_r(c.cHandle, cCoordSeq, &size) == 0 {
+		panic(c.err)
+	}
+	coordSeq := &CoordSeq{
+		context:    c,
+		s:          cCoordSeq,
+		owner:      owner,
+		dimensions: int(dimensions),
+		size:       int(size),
+	}
+	if owner == nil {
+		c.ref()
+		runtime.AddCleanup(coordSeq, c.destroyCoordSeq, cCoordSeq)
+	}
+	return coordSeq
+}
+
+func (c *Context) newCoordsFromGEOSCoordSeq(cCoordSeq *C.struct_GEOSCoordSeq_t) [][]float64 {
+	var dimensions C.uint
+	if C.GEOSCoordSeq_getDimensions_r(c.cHandle, cCoordSeq, &dimensions) == 0 {
+		panic(c.err)
+	}
+
+	var size C.uint
+	if C.GEOSCoordSeq_getSize_r(c.cHandle, cCoordSeq, &size) == 0 {
+		panic(c.err)
+	}
+
+	var hasZ C.int
+	if dimensions > 2 {
+		hasZ = 1
+	}
+
+	var hasM C.int
+	if dimensions > 3 {
+		hasM = 1
+	}
+
+	flatCoords := make([]float64, size*dimensions)
+	if C.GEOSCoordSeq_copyToBuffer_r(c.cHandle, cCoordSeq, (*C.double)(&flatCoords[0]), hasZ, hasM) == 0 {
+		panic(c.err)
+	}
+	coords := make([][]float64, size)
+	for i := range coords {
+		coord := flatCoords[i*int(dimensions) : (i+1)*int(dimensions) : (i+1)*int(dimensions)]
+		coords[i] = coord
+	}
+	return coords
+}
+
+func (c *Context) newGEOSCoordSeqFromCoords(coords [][]float64) *C.struct_GEOSCoordSeq_t {
+	var hasZ C.int
+	if len(coords[0]) > 2 {
+		hasZ = 1
+	}
+
+	var hasM C.int
+	if len(coords[0]) > 3 {
+		hasM = 1
+	}
+
+	dimensions := len(coords[0])
+	flatCoords := make([]float64, len(coords)*dimensions)
+	for i, coord := range coords {
+		copy(flatCoords[i*dimensions:(i+1)*dimensions], coord)
+	}
+	return C.GEOSCoordSeq_copyFromBuffer_r(c.cHandle, (*C.double)(unsafe.Pointer(&flatCoords[0])), C.uint(len(coords)), hasZ, hasM)
+}
+
+func (c *Context) newNonNilCoordSeq(cCoordSeq *C.struct_GEOSCoordSeq_t) *CoordSeq {
+	if cCoordSeq == nil {
+		panic(c.err)
+	}
+	return c.newCoordSeqInternal(cCoordSeq, nil)
+}
+
+func (c *Context) destroyCoordSeq(cCoordSeq *C.struct_GEOSCoordSeq_t) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	C.GEOSCoordSeq_destroy_r(c.cHandle, cCoordSeq)
+	c.unref()
 }

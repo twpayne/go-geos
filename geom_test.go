@@ -353,11 +353,6 @@ func TestGeometryPanics(t *testing.T) {
 	assert.NotPanics(t, func() { c.NewEmptyPolygon().ExteriorRing() })
 	assert.Panics(t, func() { c.NewEmptyPolygon().InteriorRing(-1) })
 	assert.Panics(t, func() { c.NewEmptyPolygon().InteriorRing(0) })
-	assert.NotPanics(t, func() {
-		g := geos.NewEmptyPoint()
-		g.Destroy()
-		g.Destroy()
-	})
 }
 
 func TestBinaryMethods(t *testing.T) {
@@ -505,11 +500,14 @@ func TestWKXRoundTrip(t *testing.T) {
 			if geos.VersionCompare(3, 12, 0) < 0 {
 				wkt = tc.wktPre3_12
 			}
-			g := mustNewGeomFromWKT(t, c, wkt)
-			assert.Equal(t, wkt, g.ToWKT())
-			newG, err := c.NewGeomFromWKB(g.ToEWKBWithSRID())
+			wktGeom := mustNewGeomFromWKT(t, c, wkt)
+			assert.Equal(t, wkt, wktGeom.ToWKT())
+			wkbGeom, err := c.NewGeomFromWKB(wktGeom.ToWKB())
 			assert.NoError(t, err)
-			assert.Equal(t, wkt, newG.ToWKT())
+			assert.Equal(t, wkt, wkbGeom.ToWKT())
+			ewkbWithSRIDGeom, err := c.NewGeomFromWKB(wktGeom.ToEWKBWithSRID())
+			assert.NoError(t, err)
+			assert.Equal(t, wkt, ewkbWithSRIDGeom.ToWKT())
 		})
 	}
 }
