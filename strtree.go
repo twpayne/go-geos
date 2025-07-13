@@ -12,7 +12,7 @@ import (
 // An STRtree is an R-tree spatial index structure for two dimensional data.
 type STRtree struct {
 	context     *Context
-	strTree     *C.struct_GEOSSTRtree_t
+	cSTRTree    *C.struct_GEOSSTRtree_t
 	itemToValue map[unsafe.Pointer]any
 	valueToItem map[any]unsafe.Pointer
 }
@@ -24,7 +24,7 @@ func (t *STRtree) Destroy() {
 	}
 	t.context.Lock()
 	defer t.context.Unlock()
-	C.GEOSSTRtree_destroy_r(t.context.handle, t.strTree)
+	C.GEOSSTRtree_destroy_r(t.context.cHandle, t.cSTRTree)
 	for item := range t.itemToValue {
 		C.free(item)
 	}
@@ -44,7 +44,7 @@ func (t *STRtree) Insert(g *Geom, value any) error {
 	item := C.calloc(1, C.size_t(unsafe.Sizeof(uintptr(0))))
 	t.itemToValue[item] = value
 	t.valueToItem[value] = item
-	C.GEOSSTRtree_insert_r(t.context.handle, t.strTree, g.geom, item)
+	C.GEOSSTRtree_insert_r(t.context.cHandle, t.cSTRTree, g.cGeom, item)
 	return nil
 }
 
@@ -57,8 +57,8 @@ func (t *STRtree) Iterate(callback func(any)) {
 	t.context.Lock()
 	defer t.context.Unlock()
 	C.GEOSSTRtree_iterate_r(
-		t.context.handle,
-		t.strTree,
+		t.context.cHandle,
+		t.cSTRTree,
 		(*[0]byte)(C.c_GEOSSTRtree_query_callback), // FIXME understand why the cast to *[0]byte is needed
 		unsafe.Pointer(&handle),                    //nolint:gocritic
 	)
@@ -78,16 +78,16 @@ func (t *STRtree) Nearest(value any, valueEnvelope *Geom, geomfn func(any) *Geom
 		if geom2 == nil {
 			return 0
 		}
-		return C.GEOSDistance_r(t.context.handle, geom1.geom, geom2.geom, distance)
+		return C.GEOSDistance_r(t.context.cHandle, geom1.cGeom, geom2.cGeom, distance)
 	})
 	defer handle.Delete()
 	t.context.Lock()
 	defer t.context.Unlock()
 	nearestItem := C.GEOSSTRtree_nearest_generic_r(
-		t.context.handle,
-		t.strTree,
+		t.context.cHandle,
+		t.cSTRTree,
 		t.valueToItem[value],
-		valueEnvelope.geom,
+		valueEnvelope.cGeom,
 		(*[0]byte)(C.c_GEOSSTRtree_distance_callback), // FIXME understand why the cast to *[0]byte is needed
 		unsafe.Pointer(&handle),                       //nolint:gocritic
 	)
@@ -103,9 +103,9 @@ func (t *STRtree) Query(g *Geom, callback func(any)) {
 	t.context.Lock()
 	defer t.context.Unlock()
 	C.GEOSSTRtree_query_r(
-		t.context.handle,
-		t.strTree,
-		g.geom,
+		t.context.cHandle,
+		t.cSTRTree,
+		g.cGeom,
 		(*[0]byte)(C.c_GEOSSTRtree_query_callback), // FIXME understand why the cast to *[0]byte is needed
 		unsafe.Pointer(&handle),                    //nolint:gocritic
 	)
@@ -119,7 +119,7 @@ func (t *STRtree) Remove(g *Geom, value any) bool {
 	item := t.valueToItem[value]
 	t.context.Lock()
 	defer t.context.Unlock()
-	switch C.GEOSSTRtree_remove_r(t.context.handle, t.strTree, g.geom, item) {
+	switch C.GEOSSTRtree_remove_r(t.context.cHandle, t.cSTRTree, g.cGeom, item) {
 	case 0:
 		return false
 	case 1:

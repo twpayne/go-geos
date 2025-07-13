@@ -30,7 +30,7 @@ func (g *Geom) {{ .name }}({{ range $index, $arg := .extraArgs }}{{ if $index }}
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	return g.context.new{{ if not .nil }}NonNil{{ end }}Geom(C.{{ $geosFunction }}(g.context.handle, g.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}), nil)
+	return g.context.new{{ if not .nil }}NonNil{{ end }}Geom(C.{{ $geosFunction }}(g.context.cHandle, g.cGeom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}), nil)
 }
 
 {{-   else if eq .type "binary" }}
@@ -40,7 +40,7 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	return g.context.newGeom(C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}), nil)
+	return g.context.newGeom(C.{{ $geosFunction }}(g.context.cHandle, g.cGeom, other.cGeom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}), nil)
 }
 
 {{-   else if eq .type "unaryPredicate" }}
@@ -50,7 +50,7 @@ func (g *Geom) {{ .name }}() bool {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	switch C.{{ $geosFunction }}(g.context.handle, g.geom) {
+	switch C.{{ $geosFunction }}(g.context.cHandle, g.cGeom) {
 	case 0:
 		return false
 	case 1:
@@ -67,7 +67,7 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	switch C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}) {
+	switch C.{{ $geosFunction }}(g.context.cHandle, g.cGeom, other.cGeom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}) {
 	case 0:
 		return false
 	case 1:
@@ -86,7 +86,7 @@ func (g *Geom) {{ .name }}() float64 {
 	g.context.Lock()
 	defer g.context.Unlock()
 	var {{ $varName }} float64
-    if C.{{ $geosFunction }}(g.context.handle, g.geom, (*C.double)(&{{ $varName }})) == 0 {
+    if C.{{ $geosFunction }}(g.context.cHandle, g.cGeom, (*C.double)(&{{ $varName }})) == 0 {
 		panic(g.context.err)
 	}
 	return {{ $varName }}
@@ -101,10 +101,10 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 	g.context.Lock()
 	defer g.context.Unlock()
     {{- if .valueReturned }}
-	return float64(C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}))
+	return float64(C.{{ $geosFunction }}(g.context.cHandle, g.cGeom, other.cGeom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}))
     {{- else }}
 	var {{ $varName }} float64
-	if C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}, (*C.double)(&{{ $varName }})) == 0 {
+	if C.{{ $geosFunction }}(g.context.cHandle, g.cGeom, other.cGeom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}, (*C.double)(&{{ $varName }})) == 0 {
 		panic(g.context.err)
 	}
 	return {{ $varName }}
@@ -119,8 +119,8 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	{{ $varName }}CStr := C.{{ $geosFunction }}(g.context.handle, g.geom, other.geom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }})
-	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer({{ $varName }}CStr))
+	{{ $varName }}CStr := C.{{ $geosFunction }}(g.context.cHandle, g.cGeom, other.cGeom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }})
+	defer C.GEOSFree_r(g.context.cHandle, unsafe.Pointer({{ $varName }}CStr))
 	return C.GoString({{ $varName }}CStr)
 }
 
