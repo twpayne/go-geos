@@ -66,7 +66,7 @@ func (p *BufferParams) SetQuadrantSegments(quadSegs int) *BufferParams {
 func (p *BufferParams) SetSingleSided(singleSided bool) *BufferParams {
 	p.context.mutex.Lock()
 	defer p.context.mutex.Unlock()
-	if C.GEOSBufferParams_setSingleSided_r(p.context.cHandle, p.cBufParams, C.int(intFromBool(singleSided))) != 1 {
+	if C.GEOSBufferParams_setSingleSided_r(p.context.cHandle, p.cBufParams, toInt[C.int](singleSided)) != 1 {
 		panic(p.context.err)
 	}
 	return p
@@ -77,11 +77,4 @@ func (p *BufferParams) finalize() {
 		return
 	}
 	p.Destroy()
-}
-
-func intFromBool(b bool) int {
-	if b {
-		return 1
-	}
-	return 0
 }
