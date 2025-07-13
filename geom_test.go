@@ -307,22 +307,22 @@ func TestPolygonUnion(t *testing.T) {
 		expectedWKT string
 	}{
 		{
-			name:        "only one",
+			name:        "only_one",
 			wkt:         "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)))",
 			expectedWKT: "POLYGON ((0 0,1 0,1 1,0 1,0 0))",
 		},
 		{
-			name:        "two identical polygons",
+			name:        "two_identical_polygons",
 			wkt:         "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)), POLYGON ((0 0,1 0,1 1,0 1,0 0)))",
 			expectedWKT: "POLYGON ((0 0,1 0,1 1,0 1,0 0))",
 		},
 		{
-			name:        "two disjoint polygons",
+			name:        "two_disjoint_polygons",
 			wkt:         "GEOMETRYCOLLECTION (POLYGON ((0 0,1 0,1 1,0 1,0 0)), POLYGON ((10 10,11 10,11 11,10 11,10 10)))",
 			expectedWKT: "MULTIPOLYGON(((0 0,1 0,1 1,0 1,0 0)), ((10 10,11 10,11 11,10 11,10 10)))",
 		},
 		{
-			name:        "two intersecting polygons",
+			name:        "two_intersecting_polygons",
 			wkt:         "GEOMETRYCOLLECTION (POLYGON ((0 0,10 0,10 10,0 10,0 0)), POLYGON ((5 0,15 0,15 10,5 10,5 0)))",
 			expectedWKT: "POLYGON((0 0,5 0,10 0,15 0,15 10,10 10,5 10,0 10,0 0))",
 		},
