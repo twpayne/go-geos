@@ -69,6 +69,7 @@ linters:
   - whitespace
   - zerologlint
   disable:
+  - arangolint
   - asasalint
   - contextcheck
   - cyclop
@@ -103,6 +104,7 @@ linters:
   - varnamelen
   - wrapcheck
   - wsl
+  - wsl_v5
   settings:
     forbidigo:
       exclude-godoc-examples: true
