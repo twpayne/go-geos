@@ -13,7 +13,7 @@ import (
 // A Geom is a geometry.
 type Geom struct {
 	context          *Context
-	geom             *C.struct_GEOSGeom_t
+	cGeom            *C.struct_GEOSGeom_t
 	parent           *Geom
 	typeID           TypeID
 	numGeometries    int
@@ -30,7 +30,7 @@ func (g *Geom) Destroy() {
 	if g.parent == nil {
 		g.context.Lock()
 		defer g.context.Unlock()
-		C.GEOSGeom_destroy_r(g.context.handle, g.geom)
+		C.GEOSGeom_destroy_r(g.context.cHandle, g.cGeom)
 	}
 	*g = Geom{} // Clear all references.
 }
@@ -41,7 +41,7 @@ func (g *Geom) Bounds() *Box2D {
 	bounds := NewBox2DEmpty()
 	g.context.Lock()
 	defer g.context.Unlock()
-	C.c_GEOSGeomBounds_r(g.context.handle, g.geom, (*C.double)(&bounds.MinX), (*C.double)(&bounds.MinY), (*C.double)(&bounds.MaxX), (*C.double)(&bounds.MaxY))
+	C.c_GEOSGeomBounds_r(g.context.cHandle, g.cGeom, (*C.double)(&bounds.MinX), (*C.double)(&bounds.MinY), (*C.double)(&bounds.MaxX), (*C.double)(&bounds.MaxY))
 	return bounds
 }
 
@@ -50,7 +50,7 @@ func (g *Geom) MakeValidWithParams(method MakeValidMethod, collapse MakeValidCol
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	cRes := C.c_GEOSMakeValidWithParams_r(g.context.handle, g.geom, C.enum_GEOSMakeValidMethods(method), C.int(collapse))
+	cRes := C.c_GEOSMakeValidWithParams_r(g.context.cHandle, g.cGeom, C.enum_GEOSMakeValidMethods(method), C.int(collapse))
 	return g.context.newGeom(cRes, nil)
 }
 
@@ -62,7 +62,7 @@ func (g *Geom) BufferWithParams(bufferParams *BufferParams, width float64) *Geom
 		bufferParams.context.Lock()
 		defer bufferParams.context.Unlock()
 	}
-	return g.context.newNonNilGeom(C.GEOSBufferWithParams_r(g.context.handle, g.geom, bufferParams.bufferParams, C.double(width)), nil)
+	return g.context.newNonNilGeom(C.GEOSBufferWithParams_r(g.context.cHandle, g.cGeom, bufferParams.cBufParams, C.double(width)), nil)
 }
 
 func (g *Geom) ClipByBox2D(box2d *Box2D) *Geom {
@@ -74,10 +74,10 @@ func (g *Geom) CoordSeq() *CoordSeq {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	s := C.GEOSGeom_getCoordSeq_r(g.context.handle, g.geom)
+	cCoordSeq := C.GEOSGeom_getCoordSeq_r(g.context.cHandle, g.cGeom)
 	// Don't set a finalizer as coordSeq is owned by g and will be finalized when g is
 	// finalized.
-	coordSeq := g.context.newCoordSeqInternal(s, nil)
+	coordSeq := g.context.newCoordSeqInternal(cCoordSeq, nil)
 	if coordSeq == nil {
 		return nil
 	}
@@ -90,7 +90,7 @@ func (g *Geom) ExteriorRing() *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	return g.context.newNonNilGeom(C.GEOSGetExteriorRing_r(g.context.handle, g.geom), g)
+	return g.context.newNonNilGeom(C.GEOSGetExteriorRing_r(g.context.cHandle, g.cGeom), g)
 }
 
 // Geometry returns the nth geometry of g.
@@ -101,7 +101,7 @@ func (g *Geom) Geometry(n int) *Geom {
 	if n < 0 || g.numGeometries <= n {
 		panic(errIndexOutOfRange)
 	}
-	return g.context.newNonNilGeom(C.GEOSGetGeometryN_r(g.context.handle, g.geom, C.int(n)), g)
+	return g.context.newNonNilGeom(C.GEOSGetGeometryN_r(g.context.cHandle, g.cGeom, C.int(n)), g)
 }
 
 // InteriorRing returns the nth interior ring.
@@ -112,7 +112,7 @@ func (g *Geom) InteriorRing(n int) *Geom {
 	if n < 0 || g.numInteriorRings <= n {
 		panic(errIndexOutOfRange)
 	}
-	return g.context.newNonNilGeom(C.GEOSGetInteriorRingN_r(g.context.handle, g.geom, C.int(n)), g)
+	return g.context.newNonNilGeom(C.GEOSGetInteriorRingN_r(g.context.cHandle, g.cGeom, C.int(n)), g)
 }
 
 // IsValidReason returns the reason that g is invalid.
@@ -120,11 +120,11 @@ func (g *Geom) IsValidReason() string {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	reason := C.GEOSisValidReason_r(g.context.handle, g.geom)
+	reason := C.GEOSisValidReason_r(g.context.cHandle, g.cGeom)
 	if reason == nil {
 		panic(g.context.err)
 	}
-	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer(reason))
+	defer C.GEOSFree_r(g.context.cHandle, unsafe.Pointer(reason))
 	return C.GoString(reason)
 }
 
@@ -134,11 +134,11 @@ func (g *Geom) NearestPoints(other *Geom) [][]float64 {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	s := C.GEOSNearestPoints_r(g.context.handle, g.geom, other.geom)
+	s := C.GEOSNearestPoints_r(g.context.cHandle, g.cGeom, other.cGeom)
 	if s == nil {
 		return nil
 	}
-	defer C.GEOSCoordSeq_destroy_r(g.context.handle, s)
+	defer C.GEOSCoordSeq_destroy_r(g.context.cHandle, s)
 	return g.context.newCoordsFromGEOSCoordSeq(s)
 }
 
@@ -146,7 +146,7 @@ func (g *Geom) Normalize() *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	if C.GEOSNormalize_r(g.context.handle, g.geom) != 0 {
+	if C.GEOSNormalize_r(g.context.cHandle, g.cGeom) != 0 {
 		panic(g.context.err)
 	}
 	return g
@@ -157,7 +157,7 @@ func (g *Geom) NumCoordinates() int {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	numCoordinates := C.GEOSGetNumCoordinates_r(g.context.handle, g.geom)
+	numCoordinates := C.GEOSGetNumCoordinates_r(g.context.cHandle, g.cGeom)
 	if numCoordinates == -1 {
 		panic(g.context.err)
 	}
@@ -190,7 +190,7 @@ func (g *Geom) Point(n int) *Geom {
 	if n < 0 || g.numPoints <= n {
 		panic(errIndexOutOfRange)
 	}
-	return g.context.newNonNilGeom(C.GEOSGeomGetPointN_r(g.context.handle, g.geom, C.int(n)), nil)
+	return g.context.newNonNilGeom(C.GEOSGeomGetPointN_r(g.context.cHandle, g.cGeom, C.int(n)), nil)
 }
 
 // PolygonizeFull returns a set of geometries which contains linework that
@@ -200,7 +200,7 @@ func (g *Geom) PolygonizeFull() (geom, cuts, dangles, invalidRings *Geom) {
 	g.context.Lock()
 	defer g.context.Unlock()
 	var cCuts, cDangles, cInvalidRings *C.struct_GEOSGeom_t
-	cGeom := C.GEOSPolygonize_full_r(g.context.handle, g.geom, &cCuts, &cDangles, &cInvalidRings) //nolint:gocritic
+	cGeom := C.GEOSPolygonize_full_r(g.context.cHandle, g.cGeom, &cCuts, &cDangles, &cInvalidRings) //nolint:gocritic
 	geom = g.context.newNonNilGeom(cGeom, nil)
 	cuts = g.context.newGeom(cCuts, nil)
 	dangles = g.context.newGeom(cDangles, nil)
@@ -213,7 +213,7 @@ func (g *Geom) Precision() float64 {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	return float64(C.GEOSGeom_getPrecision_r(g.context.handle, g.geom))
+	return float64(C.GEOSGeom_getPrecision_r(g.context.cHandle, g.cGeom))
 }
 
 // RelatePattern returns if the DE9IM pattern for g and other matches pat.
@@ -223,7 +223,7 @@ func (g *Geom) RelatePattern(other *Geom, pat string) bool {
 	defer C.free(unsafe.Pointer(patCStr))
 	g.context.Lock()
 	defer g.context.Unlock()
-	switch C.GEOSRelatePattern_r(g.context.handle, g.geom, other.geom, patCStr) {
+	switch C.GEOSRelatePattern_r(g.context.cHandle, g.cGeom, other.cGeom, patCStr) {
 	case 0:
 		return false
 	case 1:
@@ -238,7 +238,7 @@ func (g *Geom) SRID() int {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	srid := C.GEOSGetSRID_r(g.context.handle, g.geom)
+	srid := C.GEOSGetSRID_r(g.context.cHandle, g.cGeom)
 	// geos_c.h states that GEOSGetSRID_r "Return 0 on exception" but 0 is also
 	// returned if the SRID is not set, so we can't rely on it to propagate
 	// exceptions.
@@ -250,7 +250,7 @@ func (g *Geom) SetSRID(srid int) *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	C.GEOSSetSRID_r(g.context.handle, g.geom, C.int(srid))
+	C.GEOSSetSRID_r(g.context.cHandle, g.cGeom, C.int(srid))
 	return g
 }
 
@@ -259,7 +259,7 @@ func (g *Geom) SetUserData(userdata uintptr) *Geom {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	C.c_GEOSGeom_setUserData_r(g.context.handle, g.geom, C.uintptr_t(userdata))
+	C.c_GEOSGeom_setUserData_r(g.context.cHandle, g.cGeom, C.uintptr_t(userdata))
 	return g
 }
 
@@ -274,15 +274,15 @@ func (g *Geom) ToEWKBWithSRID() []byte {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	if g.context.ewkbWithSRIDWriter == nil {
-		g.context.ewkbWithSRIDWriter = C.GEOSWKBWriter_create_r(g.context.handle)
-		C.GEOSWKBWriter_setFlavor_r(g.context.handle, g.context.ewkbWithSRIDWriter, C.GEOS_WKB_EXTENDED)
-		C.GEOSWKBWriter_setIncludeSRID_r(g.context.handle, g.context.ewkbWithSRIDWriter, 1)
+	if g.context.cEWKBWithSRIDWriter == nil {
+		g.context.cEWKBWithSRIDWriter = C.GEOSWKBWriter_create_r(g.context.cHandle)
+		C.GEOSWKBWriter_setFlavor_r(g.context.cHandle, g.context.cEWKBWithSRIDWriter, C.GEOS_WKB_EXTENDED)
+		C.GEOSWKBWriter_setIncludeSRID_r(g.context.cHandle, g.context.cEWKBWithSRIDWriter, 1)
 	}
 	var size C.size_t
-	ewkbCBuf := C.GEOSWKBWriter_write_r(g.context.handle, g.context.ewkbWithSRIDWriter, g.geom, &size)
-	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer(ewkbCBuf))
-	return C.GoBytes(unsafe.Pointer(ewkbCBuf), C.int(size))
+	cEWKBBuf := C.GEOSWKBWriter_write_r(g.context.cHandle, g.context.cEWKBWithSRIDWriter, g.cGeom, &size)
+	defer C.GEOSFree_r(g.context.cHandle, unsafe.Pointer(cEWKBBuf))
+	return C.GoBytes(unsafe.Pointer(cEWKBBuf), C.int(size))
 }
 
 // ToGeoJSON returns g in GeoJSON format.
@@ -290,12 +290,12 @@ func (g *Geom) ToGeoJSON(indent int) string {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	if g.context.geoJSONWriter == nil {
-		g.context.geoJSONWriter = C.GEOSGeoJSONWriter_create_r(g.context.handle)
+	if g.context.cGeoJSONWriter == nil {
+		g.context.cGeoJSONWriter = C.GEOSGeoJSONWriter_create_r(g.context.cHandle)
 	}
-	geoJSONCStr := C.GEOSGeoJSONWriter_writeGeometry_r(g.context.handle, g.context.geoJSONWriter, g.geom, C.int(indent))
-	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer(geoJSONCStr))
-	return C.GoString(geoJSONCStr)
+	cGeoJSONStr := C.GEOSGeoJSONWriter_writeGeometry_r(g.context.cHandle, g.context.cGeoJSONWriter, g.cGeom, C.int(indent))
+	defer C.GEOSFree_r(g.context.cHandle, unsafe.Pointer(cGeoJSONStr))
+	return C.GoString(cGeoJSONStr)
 }
 
 // ToWKB returns g in WKB format.
@@ -303,13 +303,13 @@ func (g *Geom) ToWKB() []byte {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	if g.context.wkbWriter == nil {
-		g.context.wkbWriter = C.GEOSWKBWriter_create_r(g.context.handle)
+	if g.context.cWKBWriter == nil {
+		g.context.cWKBWriter = C.GEOSWKBWriter_create_r(g.context.cHandle)
 	}
 	var size C.size_t
-	wkbCBuf := C.GEOSWKBWriter_write_r(g.context.handle, g.context.wkbWriter, g.geom, &size)
-	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer(wkbCBuf))
-	return C.GoBytes(unsafe.Pointer(wkbCBuf), C.int(size))
+	cWKBBuf := C.GEOSWKBWriter_write_r(g.context.cHandle, g.context.cWKBWriter, g.cGeom, &size)
+	defer C.GEOSFree_r(g.context.cHandle, unsafe.Pointer(cWKBBuf))
+	return C.GoBytes(unsafe.Pointer(cWKBBuf), C.int(size))
 }
 
 // ToWKT returns g in WKT format.
@@ -317,12 +317,12 @@ func (g *Geom) ToWKT() string {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	if g.context.wktWriter == nil {
-		g.context.wktWriter = C.GEOSWKTWriter_create_r(g.context.handle)
+	if g.context.cWKTWriter == nil {
+		g.context.cWKTWriter = C.GEOSWKTWriter_create_r(g.context.cHandle)
 	}
-	wktCStr := C.GEOSWKTWriter_write_r(g.context.handle, g.context.wktWriter, g.geom)
-	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer(wktCStr))
-	return C.GoString(wktCStr)
+	cWKTStr := C.GEOSWKTWriter_write_r(g.context.cHandle, g.context.cWKTWriter, g.cGeom)
+	defer C.GEOSFree_r(g.context.cHandle, unsafe.Pointer(cWKTStr))
+	return C.GoString(cWKTStr)
 }
 
 // Type returns g's type.
@@ -330,12 +330,12 @@ func (g *Geom) Type() string {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	typeCStr := C.GEOSGeomType_r(g.context.handle, g.geom)
-	if typeCStr == nil {
+	cTypeStr := C.GEOSGeomType_r(g.context.cHandle, g.cGeom)
+	if cTypeStr == nil {
 		panic(g.context.err)
 	}
-	defer C.GEOSFree_r(g.context.handle, unsafe.Pointer(typeCStr))
-	return C.GoString(typeCStr)
+	defer C.GEOSFree_r(g.context.cHandle, unsafe.Pointer(cTypeStr))
+	return C.GoString(cTypeStr)
 }
 
 // TypeID returns g's geometry type id.
@@ -349,7 +349,7 @@ func (g *Geom) UserData() uintptr {
 	g.mustNotBeDestroyed()
 	g.context.Lock()
 	defer g.context.Unlock()
-	return uintptr(C.c_GEOSGeom_getUserData_r(g.context.handle, g.geom))
+	return uintptr(C.c_GEOSGeom_getUserData_r(g.context.cHandle, g.cGeom))
 }
 
 func (g *Geom) finalize() {

@@ -16,7 +16,7 @@ type CoordSeq struct {
 func (s *CoordSeq) Clone() *CoordSeq {
 	s.context.Lock()
 	defer s.context.Unlock()
-	return s.context.newNonNilCoordSeq(C.GEOSCoordSeq_clone_r(s.context.handle, s.s))
+	return s.context.newNonNilCoordSeq(C.GEOSCoordSeq_clone_r(s.context.cHandle, s.s))
 }
 
 // Destroy destroys s and all resources associated with s.
@@ -26,7 +26,7 @@ func (s *CoordSeq) Destroy() {
 	}
 	s.context.Lock()
 	defer s.context.Unlock()
-	C.GEOSCoordSeq_destroy_r(s.context.handle, s.s)
+	C.GEOSCoordSeq_destroy_r(s.context.cHandle, s.s)
 	*s = CoordSeq{} // Clear all references.
 }
 
@@ -40,7 +40,7 @@ func (s *CoordSeq) IsCCW() bool {
 	s.context.Lock()
 	defer s.context.Unlock()
 	var cIsCCW C.char
-	switch C.GEOSCoordSeq_isCCW_r(s.context.handle, s.s, &cIsCCW) {
+	switch C.GEOSCoordSeq_isCCW_r(s.context.cHandle, s.s, &cIsCCW) {
 	case 1:
 		return cIsCCW != 0
 	default:
@@ -59,7 +59,7 @@ func (s *CoordSeq) Ordinate(idx, dim int) float64 {
 		panic(errDimensionOutOfRange)
 	}
 	var value float64
-	if C.GEOSCoordSeq_getOrdinate_r(s.context.handle, s.s, C.uint(idx), C.uint(dim), (*C.double)(&value)) == 0 {
+	if C.GEOSCoordSeq_getOrdinate_r(s.context.cHandle, s.s, C.uint(idx), C.uint(dim), (*C.double)(&value)) == 0 {
 		panic(s.context.err)
 	}
 	return value
@@ -75,7 +75,7 @@ func (s *CoordSeq) SetOrdinate(idx, dim int, val float64) {
 	if dim < 0 || s.dimensions <= dim {
 		panic(errDimensionOutOfRange)
 	}
-	if C.GEOSCoordSeq_setOrdinate_r(s.context.handle, s.s, C.uint(idx), C.uint(dim), C.double(val)) == 0 {
+	if C.GEOSCoordSeq_setOrdinate_r(s.context.cHandle, s.s, C.uint(idx), C.uint(dim), C.double(val)) == 0 {
 		panic(s.context.err)
 	}
 }
@@ -90,7 +90,7 @@ func (s *CoordSeq) SetX(idx int, val float64) {
 	if s.dimensions == 0 {
 		panic(errDimensionOutOfRange)
 	}
-	if C.GEOSCoordSeq_setX_r(s.context.handle, s.s, C.uint(idx), C.double(val)) == 0 {
+	if C.GEOSCoordSeq_setX_r(s.context.cHandle, s.s, C.uint(idx), C.double(val)) == 0 {
 		panic(s.context.err)
 	}
 }
@@ -105,7 +105,7 @@ func (s *CoordSeq) SetY(idx int, val float64) {
 	if s.dimensions < 2 {
 		panic(errDimensionOutOfRange)
 	}
-	if C.GEOSCoordSeq_setY_r(s.context.handle, s.s, C.uint(idx), C.double(val)) == 0 {
+	if C.GEOSCoordSeq_setY_r(s.context.cHandle, s.s, C.uint(idx), C.double(val)) == 0 {
 		panic(s.context.err)
 	}
 }
@@ -120,7 +120,7 @@ func (s *CoordSeq) SetZ(idx int, val float64) {
 	if s.dimensions < 3 {
 		panic(errDimensionOutOfRange)
 	}
-	if C.GEOSCoordSeq_setZ_r(s.context.handle, s.s, C.uint(idx), C.double(val)) == 0 {
+	if C.GEOSCoordSeq_setZ_r(s.context.cHandle, s.s, C.uint(idx), C.double(val)) == 0 {
 		panic(s.context.err)
 	}
 }
@@ -146,7 +146,7 @@ func (s *CoordSeq) ToCoords() [][]float64 {
 	if s.dimensions > 3 {
 		hasM = 1
 	}
-	if C.GEOSCoordSeq_copyToBuffer_r(s.context.handle, s.s, (*C.double)(&flatCoords[0]), hasZ, hasM) == 0 {
+	if C.GEOSCoordSeq_copyToBuffer_r(s.context.cHandle, s.s, (*C.double)(&flatCoords[0]), hasZ, hasM) == 0 {
 		panic(s.context.err)
 	}
 	coords := make([][]float64, s.size)
@@ -169,7 +169,7 @@ func (s *CoordSeq) X(idx int) float64 {
 		panic(errDimensionOutOfRange)
 	}
 	var val float64
-	if C.GEOSCoordSeq_getX_r(s.context.handle, s.s, C.uint(idx), (*C.double)(&val)) == 0 {
+	if C.GEOSCoordSeq_getX_r(s.context.cHandle, s.s, C.uint(idx), (*C.double)(&val)) == 0 {
 		panic(s.context.err)
 	}
 	return val
@@ -186,7 +186,7 @@ func (s *CoordSeq) Y(idx int) float64 {
 		panic(errDimensionOutOfRange)
 	}
 	var val float64
-	if C.GEOSCoordSeq_getY_r(s.context.handle, s.s, C.uint(idx), (*C.double)(&val)) == 0 {
+	if C.GEOSCoordSeq_getY_r(s.context.cHandle, s.s, C.uint(idx), (*C.double)(&val)) == 0 {
 		panic(s.context.err)
 	}
 	return val
@@ -203,7 +203,7 @@ func (s *CoordSeq) Z(idx int) float64 {
 		panic(errDimensionOutOfRange)
 	}
 	var val float64
-	if C.GEOSCoordSeq_getZ_r(s.context.handle, s.s, C.uint(idx), (*C.double)(&val)) == 0 {
+	if C.GEOSCoordSeq_getZ_r(s.context.cHandle, s.s, C.uint(idx), (*C.double)(&val)) == 0 {
 		panic(s.context.err)
 	}
 	return val
