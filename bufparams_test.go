@@ -12,7 +12,7 @@ import (
 func TestBufferWithParams(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
 	c := geos.NewContext()
-	p := c.NewBufferParams()
+	p := c.NewBufParams()
 	assert.NotZero(t, p)
 	assert.NotZero(t, p.SetJoinStyle(geos.BufJoinStyleMitre))
 	assert.NotZero(t, p.SetEndCapStyle(geos.BufCapStyleSquare))
