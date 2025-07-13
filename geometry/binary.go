@@ -11,6 +11,11 @@ func NewGeometryFromWKB(wkb []byte) (*Geometry, error) {
 	return &Geometry{Geom: geom}, nil
 }
 
+// AppendBinary implements encoding.BinaryAppender.
+func (g *Geometry) AppendBinary(b []byte) ([]byte, error) {
+	return append(b, g.ToEWKBWithSRID()...), nil
+}
+
 // MarshalBinary implements encoding.BinaryMarshaler.
 func (g *Geometry) MarshalBinary() ([]byte, error) {
 	return g.ToEWKBWithSRID(), nil

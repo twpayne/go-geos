@@ -11,6 +11,11 @@ func NewGeometryFromWKT(wkt string) (*Geometry, error) {
 	return &Geometry{Geom: geom}, nil
 }
 
+// AppendText implements encoding.TextAppender.
+func (g *Geometry) AppendText(b []byte) ([]byte, error) {
+	return append(b, []byte(g.ToWKT())...), nil
+}
+
 // MarshalText implements encoding.TextMarshaler.
 func (g *Geometry) MarshalText() ([]byte, error) {
 	return []byte(g.ToWKT()), nil
