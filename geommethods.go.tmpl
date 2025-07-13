@@ -27,7 +27,6 @@ import "unsafe"
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}({{ range $index, $arg := .extraArgs }}{{ if $index }}, {{ end }}{{ $arg.name }} {{ $arg.type }}{{ end }}) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.new{{ if not .nil }}NonNil{{ end }}Geom(C.{{ $geosFunction }}(g.context.cHandle, g.cGeom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}), nil)
@@ -37,7 +36,6 @@ func (g *Geom) {{ .name }}({{ range $index, $arg := .extraArgs }}{{ if $index }}
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.{{ $geosFunction }}(g.context.cHandle, g.cGeom, other.cGeom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}), nil)
@@ -47,7 +45,6 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}() bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.{{ $geosFunction }}(g.context.cHandle, g.cGeom) {
@@ -64,7 +61,6 @@ func (g *Geom) {{ .name }}() bool {
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.{{ $geosFunction }}(g.context.cHandle, g.cGeom, other.cGeom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }}) {
@@ -82,7 +78,6 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}() float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var {{ $varName }} float64
@@ -97,7 +92,6 @@ func (g *Geom) {{ .name }}() float64 {
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
     {{- if .valueReturned }}
@@ -116,7 +110,6 @@ func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .ty
 
 {{ if .comment }}// {{ .name }} {{ .comment }}.{{ end }}
 func (g *Geom) {{ .name }}(other *Geom{{ range .extraArgs }}, {{ .name }} {{ .type }}{{ end }}) string {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	{{ $varName }}CStr := C.{{ $geosFunction }}(g.context.cHandle, g.cGeom, other.cGeom{{ range .extraArgs }}, {{ .type | cType }}({{ .name }}){{ end }})

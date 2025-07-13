@@ -26,11 +26,11 @@ var (
 
 // NewGeometryFromGeoJSON returns a new Geometry parsed from GeoJSON.
 func NewGeometryFromGeoJSON(geoJSON []byte) (*Geometry, error) {
-	g := &Geometry{}
-	if err := g.UnmarshalJSON(geoJSON); err != nil {
+	geometry := &Geometry{}
+	if err := geometry.UnmarshalJSON(geoJSON); err != nil {
 		return nil, err
 	}
-	return g, nil
+	return geometry, nil
 }
 
 // AsGeoJSON returns the GeoJSON representation of g.

@@ -9,7 +9,6 @@ import "unsafe"
 
 // Area returns g's area.
 func (g *Geom) Area() float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var area float64
@@ -21,7 +20,6 @@ func (g *Geom) Area() float64 {
 
 // Boundary returns the boundary of g.
 func (g *Geom) Boundary() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSBoundary_r(g.context.cHandle, g.cGeom), nil)
@@ -29,7 +27,6 @@ func (g *Geom) Boundary() *Geom {
 
 // Buffer returns g with the given buffer.
 func (g *Geom) Buffer(width float64, quadsegs int) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSBuffer_r(g.context.cHandle, g.cGeom, C.double(width), C.int(quadsegs)), nil)
@@ -37,7 +34,6 @@ func (g *Geom) Buffer(width float64, quadsegs int) *Geom {
 
 // BufferWithStyle returns a buffer using the provided style parameters.
 func (g *Geom) BufferWithStyle(width float64, quadsegs int, endCapStyle BufCapStyle, joinStyle BufJoinStyle, mitreLimit float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSBufferWithStyle_r(g.context.cHandle, g.cGeom, C.double(width), C.int(quadsegs), C.int(endCapStyle), C.int(joinStyle), C.double(mitreLimit)), nil)
@@ -45,7 +41,6 @@ func (g *Geom) BufferWithStyle(width float64, quadsegs int, endCapStyle BufCapSt
 
 // BuildArea returns the polygonization using all the linework, assuming that rings contained within rings are empty holes, rather than extra PolygonHoleSimplify.
 func (g *Geom) BuildArea() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSBuildArea_r(g.context.cHandle, g.cGeom), nil)
@@ -53,7 +48,6 @@ func (g *Geom) BuildArea() *Geom {
 
 // Centroid returns a point at the center of mass of g.
 func (g *Geom) Centroid() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSGetCentroid_r(g.context.cHandle, g.cGeom), nil)
@@ -61,7 +55,6 @@ func (g *Geom) Centroid() *Geom {
 
 // ClipByRect returns g clipped to a rectangular polygon.
 func (g *Geom) ClipByRect(minX float64, minY float64, maxX float64, maxY float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSClipByRect_r(g.context.cHandle, g.cGeom, C.double(minX), C.double(minY), C.double(maxX), C.double(maxY)), nil)
@@ -69,7 +62,6 @@ func (g *Geom) ClipByRect(minX float64, minY float64, maxX float64, maxY float64
 
 // Clone returns a clone of g.
 func (g *Geom) Clone() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSGeom_clone_r(g.context.cHandle, g.cGeom), nil)
@@ -77,7 +69,6 @@ func (g *Geom) Clone() *Geom {
 
 // ConcaveHull returns the concave hull of g.
 func (g *Geom) ConcaveHull(ratio float64, allowHoles uint) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSConcaveHull_r(g.context.cHandle, g.cGeom, C.double(ratio), C.unsigned(allowHoles)), nil)
@@ -85,7 +76,6 @@ func (g *Geom) ConcaveHull(ratio float64, allowHoles uint) *Geom {
 
 // ConcaveHullByLength returns the concave hull of g.
 func (g *Geom) ConcaveHullByLength(ratio float64, allowHoles uint) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSConcaveHullByLength_r(g.context.cHandle, g.cGeom, C.double(ratio), C.unsigned(allowHoles)), nil)
@@ -93,7 +83,6 @@ func (g *Geom) ConcaveHullByLength(ratio float64, allowHoles uint) *Geom {
 
 // ConstrainedDelaunayTriangulation returns the constrained Delaunay triangulation of the vertices of the g.
 func (g *Geom) ConstrainedDelaunayTriangulation() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSConstrainedDelaunayTriangulation_r(g.context.cHandle, g.cGeom), nil)
@@ -101,7 +90,6 @@ func (g *Geom) ConstrainedDelaunayTriangulation() *Geom {
 
 // Contains returns true if g contains other.
 func (g *Geom) Contains(other *Geom) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSContains_r(g.context.cHandle, g.cGeom, other.cGeom) {
@@ -116,7 +104,6 @@ func (g *Geom) Contains(other *Geom) bool {
 
 // ConvexHull returns g's convex hull.
 func (g *Geom) ConvexHull() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSConvexHull_r(g.context.cHandle, g.cGeom), nil)
@@ -124,7 +111,6 @@ func (g *Geom) ConvexHull() *Geom {
 
 // CoverageUnion returns the union of g for polygonal inputs that are correctly noded and do not overlap.
 func (g *Geom) CoverageUnion() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSCoverageUnion_r(g.context.cHandle, g.cGeom), nil)
@@ -132,7 +118,6 @@ func (g *Geom) CoverageUnion() *Geom {
 
 // CoveredBy returns true if g is covered by other.
 func (g *Geom) CoveredBy(other *Geom) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSCoveredBy_r(g.context.cHandle, g.cGeom, other.cGeom) {
@@ -147,7 +132,6 @@ func (g *Geom) CoveredBy(other *Geom) bool {
 
 // Covers returns true if g covers other.
 func (g *Geom) Covers(other *Geom) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSCovers_r(g.context.cHandle, g.cGeom, other.cGeom) {
@@ -162,7 +146,6 @@ func (g *Geom) Covers(other *Geom) bool {
 
 // Crosses returns true if g crosses other.
 func (g *Geom) Crosses(other *Geom) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSCrosses_r(g.context.cHandle, g.cGeom, other.cGeom) {
@@ -177,7 +160,6 @@ func (g *Geom) Crosses(other *Geom) bool {
 
 // Densify returns g densified with the given tolerance.
 func (g *Geom) Densify(tolerance float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSDensify_r(g.context.cHandle, g.cGeom, C.double(tolerance)), nil)
@@ -185,7 +167,6 @@ func (g *Geom) Densify(tolerance float64) *Geom {
 
 // Difference returns the difference between g and other.
 func (g *Geom) Difference(other *Geom) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSDifference_r(g.context.cHandle, g.cGeom, other.cGeom), nil)
@@ -193,7 +174,6 @@ func (g *Geom) Difference(other *Geom) *Geom {
 
 // DifferencePrec returns the difference between g and other.
 func (g *Geom) DifferencePrec(other *Geom, gridSize float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSDifferencePrec_r(g.context.cHandle, g.cGeom, other.cGeom, C.double(gridSize)), nil)
@@ -201,7 +181,6 @@ func (g *Geom) DifferencePrec(other *Geom, gridSize float64) *Geom {
 
 // Disjoint returns true if g is disjoint from other.
 func (g *Geom) Disjoint(other *Geom) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSDisjoint_r(g.context.cHandle, g.cGeom, other.cGeom) {
@@ -216,7 +195,6 @@ func (g *Geom) Disjoint(other *Geom) bool {
 
 // DisjointSubsetUnion returns the union of all components of a single geometry (optimized for inputs that can be divided into subsets that do not intersect).
 func (g *Geom) DisjointSubsetUnion() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSDisjointSubsetUnion_r(g.context.cHandle, g.cGeom), nil)
@@ -224,7 +202,6 @@ func (g *Geom) DisjointSubsetUnion() *Geom {
 
 // Distance returns the distance between the closes points on g and other.
 func (g *Geom) Distance(other *Geom) float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var distance float64
@@ -236,7 +213,6 @@ func (g *Geom) Distance(other *Geom) float64 {
 
 // DistanceIndexed returns the distance between g and other, using the indexed facet distance.
 func (g *Geom) DistanceIndexed(other *Geom) float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var distanceIndexed float64
@@ -248,7 +224,6 @@ func (g *Geom) DistanceIndexed(other *Geom) float64 {
 
 // DistanceWithin returns whether the distance between g and other is within the given dist.
 func (g *Geom) DistanceWithin(other *Geom, dist float64) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSDistanceWithin_r(g.context.cHandle, g.cGeom, other.cGeom, C.double(dist)) {
@@ -263,7 +238,6 @@ func (g *Geom) DistanceWithin(other *Geom, dist float64) bool {
 
 // EndPoint returns the last point of a LineString.
 func (g *Geom) EndPoint() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSGeomGetEndPoint_r(g.context.cHandle, g.cGeom), nil)
@@ -271,7 +245,6 @@ func (g *Geom) EndPoint() *Geom {
 
 // Envelope returns the envelope of g.
 func (g *Geom) Envelope() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSEnvelope_r(g.context.cHandle, g.cGeom), nil)
@@ -279,7 +252,6 @@ func (g *Geom) Envelope() *Geom {
 
 // Equals returns true if g equals other.
 func (g *Geom) Equals(other *Geom) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSEquals_r(g.context.cHandle, g.cGeom, other.cGeom) {
@@ -294,7 +266,6 @@ func (g *Geom) Equals(other *Geom) bool {
 
 // EqualsExact returns true if g equals other exactly.
 func (g *Geom) EqualsExact(other *Geom, tolerance float64) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSEqualsExact_r(g.context.cHandle, g.cGeom, other.cGeom, C.double(tolerance)) {
@@ -309,7 +280,6 @@ func (g *Geom) EqualsExact(other *Geom, tolerance float64) bool {
 
 // FrechetDistance returns the Fréchet distance between g and other.
 func (g *Geom) FrechetDistance(other *Geom) float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var frechetDistance float64
@@ -321,7 +291,6 @@ func (g *Geom) FrechetDistance(other *Geom) float64 {
 
 // FrechetDistanceDensify returns the Fréchet distance between g and other.
 func (g *Geom) FrechetDistanceDensify(other *Geom, densifyFrac float64) float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var frechetDistanceDensify float64
@@ -333,7 +302,6 @@ func (g *Geom) FrechetDistanceDensify(other *Geom, densifyFrac float64) float64 
 
 // HasZ returns if g has Z coordinates.
 func (g *Geom) HasZ() bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSHasZ_r(g.context.cHandle, g.cGeom) {
@@ -348,7 +316,6 @@ func (g *Geom) HasZ() bool {
 
 // HausdorffDistance returns the Hausdorff distance between g and other.
 func (g *Geom) HausdorffDistance(other *Geom) float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var hausdorffDistance float64
@@ -360,7 +327,6 @@ func (g *Geom) HausdorffDistance(other *Geom) float64 {
 
 // HausdorffDistanceDensify returns the Hausdorff distance between g and other.
 func (g *Geom) HausdorffDistanceDensify(other *Geom, densifyFrac float64) float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var hausdorffDistanceDensify float64
@@ -372,7 +338,6 @@ func (g *Geom) HausdorffDistanceDensify(other *Geom, densifyFrac float64) float6
 
 // Interpolate returns a point distance d from the start of g, which must be a linestring.
 func (g *Geom) Interpolate(d float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSInterpolate_r(g.context.cHandle, g.cGeom, C.double(d)), nil)
@@ -380,7 +345,6 @@ func (g *Geom) Interpolate(d float64) *Geom {
 
 // InterpolateNormalized returns the point that is at proportion from the start.
 func (g *Geom) InterpolateNormalized(proportion float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSInterpolateNormalized_r(g.context.cHandle, g.cGeom, C.double(proportion)), nil)
@@ -388,7 +352,6 @@ func (g *Geom) InterpolateNormalized(proportion float64) *Geom {
 
 // Intersection returns the intersection of g and other.
 func (g *Geom) Intersection(other *Geom) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSIntersection_r(g.context.cHandle, g.cGeom, other.cGeom), nil)
@@ -396,7 +359,6 @@ func (g *Geom) Intersection(other *Geom) *Geom {
 
 // IntersectionPrec returns the intersection of g and other.
 func (g *Geom) IntersectionPrec(other *Geom, gridSize float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSIntersectionPrec_r(g.context.cHandle, g.cGeom, other.cGeom, C.double(gridSize)), nil)
@@ -404,7 +366,6 @@ func (g *Geom) IntersectionPrec(other *Geom, gridSize float64) *Geom {
 
 // Intersects returns true if g intersects other.
 func (g *Geom) Intersects(other *Geom) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSIntersects_r(g.context.cHandle, g.cGeom, other.cGeom) {
@@ -419,7 +380,6 @@ func (g *Geom) Intersects(other *Geom) bool {
 
 // IsClosed returns true if g is closed.
 func (g *Geom) IsClosed() bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSisClosed_r(g.context.cHandle, g.cGeom) {
@@ -434,7 +394,6 @@ func (g *Geom) IsClosed() bool {
 
 // IsEmpty returns true if g is empty.
 func (g *Geom) IsEmpty() bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSisEmpty_r(g.context.cHandle, g.cGeom) {
@@ -449,7 +408,6 @@ func (g *Geom) IsEmpty() bool {
 
 // IsRing returns true if g is a ring.
 func (g *Geom) IsRing() bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSisRing_r(g.context.cHandle, g.cGeom) {
@@ -464,7 +422,6 @@ func (g *Geom) IsRing() bool {
 
 // IsSimple returns true if g is simple.
 func (g *Geom) IsSimple() bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSisSimple_r(g.context.cHandle, g.cGeom) {
@@ -479,7 +436,6 @@ func (g *Geom) IsSimple() bool {
 
 // IsValid returns true if g is valid.
 func (g *Geom) IsValid() bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSisValid_r(g.context.cHandle, g.cGeom) {
@@ -494,7 +450,6 @@ func (g *Geom) IsValid() bool {
 
 // LargestEmptyCircle returns the largest empty circle for g, up to a specified tolerance.
 func (g *Geom) LargestEmptyCircle(other *Geom, tolerance float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSLargestEmptyCircle_r(g.context.cHandle, g.cGeom, other.cGeom, C.double(tolerance)), nil)
@@ -502,7 +457,6 @@ func (g *Geom) LargestEmptyCircle(other *Geom, tolerance float64) *Geom {
 
 // Length returns g's length.
 func (g *Geom) Length() float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var length float64
@@ -514,7 +468,6 @@ func (g *Geom) Length() float64 {
 
 // LineMerge returns a set of fully noded LineStrings, removing any cardinality 2 nodes in the linework.
 func (g *Geom) LineMerge() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSLineMerge_r(g.context.cHandle, g.cGeom), nil)
@@ -522,7 +475,6 @@ func (g *Geom) LineMerge() *Geom {
 
 // MakeValid repairs an invalid geometry, returning a valid output.
 func (g *Geom) MakeValid() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSMakeValid_r(g.context.cHandle, g.cGeom), nil)
@@ -530,7 +482,6 @@ func (g *Geom) MakeValid() *Geom {
 
 // MaximumInscribedCircle returns the maximum inscribed circle of g up to the the given tolerance.
 func (g *Geom) MaximumInscribedCircle(tolerance float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSMaximumInscribedCircle_r(g.context.cHandle, g.cGeom, C.double(tolerance)), nil)
@@ -538,7 +489,6 @@ func (g *Geom) MaximumInscribedCircle(tolerance float64) *Geom {
 
 // MinimumClearance returns the minimum clearance of g.
 func (g *Geom) MinimumClearance() float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var minimumClearance float64
@@ -550,7 +500,6 @@ func (g *Geom) MinimumClearance() float64 {
 
 // MinimumClearanceLine returns a LineString whose endpoints define the minimum clearance of g.
 func (g *Geom) MinimumClearanceLine() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSMinimumClearanceLine_r(g.context.cHandle, g.cGeom), nil)
@@ -558,7 +507,6 @@ func (g *Geom) MinimumClearanceLine() *Geom {
 
 // MinimumRotatedRectangle returns the minimum rotated rectangle enclosing g.
 func (g *Geom) MinimumRotatedRectangle() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSMinimumRotatedRectangle_r(g.context.cHandle, g.cGeom), nil)
@@ -566,7 +514,6 @@ func (g *Geom) MinimumRotatedRectangle() *Geom {
 
 // MinimumWidth returns a linestring geometry which represents the minimum diameter of g.
 func (g *Geom) MinimumWidth() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSMinimumWidth_r(g.context.cHandle, g.cGeom), nil)
@@ -574,7 +521,6 @@ func (g *Geom) MinimumWidth() *Geom {
 
 // Node returns a new geometry in which no lines cross each other, and all touching occurs at endpoints.
 func (g *Geom) Node() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSNode_r(g.context.cHandle, g.cGeom), nil)
@@ -582,7 +528,6 @@ func (g *Geom) Node() *Geom {
 
 // OffsetCurve returns the offset curve line(s) of g.
 func (g *Geom) OffsetCurve(width float64, quadsegs int, joinStyle BufJoinStyle, mitreLimit float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSOffsetCurve_r(g.context.cHandle, g.cGeom, C.double(width), C.int(quadsegs), C.int(joinStyle), C.double(mitreLimit)), nil)
@@ -590,7 +535,6 @@ func (g *Geom) OffsetCurve(width float64, quadsegs int, joinStyle BufJoinStyle, 
 
 // Overlaps returns true if g overlaps other.
 func (g *Geom) Overlaps(other *Geom) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSOverlaps_r(g.context.cHandle, g.cGeom, other.cGeom) {
@@ -605,7 +549,6 @@ func (g *Geom) Overlaps(other *Geom) bool {
 
 // PointOnSurface returns a point that is inside the boundary of a polygonal geometry.
 func (g *Geom) PointOnSurface() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSPointOnSurface_r(g.context.cHandle, g.cGeom), nil)
@@ -613,7 +556,6 @@ func (g *Geom) PointOnSurface() *Geom {
 
 // Project returns the distance of other(a point) projected onto g(a line) from the start of the line.
 func (g *Geom) Project(other *Geom) float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return float64(C.GEOSProject_r(g.context.cHandle, g.cGeom, other.cGeom))
@@ -621,7 +563,6 @@ func (g *Geom) Project(other *Geom) float64 {
 
 // ProjectNormalized returns the proportional distance of other(a point) projected onto g(a line) from the start of the line. For example, a point that projects to the middle of a line would be return 0.5.
 func (g *Geom) ProjectNormalized(other *Geom) float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return float64(C.GEOSProjectNormalized_r(g.context.cHandle, g.cGeom, other.cGeom))
@@ -629,7 +570,6 @@ func (g *Geom) ProjectNormalized(other *Geom) float64 {
 
 // Relate returns the DE9IM pattern for g and other.
 func (g *Geom) Relate(other *Geom) string {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	relateCStr := C.GEOSRelate_r(g.context.cHandle, g.cGeom, other.cGeom)
@@ -639,7 +579,6 @@ func (g *Geom) Relate(other *Geom) string {
 
 // RelateBoundaryNodeRule returns the DE9IM pattern for g and other.
 func (g *Geom) RelateBoundaryNodeRule(other *Geom, bnr RelateBoundaryNodeRule) string {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	relateBoundaryNodeRuleCStr := C.GEOSRelateBoundaryNodeRule_r(g.context.cHandle, g.cGeom, other.cGeom, C.int(bnr))
@@ -649,7 +588,6 @@ func (g *Geom) RelateBoundaryNodeRule(other *Geom, bnr RelateBoundaryNodeRule) s
 
 // Reverse returns g with sequence orders reversed.
 func (g *Geom) Reverse() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSReverse_r(g.context.cHandle, g.cGeom), nil)
@@ -657,7 +595,6 @@ func (g *Geom) Reverse() *Geom {
 
 // SetPrecision changes the coordinate precision of g.
 func (g *Geom) SetPrecision(gridSize float64, flags PrecisionRule) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSGeom_setPrecision_r(g.context.cHandle, g.cGeom, C.double(gridSize), C.int(flags)), nil)
@@ -665,7 +602,6 @@ func (g *Geom) SetPrecision(gridSize float64, flags PrecisionRule) *Geom {
 
 // SharedPaths returns the paths shared between g and other, which must be lineal geometries.
 func (g *Geom) SharedPaths(other *Geom) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSSharedPaths_r(g.context.cHandle, g.cGeom, other.cGeom), nil)
@@ -673,7 +609,6 @@ func (g *Geom) SharedPaths(other *Geom) *Geom {
 
 // Simplify returns a simplified geometry.
 func (g *Geom) Simplify(tolerance float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSSimplify_r(g.context.cHandle, g.cGeom, C.double(tolerance)), nil)
@@ -681,7 +616,6 @@ func (g *Geom) Simplify(tolerance float64) *Geom {
 
 // Snap returns a geometry with the vertices and segments of g snapped to other within the given tolerance.
 func (g *Geom) Snap(other *Geom, tolerance float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSSnap_r(g.context.cHandle, g.cGeom, other.cGeom, C.double(tolerance)), nil)
@@ -689,7 +623,6 @@ func (g *Geom) Snap(other *Geom, tolerance float64) *Geom {
 
 // StartPoint returns the first point of a LineString.
 func (g *Geom) StartPoint() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSGeomGetStartPoint_r(g.context.cHandle, g.cGeom), nil)
@@ -697,7 +630,6 @@ func (g *Geom) StartPoint() *Geom {
 
 // SymDifference returns the symmetric difference between g and other.
 func (g *Geom) SymDifference(other *Geom) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSSymDifference_r(g.context.cHandle, g.cGeom, other.cGeom), nil)
@@ -705,7 +637,6 @@ func (g *Geom) SymDifference(other *Geom) *Geom {
 
 // SymDifferencePrec returns the symmetric difference between g and other.
 func (g *Geom) SymDifferencePrec(other *Geom, gridSize float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSSymDifferencePrec_r(g.context.cHandle, g.cGeom, other.cGeom, C.double(gridSize)), nil)
@@ -713,7 +644,6 @@ func (g *Geom) SymDifferencePrec(other *Geom, gridSize float64) *Geom {
 
 // TopologyPreserveSimplify returns a simplified geometry preserving topology.
 func (g *Geom) TopologyPreserveSimplify(tolerance float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSTopologyPreserveSimplify_r(g.context.cHandle, g.cGeom, C.double(tolerance)), nil)
@@ -721,7 +651,6 @@ func (g *Geom) TopologyPreserveSimplify(tolerance float64) *Geom {
 
 // Touches returns true if g touches other.
 func (g *Geom) Touches(other *Geom) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSTouches_r(g.context.cHandle, g.cGeom, other.cGeom) {
@@ -736,7 +665,6 @@ func (g *Geom) Touches(other *Geom) bool {
 
 // UnaryUnion returns the union of all components of a single geometry.
 func (g *Geom) UnaryUnion() *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSUnaryUnion_r(g.context.cHandle, g.cGeom), nil)
@@ -744,7 +672,6 @@ func (g *Geom) UnaryUnion() *Geom {
 
 // UnaryUnionPrec returns the union of all components of a single geometry.
 func (g *Geom) UnaryUnionPrec(gridSize float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSUnaryUnionPrec_r(g.context.cHandle, g.cGeom, C.double(gridSize)), nil)
@@ -752,7 +679,6 @@ func (g *Geom) UnaryUnionPrec(gridSize float64) *Geom {
 
 // Union returns the union of g and other.
 func (g *Geom) Union(other *Geom) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSUnion_r(g.context.cHandle, g.cGeom, other.cGeom), nil)
@@ -760,7 +686,6 @@ func (g *Geom) Union(other *Geom) *Geom {
 
 // UnionPrec returns the union of g and other.
 func (g *Geom) UnionPrec(other *Geom, gridSize float64) *Geom {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newGeom(C.GEOSUnionPrec_r(g.context.cHandle, g.cGeom, other.cGeom, C.double(gridSize)), nil)
@@ -768,7 +693,6 @@ func (g *Geom) UnionPrec(other *Geom, gridSize float64) *Geom {
 
 // Within returns true if g is within other.
 func (g *Geom) Within(other *Geom) bool {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	switch C.GEOSWithin_r(g.context.cHandle, g.cGeom, other.cGeom) {
@@ -783,7 +707,6 @@ func (g *Geom) Within(other *Geom) bool {
 
 // X returns g's X coordinate.
 func (g *Geom) X() float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var x float64
@@ -795,7 +718,6 @@ func (g *Geom) X() float64 {
 
 // Y returns g's Y coordinate.
 func (g *Geom) Y() float64 {
-	g.mustNotBeDestroyed()
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var y float64
