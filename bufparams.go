@@ -5,30 +5,30 @@ import "C"
 
 import "runtime"
 
-// A BufferParams contains parameters for BufferWithParams.
-type BufferParams struct {
+// A BufParams contains parameters for BufferWithParams.
+type BufParams struct {
 	context    *Context
 	cBufParams *C.struct_GEOSBufParams_t
 }
 
-// NewBufferParams returns a new BufferParams.
-func (c *Context) NewBufferParams() *BufferParams {
+// NewBufParams returns a new BufParams.
+func (c *Context) NewBufParams() *BufParams {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
-	cBufferParams := C.GEOSBufferParams_create_r(c.cHandle)
-	if cBufferParams == nil {
+	cBufParams := C.GEOSBufferParams_create_r(c.cHandle)
+	if cBufParams == nil {
 		panic(c.err)
 	}
-	bufferParams := &BufferParams{
+	bufParams := &BufParams{
 		context:    c,
-		cBufParams: cBufferParams,
+		cBufParams: cBufParams,
 	}
-	runtime.AddCleanup(bufferParams, c.destroyBufferParams, cBufferParams)
-	return bufferParams
+	runtime.AddCleanup(bufParams, c.destroyBufParams, cBufParams)
+	return bufParams
 }
 
 // SetEndCapStyle sets p's end cap style.
-func (p *BufferParams) SetEndCapStyle(style BufCapStyle) *BufferParams {
+func (p *BufParams) SetEndCapStyle(style BufCapStyle) *BufParams {
 	p.context.mutex.Lock()
 	defer p.context.mutex.Unlock()
 	if C.GEOSBufferParams_setEndCapStyle_r(p.context.cHandle, p.cBufParams, C.int(style)) != 1 {
@@ -38,7 +38,7 @@ func (p *BufferParams) SetEndCapStyle(style BufCapStyle) *BufferParams {
 }
 
 // SetJoinStyle sets p's join style.
-func (p *BufferParams) SetJoinStyle(style BufJoinStyle) *BufferParams {
+func (p *BufParams) SetJoinStyle(style BufJoinStyle) *BufParams {
 	p.context.mutex.Lock()
 	defer p.context.mutex.Unlock()
 	if C.GEOSBufferParams_setJoinStyle_r(p.context.cHandle, p.cBufParams, C.int(style)) != 1 {
@@ -48,7 +48,7 @@ func (p *BufferParams) SetJoinStyle(style BufJoinStyle) *BufferParams {
 }
 
 // SetMitreLimit sets p's mitre limit.
-func (p *BufferParams) SetMitreLimit(mitreLimit float64) *BufferParams {
+func (p *BufParams) SetMitreLimit(mitreLimit float64) *BufParams {
 	p.context.mutex.Lock()
 	defer p.context.mutex.Unlock()
 	if C.GEOSBufferParams_setMitreLimit_r(p.context.cHandle, p.cBufParams, C.double(mitreLimit)) != 1 {
@@ -59,7 +59,7 @@ func (p *BufferParams) SetMitreLimit(mitreLimit float64) *BufferParams {
 
 // SetQuadrantSegments sets the number of segments to stroke each quadrant of
 // circular arcs.
-func (p *BufferParams) SetQuadrantSegments(quadSegs int) *BufferParams {
+func (p *BufParams) SetQuadrantSegments(quadSegs int) *BufParams {
 	p.context.mutex.Lock()
 	defer p.context.mutex.Unlock()
 	if C.GEOSBufferParams_setQuadrantSegments_r(p.context.cHandle, p.cBufParams, C.int(quadSegs)) != 1 {
@@ -69,7 +69,7 @@ func (p *BufferParams) SetQuadrantSegments(quadSegs int) *BufferParams {
 }
 
 // SetSingleSided sets whether the computed buffer should be single sided.
-func (p *BufferParams) SetSingleSided(singleSided bool) *BufferParams {
+func (p *BufParams) SetSingleSided(singleSided bool) *BufParams {
 	p.context.mutex.Lock()
 	defer p.context.mutex.Unlock()
 	if C.GEOSBufferParams_setSingleSided_r(p.context.cHandle, p.cBufParams, toInt[C.int](singleSided)) != 1 {
@@ -78,8 +78,8 @@ func (p *BufferParams) SetSingleSided(singleSided bool) *BufferParams {
 	return p
 }
 
-func (c *Context) destroyBufferParams(cBufferParams *C.struct_GEOSBufParams_t) {
+func (c *Context) destroyBufParams(cBufParams *C.struct_GEOSBufParams_t) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
-	C.GEOSBufferParams_destroy_r(c.cHandle, cBufferParams)
+	C.GEOSBufferParams_destroy_r(c.cHandle, cBufParams)
 }
