@@ -15,12 +15,13 @@ type PrepGeom struct {
 func (g *Geom) Prepare() *PrepGeom {
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
-	pg := &PrepGeom{
+	cPrepGeom := C.GEOSPrepare_r(g.context.cHandle, g.cGeom)
+	prepGeom := &PrepGeom{
 		parent:    g,
-		cPrepGeom: C.GEOSPrepare_r(g.context.cHandle, g.cGeom),
+		cPrepGeom: cPrepGeom,
 	}
-	runtime.SetFinalizer(pg, (*PrepGeom).Destroy)
-	return pg
+	runtime.AddCleanup(prepGeom, g.context.destroyPrepGeom, cPrepGeom)
+	return prepGeom
 }
 
 // Contains returns if pg contains g.
@@ -125,17 +126,6 @@ func (pg *PrepGeom) Crosses(g *Geom) bool {
 	default:
 		panic(pg.parent.context.err)
 	}
-}
-
-// Destroy destroys pg and all resources associated with s.
-func (pg *PrepGeom) Destroy() {
-	if pg == nil || pg.parent == nil || pg.parent.context == nil {
-		return
-	}
-	pg.parent.context.mutex.Lock()
-	defer pg.parent.context.mutex.Unlock()
-	C.GEOSPreparedGeom_destroy_r(pg.parent.context.cHandle, pg.cPrepGeom)
-	*pg = PrepGeom{} // Clear all references.
 }
 
 // Disjoint returns if pg is disjoint from g.
@@ -269,4 +259,10 @@ func (pg *PrepGeom) Within(g *Geom) bool {
 	default:
 		panic(pg.parent.context.err)
 	}
+}
+
+func (c *Context) destroyPrepGeom(cPrepGeom *C.struct_GEOSPrepGeom_t) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	C.GEOSPreparedGeom_destroy_r(c.cHandle, cPrepGeom)
 }
