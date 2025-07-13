@@ -110,3 +110,14 @@ func VersionCompare(major, minor, patch int) int {
 	}
 	return VersionPatch - patch
 }
+
+type intType interface {
+	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
+}
+
+func toInt[T intType](b bool) T { //nolint:ireturn
+	if b {
+		return 1
+	}
+	return 0
+}
