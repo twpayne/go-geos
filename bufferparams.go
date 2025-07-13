@@ -3,22 +3,28 @@ package geos
 // #include "go-geos.h"
 import "C"
 
+import "runtime"
+
 // A BufferParams contains parameters for BufferWithParams.
 type BufferParams struct {
 	context    *Context
 	cBufParams *C.struct_GEOSBufParams_t
 }
 
-// Destroy destroys all resources associated with p.
-func (p *BufferParams) Destroy() {
-	// Protect against Destroy being called more than once.
-	if p == nil || p.context == nil {
-		return
+// NewBufferParams returns a new BufferParams.
+func (c *Context) NewBufferParams() *BufferParams {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	cBufferParams := C.GEOSBufferParams_create_r(c.cHandle)
+	if cBufferParams == nil {
+		panic(c.err)
 	}
-	p.context.mutex.Lock()
-	defer p.context.mutex.Unlock()
-	C.GEOSBufferParams_destroy_r(p.context.cHandle, p.cBufParams)
-	*p = BufferParams{} // Clear all references.
+	bufferParams := &BufferParams{
+		context:    c,
+		cBufParams: cBufferParams,
+	}
+	runtime.AddCleanup(bufferParams, c.destroyBufferParams, cBufferParams)
+	return bufferParams
 }
 
 // SetEndCapStyle sets p's end cap style.
@@ -72,9 +78,8 @@ func (p *BufferParams) SetSingleSided(singleSided bool) *BufferParams {
 	return p
 }
 
-func (p *BufferParams) finalize() {
-	if p.context == nil {
-		return
-	}
-	p.Destroy()
+func (c *Context) destroyBufferParams(cBufferParams *C.struct_GEOSBufParams_t) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	C.GEOSBufferParams_destroy_r(c.cHandle, cBufferParams)
 }
