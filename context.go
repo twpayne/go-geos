@@ -12,7 +12,7 @@ import (
 
 // A Context is a context.
 type Context struct {
-	sync.Mutex
+	mutex               sync.Mutex
 	cHandle             C.GEOSContextHandle_t
 	cEWKBWithSRIDWriter *C.struct_GEOSWKBWriter_t
 	cGeoJSONReader      *C.struct_GEOSGeoJSONReader_t
@@ -81,8 +81,8 @@ func (c *Context) Clone(g *Geom) *Geom {
 
 // NewBufferParams returns a new BufferParams.
 func (c *Context) NewBufferParams() *BufferParams {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	cBufferParams := C.GEOSBufferParams_create_r(c.cHandle)
 	if cBufferParams == nil {
 		panic(c.err)
@@ -95,8 +95,8 @@ func (c *Context) NewCollection(typeID TypeID, geoms []*Geom) *Geom {
 	if len(geoms) == 0 {
 		return c.NewEmptyCollection(typeID)
 	}
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	cGeoms := make([]*C.GEOSGeometry, len(geoms))
 	for i, geom := range geoms {
 		cGeoms[i] = geom.cGeom
@@ -110,43 +110,43 @@ func (c *Context) NewCollection(typeID TypeID, geoms []*Geom) *Geom {
 
 // NewCoordSeq returns a new CoordSeq.
 func (c *Context) NewCoordSeq(size, dims int) *CoordSeq {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilCoordSeq(C.GEOSCoordSeq_create_r(c.cHandle, C.uint(size), C.uint(dims)))
 }
 
 // NewCoordSeqFromCoords returns a new CoordSeq populated with coords.
 func (c *Context) NewCoordSeqFromCoords(coords [][]float64) *CoordSeq {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilCoordSeq(c.newGEOSCoordSeqFromCoords(coords))
 }
 
 // NewEmptyCollection returns a new empty collection.
 func (c *Context) NewEmptyCollection(typeID TypeID) *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilGeom(C.GEOSGeom_createEmptyCollection_r(c.cHandle, C.int(typeID)), nil)
 }
 
 // NewEmptyLineString returns a new empty line string.
 func (c *Context) NewEmptyLineString() *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilGeom(C.GEOSGeom_createEmptyLineString_r(c.cHandle), nil)
 }
 
 // NewEmptyPoint returns a new empty point.
 func (c *Context) NewEmptyPoint() *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilGeom(C.GEOSGeom_createEmptyPoint_r(c.cHandle), nil)
 }
 
 // NewEmptyPolygon returns a new empty polygon.
 func (c *Context) NewEmptyPolygon() *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilGeom(C.GEOSGeom_createEmptyPolygon_r(c.cHandle), nil)
 }
 
@@ -169,8 +169,8 @@ func (c *Context) NewGeomFromBounds(minX, minY, maxX, maxY float64) *Geom {
 
 // NewGeomFromGeoJSON returns a new geometry in JSON format from json.
 func (c *Context) NewGeomFromGeoJSON(geoJSON string) (*Geom, error) {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	c.err = nil
 	if c.cGeoJSONReader == nil {
 		c.cGeoJSONReader = C.GEOSGeoJSONReader_create_r(c.cHandle)
@@ -182,8 +182,8 @@ func (c *Context) NewGeomFromGeoJSON(geoJSON string) (*Geom, error) {
 
 // NewGeomFromWKB parses a geometry in WKB format from wkb.
 func (c *Context) NewGeomFromWKB(wkb []byte) (*Geom, error) {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	c.err = nil
 	if c.cWKBReader == nil {
 		c.cWKBReader = C.GEOSWKBReader_create_r(c.cHandle)
@@ -195,8 +195,8 @@ func (c *Context) NewGeomFromWKB(wkb []byte) (*Geom, error) {
 
 // NewGeomFromWKT parses a geometry in WKT format from wkt.
 func (c *Context) NewGeomFromWKT(wkt string) (*Geom, error) {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	c.err = nil
 	if c.cWKTReader == nil {
 		c.cWKTReader = C.GEOSWKTReader_create_r(c.cHandle)
@@ -208,16 +208,16 @@ func (c *Context) NewGeomFromWKT(wkt string) (*Geom, error) {
 
 // NewLinearRing returns a new linear ring populated with coords.
 func (c *Context) NewLinearRing(coords [][]float64) *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	s := c.newGEOSCoordSeqFromCoords(coords)
 	return c.newNonNilGeom(C.GEOSGeom_createLinearRing_r(c.cHandle, s), nil)
 }
 
 // NewLineString returns a new line string populated with coords.
 func (c *Context) NewLineString(coords [][]float64) *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	s := c.newGEOSCoordSeqFromCoords(coords)
 	return c.newNonNilGeom(C.GEOSGeom_createLineString_r(c.cHandle, s), nil)
 }
@@ -252,13 +252,13 @@ func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
 	}
 	var (
 		cShellGeom *C.struct_GEOSGeom_t
-		holesSlice []*C.struct_GEOSGeom_t
+		holeCGeoms []*C.struct_GEOSGeom_t
 	)
 	defer func() {
 		if v := recover(); v != nil {
 			C.GEOSGeom_destroy_r(c.cHandle, cShellGeom)
-			for _, hole := range holesSlice {
-				C.GEOSGeom_destroy_r(c.cHandle, hole)
+			for _, cHoleGeom := range holeCGeoms {
+				C.GEOSGeom_destroy_r(c.cHandle, cHoleGeom)
 			}
 			panic(v)
 		}
@@ -267,26 +267,26 @@ func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
 	if cShellGeom == nil {
 		panic(c.err)
 	}
-	var holes **C.struct_GEOSGeom_t
+	var holeGeoms **C.struct_GEOSGeom_t
 	nholes := len(coordss) - 1
 	if nholes > 0 {
-		holesSlice = make([]*C.struct_GEOSGeom_t, nholes)
-		for i := range holesSlice {
+		holeCGeoms = make([]*C.struct_GEOSGeom_t, nholes)
+		for i := range holeCGeoms {
 			cHoleGeom := C.GEOSGeom_createLinearRing_r(c.cHandle, c.newGEOSCoordSeqFromCoords(coordss[i+1]))
 			if cHoleGeom == nil {
 				panic(c.err)
 			}
-			holesSlice[i] = cHoleGeom
+			holeCGeoms[i] = cHoleGeom
 		}
-		holes = (**C.struct_GEOSGeom_t)(unsafe.Pointer(&holesSlice[0]))
+		holeGeoms = (**C.struct_GEOSGeom_t)(unsafe.Pointer(&holeCGeoms[0]))
 	}
-	return c.newNonNilGeom(C.GEOSGeom_createPolygon_r(c.cHandle, cShellGeom, holes, C.uint(nholes)), nil)
+	return c.newNonNilGeom(C.GEOSGeom_createPolygon_r(c.cHandle, cShellGeom, holeGeoms, C.uint(nholes)), nil)
 }
 
 // NewSTRtree returns a new STRtree.
 func (c *Context) NewSTRtree(nodeCapacity int) *STRtree {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	t := &STRtree{
 		context:     c,
 		cSTRTree:    C.GEOSSTRtree_create_r(c.cHandle, C.size_t(nodeCapacity)),
@@ -299,16 +299,16 @@ func (c *Context) NewSTRtree(nodeCapacity int) *STRtree {
 
 // OrientationIndex returns the orientation index from A to B and then to P.
 func (c *Context) OrientationIndex(ax, ay, bx, by, px, py float64) int {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return int(C.GEOSOrientationIndex_r(c.cHandle, C.double(ax), C.double(ay), C.double(bx), C.double(by), C.double(px), C.double(py)))
 }
 
 // Polygonize returns a set of geometries which contains linework that
 // represents the edges of a planar graph.
 func (c *Context) Polygonize(geoms []*Geom) *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	cGeoms, unlockFunc := c.cGeomsLocked(geoms)
 	defer unlockFunc()
 	return c.newNonNilGeom(C.GEOSPolygonize_r(c.cHandle, cGeoms, C.uint(len(geoms))), nil)
@@ -317,8 +317,8 @@ func (c *Context) Polygonize(geoms []*Geom) *Geom {
 // PolygonizeValid returns a set of polygons which contains linework that
 // represents the edges of a planar graph.
 func (c *Context) PolygonizeValid(geoms []*Geom) *Geom {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	cGeoms, unlockFunc := c.cGeomsLocked(geoms)
 	defer unlockFunc()
 	return c.newNonNilGeom(C.GEOSPolygonize_valid_r(c.cHandle, cGeoms, C.uint(len(geoms))), nil)
@@ -330,8 +330,8 @@ func (c *Context) RelatePatternMatch(mat, pat string) bool {
 	defer C.free(unsafe.Pointer(matCStr))
 	patCStr := C.CString(pat)
 	defer C.free(unsafe.Pointer(patCStr))
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	switch C.GEOSRelatePatternMatch_r(c.cHandle, matCStr, patCStr) {
 	case 0:
 		return false
@@ -344,8 +344,8 @@ func (c *Context) RelatePatternMatch(mat, pat string) bool {
 
 // SegmentIntersection returns the coordinate where two lines intersect.
 func (c *Context) SegmentIntersection(ax0, ay0, ax1, ay1, bx0, by0, bx1, by1 float64) (x, y float64, intersection bool) {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	var cx, cy float64
 	switch C.GEOSSegmentIntersection_r(c.cHandle,
 		C.double(ax0), C.double(ay0), C.double(ax1), C.double(ay1),
@@ -371,7 +371,7 @@ func (c *Context) cGeomsLocked(geoms []*Geom) (**C.struct_GEOSGeom_t, func()) {
 		geom := geoms[i]
 		geom.mustNotBeDestroyed()
 		if _, ok := uniqueContexts[geom.context]; !ok {
-			geom.context.Lock()
+			geom.context.mutex.Lock()
 			uniqueContexts[geom.context] = struct{}{}
 			extraContexts = append(extraContexts, geom.context)
 		}
@@ -379,14 +379,14 @@ func (c *Context) cGeomsLocked(geoms []*Geom) (**C.struct_GEOSGeom_t, func()) {
 	}
 	return &cGeoms[0], func() {
 		for i := len(extraContexts) - 1; i >= 0; i-- {
-			extraContexts[i].Unlock()
+			extraContexts[i].mutex.Unlock()
 		}
 	}
 }
 
 func (c *Context) finish() {
-	c.Lock()
-	defer c.Unlock()
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	if c.cEWKBWithSRIDWriter != nil {
 		C.GEOSWKBWriter_destroy_r(c.cHandle, c.cEWKBWithSRIDWriter)
 	}
