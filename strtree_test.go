@@ -47,10 +47,15 @@ func TestSTRtree(t *testing.T) {
 	}, items)
 
 	assert.True(t, tree.Remove(g1, 1))
-	if false {
-		// Items removed with GEOSSTRtree_remove_r are still returned by
+	if geos.VersionCompare(3, 12, 0) >= 0 || geos.VersionCompare(3, 11, 3) >= 0 || geos.VersionCompare(3, 10, 6) >= 0 {
+		assert.Equal(t, map[any]struct{}{
+			2: {},
+		}, allItems())
+	} else {
+		// Items removed with GEOSSTRtree_remove_r are returned by
 		// STRtree.Iterate. See https://github.com/libgeos/geos/issues/833.
 		assert.Equal(t, map[any]struct{}{
+			1: {},
 			2: {},
 		}, allItems())
 	}
