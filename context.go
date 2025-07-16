@@ -66,7 +66,7 @@ func NewContext() *Context {
 	c.wktWriter = sync.OnceValue(func() *WKTWriter {
 		return c.NewWKTWriter()
 	})
-	// FIXME golangci-lint complains about the following line saying: Error:
+	// FIXME golangci-lint complains about the following line saying:
 	// dupSubExpr: suspicious identical LHS and RHS for `==` operator (gocritic)
 	// As the line does not contain an `==` operator, disable gocritic on this
 	// line.

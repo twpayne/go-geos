@@ -88,6 +88,11 @@ func NewPolygon(coordss [][][]float64) *Geom {
 	return DefaultContext.NewPolygon(coordss)
 }
 
+// NewSTRtree returns a new STRtree with the given number of entries per node.
+func NewSTRtree(nodeCapacity int) *STRtree {
+	return DefaultContext.NewSTRtree(nodeCapacity)
+}
+
 // Polygonize returns a set of geometries which contains linework that
 // represents the edges of a planar graph.
 func Polygonize(geoms []*Geom) *Geom {
