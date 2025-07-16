@@ -206,3 +206,17 @@ func TestNewGeometry(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
+
+func TestIssue200(t *testing.T) {
+	t.Skip("STRtree.Nearest is broken") // FIXME fix STRTree.Nearest
+
+	strTree := geos.NewSTRtree(10)
+
+	geometry1 := geometry.Must(geometry.NewGeometryFromWKT("POINT(1 0)"))
+	assert.NoError(t, strTree.Insert(geometry1.Geom, 0))
+
+	geometry2 := geometry.Must(geometry.NewGeometryFromWKT("POINT(2 0)"))
+	assert.NoError(t, strTree.Insert(geometry2.Geom, 1))
+
+	assert.Equal(t, geometry2.ToWKT(), strTree.Nearest(geos.NewPointFromXY(3, 0)).ToWKT())
+}
