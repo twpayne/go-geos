@@ -77,6 +77,12 @@ func (t *STRtree) Nearest(value any, valueEnvelope *Geom, geomfn func(any) *Geom
 		panic(errContextMismatch)
 	}
 	callbackHandle := cgo.NewHandle(func(item1, item2 unsafe.Pointer, distance *C.double) C.int {
+		if item1 == nil {
+			panic("nil item1") // FIXME this should never happen
+		}
+		if item2 == nil {
+			panic("nil item2") // FIXME this should never happen
+		}
 		valueHandle1 := (*cgo.Handle)(item1)
 		geom1 := geomfn(valueHandle1.Value())
 		handle2 := (*cgo.Handle)(item2)

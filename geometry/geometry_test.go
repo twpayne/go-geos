@@ -206,3 +206,28 @@ func TestNewGeometry(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, expected, actual)
 }
+
+func TestIssue200(t *testing.T) {
+	strTree := geos.NewSTRtree(10)
+
+	var geoms []*geos.Geom
+
+	geometry1 := geometry.Must(geometry.NewGeometryFromWKT("POINT(1 0)"))
+	assert.NoError(t, strTree.Insert(geometry1.Geom, 0))
+	geoms = append(geoms, geometry1.Geom)
+
+	geometry2 := geometry.Must(geometry.NewGeometryFromWKT("POINT(2 0)"))
+	assert.NoError(t, strTree.Insert(geometry2.Geom, 1))
+	geoms = append(geoms, geometry2.Geom)
+
+	point := geos.NewPointFromXY(3, 0)
+	x := strTree.Nearest(point, point.Envelope(), func(a any) *geos.Geom {
+		return geoms[a.(int)]
+	})
+
+	assert.Equal(t, asAny(1), x)
+}
+
+func asAny(x any) any {
+	return x
+}
