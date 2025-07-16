@@ -6,6 +6,7 @@ import "C"
 
 import (
 	"runtime"
+	"runtime/cgo"
 	"sync"
 	"sync/atomic"
 	"unsafe"
@@ -66,12 +67,14 @@ func NewContext() *Context {
 	c.wktWriter = sync.OnceValue(func() *WKTWriter {
 		return c.NewWKTWriter()
 	})
+	errPHandle := cgo.NewHandle(&c.err)
+	runtime.AddCleanup(c, cgo.Handle.Delete, errPHandle)
 	// FIXME golangci-lint complains about the following line saying: Error:
 	// dupSubExpr: suspicious identical LHS and RHS for `==` operator (gocritic)
 	// As the line does not contain an `==` operator, disable gocritic on this
 	// line.
 	//nolint:gocritic
-	C.GEOSContext_setErrorMessageHandler_r(c.cHandle, C.GEOSMessageHandler_r(C.c_errorMessageHandler), unsafe.Pointer(&c.err))
+	C.GEOSContext_setErrorMessageHandler_r(c.cHandle, C.GEOSMessageHandler_r(C.c_errorMessageHandler), unsafe.Pointer(&errPHandle))
 	return c
 }
 
@@ -206,6 +209,7 @@ func (c *Context) unref() {
 
 //export go_errorMessageHandler
 func go_errorMessageHandler(message *C.char, userdata unsafe.Pointer) {
-	errP := (*error)(userdata)
+	errPHandle := (*cgo.Handle)(userdata)
+	errP := errPHandle.Value().(*error) //nolint:forcetypeassert,revive
 	*errP = Error(C.GoString(message))
 }
