@@ -169,8 +169,7 @@ func geojsonWriteGeom(sb *strings.Builder, geom *geos.Geom) error {
 	if _, err := sb.WriteString(`{"type":"` + typ + `"`); err != nil {
 		return err
 	}
-	//nolint:exhaustive
-	switch geom.TypeID() {
+	switch typeID := geom.TypeID(); typeID {
 	case geos.TypeIDPoint:
 		if geom.IsEmpty() {
 			return errUnsupportedEmptyGeometry
@@ -264,6 +263,8 @@ func geojsonWriteGeom(sb *strings.Builder, geom *geos.Geom) error {
 		if err := sb.WriteByte(']'); err != nil {
 			return err
 		}
+	default:
+		return fmt.Errorf("%d: unknown type id", typeID)
 	}
 	return sb.WriteByte('}')
 }
