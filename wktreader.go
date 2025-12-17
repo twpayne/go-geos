@@ -25,7 +25,7 @@ func (c *Context) NewWKTReader() *WKTReader {
 		cWKTReader: cWKTReader,
 	}
 	c.ref()
-	runtime.AddCleanup(c, c.destroyWKTReader, cWKTReader)
+	runtime.AddCleanup(wktReader, c.destroyWKTReader, cWKTReader)
 	return wktReader
 }
 

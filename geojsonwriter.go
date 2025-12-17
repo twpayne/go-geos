@@ -25,7 +25,7 @@ func (c *Context) NewGeoJSONWriter() *GeoJSONWriter {
 		cGeoJSONWriter: cGeoJSONWriter,
 	}
 	c.ref()
-	runtime.AddCleanup(c, c.destroyGeoJSONWriter, cGeoJSONWriter)
+	runtime.AddCleanup(geoJSONWriter, c.destroyGeoJSONWriter, cGeoJSONWriter)
 	return geoJSONWriter
 }
 

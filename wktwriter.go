@@ -24,7 +24,7 @@ func (c *Context) NewWKTWriter() *WKTWriter {
 		cWKTWriter: cWKTWriter,
 	}
 	c.ref()
-	runtime.AddCleanup(c, c.destroyWKTWriter, cWKTWriter)
+	runtime.AddCleanup(wktWriter, c.destroyWKTWriter, cWKTWriter)
 	return wktWriter
 }
 

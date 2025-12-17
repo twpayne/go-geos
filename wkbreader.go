@@ -24,7 +24,7 @@ func (c *Context) NewWKBReader() *WKBReader {
 		cWKBReader: cWKBReader,
 	}
 	c.ref()
-	runtime.AddCleanup(c, c.destroyWKBReader, cWKBReader)
+	runtime.AddCleanup(wkbReader, c.destroyWKBReader, cWKBReader)
 	return wkbReader
 }
 

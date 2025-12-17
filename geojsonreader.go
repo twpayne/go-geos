@@ -25,7 +25,7 @@ func (c *Context) NewGeoJSONReader() *GeoJSONReader {
 		cGeoJSONReader: cGeoJSONReader,
 	}
 	c.ref()
-	runtime.AddCleanup(c, c.destroyGeoJSONReader, cGeoJSONReader)
+	runtime.AddCleanup(geoJSONReader, c.destroyGeoJSONReader, cGeoJSONReader)
 	return geoJSONReader
 }
 

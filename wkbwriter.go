@@ -50,7 +50,7 @@ func (c *Context) NewWKBWriter(options ...WKBWriterOption) *WKBWriter {
 		cWKBWriter: cWKBWriter,
 	}
 	c.ref()
-	runtime.AddCleanup(c, c.destroyWKBWriter, cWKBWriter)
+	runtime.AddCleanup(wkbWriter, c.destroyWKBWriter, cWKBWriter)
 	for _, option := range options {
 		option(wkbWriter)
 	}
