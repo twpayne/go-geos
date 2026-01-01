@@ -15,7 +15,7 @@ jobs:
     - name: install-dependencies
       run: |
         sudo apt-get install -y libgeos-dev
-    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
     - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00
       with:
         go-version: stable
@@ -35,7 +35,7 @@ jobs:
     - name: install-dependencies
       run: |
         sudo apt-get install -y libgeos-dev
-    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
     - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00
       with:
         go-version: stable
@@ -79,7 +79,7 @@ jobs:
     - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00
       with:
         go-version: stable
-    - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+    - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8
     - name: test
       run: |
         sudo ldconfig
