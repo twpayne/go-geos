@@ -209,7 +209,7 @@ func TestGeometryConstructors(t *testing.T) {
 
 func TestMultipleContexts(t *testing.T) {
 	c1, c2 := geos.NewContext(), geos.NewContext()
-	g1s, g2s := []*geos.Geom{}, []*geos.Geom{}
+	g1s, g2s := []*geos.Geom{}, []*geos.Geom{} //nolint:prealloc
 	for _, wkt := range []string{
 		"POINT (0 0)",
 		"LINESTRING (0 0, 0 1)",

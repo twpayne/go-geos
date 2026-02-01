@@ -3,11 +3,14 @@ run:
   go: '1.24'
 linters:
   enable:
+  - arangolint
+  - asasalint
   - asciicheck
   - bidichk
   - bodyclose
   - canonicalheader
   - containedctx
+  - contextcheck
   - copyloopvar
   - decorder
   - dogsled
@@ -23,12 +26,16 @@ linters:
   - forbidigo
   - forcetypeassert
   - funcorder
+  - ginkgolinter
   - gocheckcompilerdirectives
   - gochecksumtype
   - gocritic
+  - godoclint
   - godot
+  - gomoddirectives
   - gomodguard
   - goprintffuncname
+  - gosec
   - gosmopolitan
   - grouper
   - iface
@@ -42,8 +49,10 @@ linters:
   - mirror
   - misspell
   - modernize
+  - musttag
   - nilerr
   - nilnesserr
+  - nilnil
   - noctx
   - nolintlint
   - nosprintfhostport
@@ -66,22 +75,19 @@ linters:
   - thelper
   - unconvert
   - unparam
+  - unqueryvet
   - usestdlibvars
   - usetesting
   - wastedassign
   - whitespace
   - zerologlint
   disable:
-  - arangolint
-  - asasalint
-  - contextcheck
   - cyclop
   - depguard
   - dupl
   - exhaustive
   - exhaustruct
   - funlen
-  - ginkgolinter
   - gochecknoglobals
   - gochecknoinits
   - gocognit
@@ -90,11 +96,9 @@ linters:
   - godox
   - goheader
   - gomoddirectives
-  - gosec
   - ireturn
   - lll
   - maintidx
-  - musttag
   - nakedret
   - nestif
   - nilnil
