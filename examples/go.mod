@@ -6,10 +6,10 @@ toolchain go1.24.2
 
 require (
 	github.com/alecthomas/assert/v2 v2.11.0
-	github.com/lib/pq v1.10.9
+	github.com/lib/pq v1.11.1
 	github.com/testcontainers/testcontainers-go v0.35.0
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.35.0
-	github.com/twpayne/go-geos v0.20.1
+	github.com/twpayne/go-geos v0.20.2
 )
 
 require (
