@@ -25,6 +25,7 @@ type Context struct {
 	wktReader          func() *WKTReader
 	wktWriter          func() *WKTWriter
 	err                error
+	errPHandle         cgo.Handle
 }
 
 // NewContext returns a new Context.
@@ -67,14 +68,14 @@ func NewContext() *Context {
 	c.wktWriter = sync.OnceValue(func() *WKTWriter {
 		return c.NewWKTWriter()
 	})
-	errPHandle := cgo.NewHandle(&c.err)
-	runtime.AddCleanup(c, cgo.Handle.Delete, errPHandle)
+	c.errPHandle = cgo.NewHandle(&c.err)
+	runtime.AddCleanup(c, cgo.Handle.Delete, c.errPHandle)
 	// FIXME golangci-lint complains about the following line saying: Error:
 	// dupSubExpr: suspicious identical LHS and RHS for `==` operator (gocritic)
 	// As the line does not contain an `==` operator, disable gocritic on this
 	// line.
 	//nolint:gocritic
-	C.GEOSContext_setErrorMessageHandler_r(c.cHandle, C.GEOSMessageHandler_r(C.c_errorMessageHandler), unsafe.Pointer(&errPHandle))
+	C.GEOSContext_setErrorMessageHandler_r(c.cHandle, C.GEOSMessageHandler_r(C.c_errorMessageHandler), unsafe.Pointer(&c.errPHandle))
 	return c
 }
 
