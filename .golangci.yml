@@ -99,10 +99,12 @@ linters:
   - ireturn
   - lll
   - maintidx
+  - mnd
   - nakedret
   - nestif
   - nilnil
   - nlreturn
+  - noinlineerr
   - nonamedreturns
   - paralleltest
   - recvcheck
