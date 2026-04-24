@@ -53,7 +53,7 @@ jobs:
         - 3.12.1 # Used in Ubuntu 24.04 LTS
         - 3.12.3 # Latest 3.12.x
         - 3.13.1 # Latest 3.13.x
-        - 3.14.1 # Latest
+        - 3.14.1 # Used in Ubuntu 26.04 LTS
     runs-on: ubuntu-22.04
     steps:
     - uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae   # v5.0.5
