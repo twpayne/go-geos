@@ -35,7 +35,7 @@ func (r *WKBReader) Read(wkb []byte) (*Geom, error) {
 	wkbCBuf := C.CBytes(wkb)
 	defer C.free(wkbCBuf)
 	r.context.err = nil
-	return r.context.newGeom(C.GEOSWKBReader_read_r(r.context.cHandle, r.cWKBReader, (*C.uchar)(wkbCBuf), C.ulong(len(wkb))), nil), r.context.err
+	return r.context.newGeom(C.GEOSWKBReader_read_r(r.context.cHandle, r.cWKBReader, (*C.uchar)(wkbCBuf), C.size_t(len(wkb))), nil), r.context.err
 }
 
 func (c *Context) destroyWKBReader(cWKBReader *C.struct_GEOSWKBReader_t) {
