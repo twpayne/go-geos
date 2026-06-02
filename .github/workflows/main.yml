@@ -7,6 +7,7 @@ on:
     tags:
     - v*
 env:
+  GOEXPERIMENT: cgocheck2
   GOTOOLCHAIN: local
 jobs:
   main:
