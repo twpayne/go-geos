@@ -192,6 +192,32 @@ func (g *Geom) BufferWithParams(bufParams *BufParams, width float64) *Geom {
 	return g.context.newNonNilGeom(C.GEOSBufferWithParams_r(g.context.cHandle, g.cGeom, bufParams.cBufParams, C.double(width)), nil)
 }
 
+type VoronoiDiagramFlags int
+
+const (
+	VoronoiDiagramCells         VoronoiDiagramFlags = 0
+	VoronoiDiagramEdges         VoronoiDiagramFlags = 1
+	VoronoiDiagramPreserveOrder VoronoiDiagramFlags = 2
+)
+
+// VoronoiDiagram returns the Voronoi diagram of the vertices of g.
+func (g *Geom) VoronoiDiagram(env *Geom, tolerance float64, flags VoronoiDiagramFlags) *Geom {
+	if flags&VoronoiDiagramPreserveOrder != 0 && VersionCompare(3, 12, 0) < 0 {
+		panic("VoronoiDiagramPreserveOrder requires GEOS >= 3.12")
+	}
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
+	var cEnv *C.struct_GEOSGeom_t
+	if env != nil {
+		if env.context != g.context {
+			env.context.mutex.Lock()
+			defer env.context.mutex.Unlock()
+		}
+		cEnv = env.cGeom
+	}
+	return g.context.newNonNilGeom(C.GEOSVoronoiDiagram_r(g.context.cHandle, g.cGeom, cEnv, C.double(tolerance), C.int(flags)), nil)
+}
+
 // ClipByBox2D clips g by box2d.
 func (g *Geom) ClipByBox2D(box2d *Box2D) *Geom {
 	return g.ClipByRect(box2d.MinX, box2d.MinY, box2d.MaxX, box2d.MaxY)
