@@ -345,6 +345,64 @@ func TestPolygonUnion(t *testing.T) {
 	}
 }
 
+func TestVoronoiDiagram(t *testing.T) {
+	for _, tc := range []struct {
+		name        string
+		envWKT      string
+		flags       geos.VoronoiDiagramFlags
+		expectedWKT string
+	}{
+		{
+			name:        "no_env",
+			flags:       geos.VoronoiDiagramCells,
+			expectedWKT: "GEOMETRYCOLLECTION (POLYGON ((20 20, 20 5, 5 5, 5 20, 20 20)), POLYGON ((-10 20, 5 20, 5 5, -10 5, -10 20)), POLYGON ((-10 -10, -10 5, 5 5, 5 -10, -10 -10)), POLYGON ((20 -10, 5 -10, 5 5, 20 5, 20 -10)))",
+		},
+		{
+			name:        "with_env",
+			envWKT:      "POLYGON ((-100 -100, 100 -100, 100 100, -100 100, -100 -100))",
+			flags:       geos.VoronoiDiagramCells,
+			expectedWKT: "GEOMETRYCOLLECTION (POLYGON ((-100 100, 5 100, 5 5, -100 5, -100 100)), POLYGON ((-100 -100, -100 5, 5 5, 5 -100, -100 -100)), POLYGON ((100 -100, 5 -100, 5 5, 100 5, 100 -100)), POLYGON ((100 100, 100 5, 5 5, 5 100, 100 100)))",
+		},
+		{
+			name:        "only_edges",
+			flags:       geos.VoronoiDiagramEdges,
+			expectedWKT: "MULTILINESTRING ((5 5, 5 20), (20 5, 5 5), (5 5, -10 5), (5 5, 5 -10))",
+		},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			defer runtime.GC() // Exercise finalizers.
+			c := geos.NewContext()
+			sites := mustNewGeomFromWKT(t, c, "MULTIPOINT (0 0, 10 0, 10 10, 0 10)")
+			var env *geos.Geom
+			if tc.envWKT != "" {
+				env = mustNewGeomFromWKT(t, c, tc.envWKT)
+			}
+			expected := mustNewGeomFromWKT(t, c, tc.expectedWKT)
+			assert.True(t, expected.Equals(sites.VoronoiDiagram(env, 0, tc.flags)))
+		})
+	}
+
+	t.Run("preserve_order", func(t *testing.T) {
+		defer runtime.GC() // Exercise finalizers.
+		c := geos.NewContext()
+		sites := mustNewGeomFromWKT(t, c, "MULTIPOINT (10 10, 0 0, 0 10, 10 0)")
+		sitePoints := []*geos.Geom{
+			mustNewGeomFromWKT(t, c, "POINT (10 10)"),
+			mustNewGeomFromWKT(t, c, "POINT (0 0)"),
+			mustNewGeomFromWKT(t, c, "POINT (0 10)"),
+			mustNewGeomFromWKT(t, c, "POINT (10 0)"),
+		}
+		if geos.VersionCompare(3, 12, 0) >= 0 {
+			diagram := sites.VoronoiDiagram(nil, 0, geos.VoronoiDiagramPreserveOrder)
+			for i, sitePoint := range sitePoints {
+				assert.True(t, diagram.Geometry(i).Contains(sitePoint))
+			}
+		} else {
+			assert.Panics(t, func() { sites.VoronoiDiagram(nil, 0, geos.VoronoiDiagramPreserveOrder) })
+		}
+	})
+}
+
 func TestGeometryPanics(t *testing.T) {
 	defer runtime.GC() // Exercise finalizers.
 	c := geos.NewContext()
