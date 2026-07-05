@@ -7,6 +7,7 @@ import "C"
 import (
 	"runtime"
 	"runtime/cgo"
+	"slices"
 	"sync"
 	"sync/atomic"
 	"unsafe"
@@ -189,8 +190,8 @@ func (c *Context) cGeomsLocked(geoms []*Geom) (**C.struct_GEOSGeom_t, func()) {
 		cGeoms[i] = geom.cGeom
 	}
 	return &cGeoms[0], func() {
-		for i := len(extraContexts) - 1; i >= 0; i-- {
-			extraContexts[i].mutex.Unlock()
+		for _, extraContext := range slices.Backward(extraContexts) {
+			extraContext.mutex.Unlock()
 		}
 	}
 }
