@@ -192,16 +192,8 @@ func (g *Geom) BufferWithParams(bufParams *BufParams, width float64) *Geom {
 	return g.context.newNonNilGeom(C.GEOSBufferWithParams_r(g.context.cHandle, g.cGeom, bufParams.cBufParams, C.double(width)), nil)
 }
 
-type VoronoiDiagramFlags int
-
-const (
-	VoronoiDiagramCells         VoronoiDiagramFlags = 0
-	VoronoiDiagramEdges         VoronoiDiagramFlags = 1
-	VoronoiDiagramPreserveOrder VoronoiDiagramFlags = 2
-)
-
 // VoronoiDiagram returns the Voronoi diagram of the vertices of g.
-func (g *Geom) VoronoiDiagram(env *Geom, tolerance float64, flags VoronoiDiagramFlags) *Geom {
+func (g *Geom) VoronoiDiagram(env *Geom, tolerance float64, flags VoronoiDiagramFlag) *Geom {
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var cEnv *C.struct_GEOSGeom_t
