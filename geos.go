@@ -100,7 +100,15 @@ type MakeValidCollapsed int
 // MakeValidMethods.
 const (
 	MakeValidDiscardCollapsed MakeValidCollapsed = 0
-	MakeValidKeepCollapsed    MakeValidCollapsed = 1
+	MakeValidKeepCollapsed    MakeValidCollapsed = C.GEOS_PREC_KEEP_COLLAPSED
+)
+
+type VoronoiDiagramFlag int
+
+// Voronoi diagram flags.
+const (
+	VoronoiDiagramFlagOnlyEdges     VoronoiDiagramFlag = 1 // FIXME use C.GEOS_VORONOI_ONLY_EDGES
+	VoronoiDiagramFlagPreserveOrder VoronoiDiagramFlag = 2 // FIXME use C.GEOS_VORONOI_PRESERVE_ORDER
 )
 
 // VersionCompare returns a negative number if the GEOS version is less than the
