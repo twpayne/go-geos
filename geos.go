@@ -4,7 +4,11 @@ package geos
 // #cgo pkg-config: geos
 // #include "go-geos.h"
 import "C"
-import "cmp"
+
+import (
+	"cmp"
+	"fmt"
+)
 
 // Version.
 const (
@@ -108,6 +112,12 @@ func VersionCompare(major, minor, patch int) int {
 
 type intType interface {
 	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr
+}
+
+func init() {
+	if VersionCompare(3, 12, 0) < 0 {
+		panic(fmt.Sprintf("unsupported GEOS version %d.%d.%d", VersionMajor, VersionMinor, VersionPatch))
+	}
 }
 
 func toInt[T intType](b bool) T { //nolint:ireturn

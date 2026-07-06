@@ -202,9 +202,6 @@ const (
 
 // VoronoiDiagram returns the Voronoi diagram of the vertices of g.
 func (g *Geom) VoronoiDiagram(env *Geom, tolerance float64, flags VoronoiDiagramFlags) *Geom {
-	if flags&VoronoiDiagramPreserveOrder != 0 && VersionCompare(3, 12, 0) < 0 {
-		panic("VoronoiDiagramPreserveOrder requires GEOS >= 3.12")
-	}
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	var cEnv *C.struct_GEOSGeom_t

@@ -37,9 +37,9 @@ similar the method is to existing methods:
 
 ## Maintaining backwards compatibility
 
-`go-geos` supports the libgeos version using in the latest [Ubuntu LTS
-release](https://ubuntu.com/about/release-cycle), which is currently GEOS
-3.10.2.
+`go-geos` supports the libgeos version using in the last two [Ubuntu LTS
+releases](https://ubuntu.com/about/release-cycle), which is currently GEOS
+3.12.1.
 
 As `libgeos` is under active development, bugs are fixed and new features are
 added over time. This causes problems when versions might behave incorrectly or
@@ -49,7 +49,7 @@ miss newly-added features. In these cases:
   sufficiently recent version of `libgeos` for their needs. `go-geos` can
   forward incorrect results from `libgeos` and behave in an undefined manner
   (including crashing the program) when missing features are invoked.
-* For features not present in GEOS 3.10.2, you will need to add stubs in
+* For features not present in GEOS 3.12.1, you will need to add stubs in
   [`go-geos.c`](https://github.com/twpayne/go-geos/blob/master/go-geos.c) and
   [`go-geos.h`](https://github.com/twpayne/go-geos/blob/master/go-geos.h) to
   provide the function when it is not provided.

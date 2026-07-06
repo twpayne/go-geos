@@ -17,9 +17,6 @@ func TestBox2D(t *testing.T) {
 	assert.False(t, b.ContainsPoint(2, 1))
 	assert.True(t, b.Equals(geos.NewBox2D(1, 2, 3, 4)))
 	expectedWKT := "POLYGON ((1 2, 3 2, 3 4, 1 4, 1 2))"
-	if geos.VersionCompare(3, 12, 0) < 0 {
-		expectedWKT = "POLYGON ((1.0000000000000000 2.0000000000000000, 3.0000000000000000 2.0000000000000000, 3.0000000000000000 4.0000000000000000, 1.0000000000000000 4.0000000000000000, 1.0000000000000000 2.0000000000000000))"
-	}
 	assert.Equal(t, expectedWKT, b.Geom().ToWKT())
 	assert.False(t, b.IsEmpty())
 	assert.Equal(t, 2.0, b.Height())
@@ -53,9 +50,6 @@ func TestBox2DPoint(t *testing.T) {
 	assert.False(t, b.Equals(geos.NewBox2D(1, 2, 3, 4)))
 	assert.False(t, b.Equals(geos.NewBox2DEmpty()))
 	expectedWKT := "POINT (0 0)"
-	if geos.VersionCompare(3, 12, 0) < 0 {
-		expectedWKT = "POINT (0.0000000000000000 0.0000000000000000)"
-	}
 	assert.Equal(t, expectedWKT, b.Geom().ToWKT())
 	assert.False(t, b.IsEmpty())
 	assert.Equal(t, 0.0, b.Height())

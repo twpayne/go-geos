@@ -48,18 +48,9 @@ func TestSTRtree(t *testing.T) {
 	}, items)
 
 	assert.True(t, tree.Remove(g1, 1))
-	if geos.VersionCompare(3, 12, 0) >= 0 || geos.VersionCompare(3, 11, 3) >= 0 || geos.VersionCompare(3, 10, 6) >= 0 {
-		assert.Equal(t, map[any]struct{}{
-			2: {},
-		}, allItems())
-	} else {
-		// Items removed with GEOSSTRtree_remove_r are returned by
-		// STRtree.Iterate. See https://github.com/libgeos/geos/issues/833.
-		assert.Equal(t, map[any]struct{}{
-			1: {},
-			2: {},
-		}, allItems())
-	}
+	assert.Equal(t, map[any]struct{}{
+		2: {},
+	}, allItems())
 
 	items2 := make(map[any]struct{})
 	tree.Query(mustNewGeomFromWKT(t, c, "POLYGON ((-1 -1,1 -1,1 1,-1 1,-1 -1))"), func(value any) {

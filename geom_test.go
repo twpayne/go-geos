@@ -337,10 +337,8 @@ func TestPolygonUnion(t *testing.T) {
 			union1 := polygons.UnaryUnion()
 			assert.True(t, expectedUnion.Equals(union1))
 
-			if geos.VersionCompare(3, 12, 0) >= 0 {
-				union2 := polygons.DisjointSubsetUnion()
-				assert.True(t, expectedUnion.Equals(union2))
-			}
+			union2 := polygons.DisjointSubsetUnion()
+			assert.True(t, expectedUnion.Equals(union2))
 		})
 	}
 }
@@ -392,13 +390,9 @@ func TestVoronoiDiagram(t *testing.T) {
 			mustNewGeomFromWKT(t, c, "POINT (0 10)"),
 			mustNewGeomFromWKT(t, c, "POINT (10 0)"),
 		}
-		if geos.VersionCompare(3, 12, 0) >= 0 {
-			diagram := sites.VoronoiDiagram(nil, 0, geos.VoronoiDiagramPreserveOrder)
-			for i, sitePoint := range sitePoints {
-				assert.True(t, diagram.Geometry(i).Contains(sitePoint))
-			}
-		} else {
-			assert.Panics(t, func() { sites.VoronoiDiagram(nil, 0, geos.VoronoiDiagramPreserveOrder) })
+		diagram := sites.VoronoiDiagram(nil, 0, geos.VoronoiDiagramPreserveOrder)
+		for i, sitePoint := range sitePoints {
+			assert.True(t, diagram.Geometry(i).Contains(sitePoint))
 		}
 	})
 }
@@ -541,23 +535,18 @@ func TestWKXRoundTrip(t *testing.T) {
 		wktPre3_12 string
 	}{
 		{
-			name:       "point",
-			wkt:        "POINT (0 0)",
-			wktPre3_12: "POINT (0.0000000000000000 0.0000000000000000)",
+			name: "point",
+			wkt:  "POINT (0 0)",
 		},
 		{
-			name:       "line_string",
-			wkt:        "LINESTRING (0 0, 1 0)",
-			wktPre3_12: "LINESTRING (0.0000000000000000 0.0000000000000000, 1.0000000000000000 0.0000000000000000)",
+			name: "line_string",
+			wkt:  "LINESTRING (0 0, 1 0)",
 		},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			defer runtime.GC() // Exercise finalizers.
 			c := geos.NewContext()
 			wkt := tc.wkt
-			if geos.VersionCompare(3, 12, 0) < 0 {
-				wkt = tc.wktPre3_12
-			}
 			wktGeom := mustNewGeomFromWKT(t, c, wkt)
 			assert.Equal(t, wkt, wktGeom.ToWKT())
 			wkbGeom, err := c.NewGeomFromWKB(wktGeom.ToWKB())
