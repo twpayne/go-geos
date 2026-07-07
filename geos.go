@@ -107,8 +107,8 @@ type VoronoiDiagramFlag int
 
 // Voronoi diagram flags.
 const (
-	VoronoiDiagramFlagOnlyEdges     VoronoiDiagramFlag = 1 // FIXME use C.GEOS_VORONOI_ONLY_EDGES
-	VoronoiDiagramFlagPreserveOrder VoronoiDiagramFlag = 2 // FIXME use C.GEOS_VORONOI_PRESERVE_ORDER
+	VoronoiDiagramFlagOnlyEdges     VoronoiDiagramFlag = C.GEOS_VORONOI_ONLY_EDGES
+	VoronoiDiagramFlagPreserveOrder VoronoiDiagramFlag = C.GEOS_VORONOI_PRESERVE_ORDER
 )
 
 // VersionCompare returns a negative number if the GEOS version is less than the

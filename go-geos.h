@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 
-#define GEOS_USE_ONLY_R_API
 #include <geos_c.h>
 
 uintptr_t c_GEOSGeom_getUserData_r(GEOSContextHandle_t handle,
