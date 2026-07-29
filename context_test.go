@@ -292,8 +292,8 @@ func TestPolygonize(t *testing.T) {
 				geom := mustNewGeomFromWKT(t, c, geomWKT)
 				geoms = append(geoms, geom)
 			}
-			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedWKT), c.Polygonize(geoms))
-			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedValidWKT), c.PolygonizeValid(geoms))
+			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedWKT), c.Polygonize(geoms), assert.Exclude[runtime.Cleanup]())
+			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedValidWKT), c.PolygonizeValid(geoms), assert.Exclude[runtime.Cleanup]())
 		})
 	}
 }
@@ -310,6 +310,7 @@ func TestPolygonizeMultiContext(t *testing.T) {
 				mustNewGeomFromWKT(t, c1, "LINESTRING (1 1,0 1)"),
 				mustNewGeomFromWKT(t, c2, "LINESTRING (0 1,0 0)"),
 			}),
+			assert.Exclude[runtime.Cleanup](),
 		)
 	}
 }

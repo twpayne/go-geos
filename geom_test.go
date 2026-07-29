@@ -143,16 +143,16 @@ func TestGeometryMethods(t *testing.T) {
 			assert.Equal(t, 4326, g.SRID())
 			assert.Equal(t, tc.expectedArea, g.Area())
 			assert.Equal(t, tc.expectedLength, g.Length())
-			assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidDiscardCollapsed))
-			assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidDiscardCollapsed))
-			assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidKeepCollapsed))
+			assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidDiscardCollapsed), assert.Exclude[runtime.Cleanup]())
+			assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidDiscardCollapsed), assert.Exclude[runtime.Cleanup]())
+			assert.Equal(t, v, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidKeepCollapsed), assert.Exclude[runtime.Cleanup]())
 			var expectedValidStructureKeepCollapsed *geos.Geom
 			if tc.expectedValidWKTStructureKeepCollapsed != "" {
 				expectedValidStructureKeepCollapsed = mustNewGeomFromWKT(t, c, tc.expectedValidWKTStructureKeepCollapsed)
 			} else {
 				expectedValidStructureKeepCollapsed = v
 			}
-			assert.Equal(t, expectedValidStructureKeepCollapsed, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidKeepCollapsed))
+			assert.Equal(t, expectedValidStructureKeepCollapsed, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidKeepCollapsed), assert.Exclude[runtime.Cleanup]())
 		})
 	}
 }
@@ -452,10 +452,10 @@ func TestGeomPolygonizeFull(t *testing.T) {
 			c := geos.NewContext()
 			g := mustNewGeomFromWKT(t, c, tc.wkt)
 			actual, cuts, dangles, invalidRings := g.PolygonizeFull()
-			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedWKT), actual)
-			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedCutsWKT), cuts)
-			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedDanglesWKT), dangles)
-			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedInvalidRingsWKT), invalidRings)
+			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedWKT), actual, assert.Exclude[runtime.Cleanup]())
+			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedCutsWKT), cuts, assert.Exclude[runtime.Cleanup]())
+			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedDanglesWKT), dangles, assert.Exclude[runtime.Cleanup]())
+			assert.Equal(t, mustNewGeomFromWKT(t, c, tc.expectedInvalidRingsWKT), invalidRings, assert.Exclude[runtime.Cleanup]())
 		})
 	}
 }
@@ -503,13 +503,13 @@ func TestGeomToJSON(t *testing.T) {
 	assert.Equal(t, `{"type":"Point","coordinates":[1.0,2.0]}`, geom.ToGeoJSON(-1))
 }
 
-func TestWKBError(t *testing.T) {
+func TestWKTError(t *testing.T) {
 	_, err := geos.NewContext().NewGeomFromWKT("POINT (0 0")
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "ParseException: Expected word but encountered end of stream")
 }
 
-func TestWKTError(t *testing.T) {
+func TestWKBError(t *testing.T) {
 	_, err := geos.NewContext().NewGeomFromWKB(nil)
 	assert.Error(t, err)
 	assert.Equal(t, err.Error(), "ParseException: Unexpected EOF parsing WKB")
@@ -625,10 +625,10 @@ func TestMakeValid(t *testing.T) {
 			v2 := mustNewGeomFromWKT(t, c, tc.expectedWktStructureDiscard)
 			v3 := mustNewGeomFromWKT(t, c, tc.expectedWktLineworkKeep)
 			v4 := mustNewGeomFromWKT(t, c, tc.expectedWktStructureKeep)
-			assert.Equal(t, v1, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidDiscardCollapsed))
-			assert.Equal(t, v2, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidDiscardCollapsed))
-			assert.Equal(t, v3, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidKeepCollapsed))
-			assert.Equal(t, v4, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidKeepCollapsed))
+			assert.Equal(t, v1, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidDiscardCollapsed), assert.Exclude[runtime.Cleanup]())
+			assert.Equal(t, v2, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidDiscardCollapsed), assert.Exclude[runtime.Cleanup]())
+			assert.Equal(t, v3, g.MakeValidWithParams(geos.MakeValidLinework, geos.MakeValidKeepCollapsed), assert.Exclude[runtime.Cleanup]())
+			assert.Equal(t, v4, g.MakeValidWithParams(geos.MakeValidStructure, geos.MakeValidKeepCollapsed), assert.Exclude[runtime.Cleanup]())
 		})
 	}
 }

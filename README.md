@@ -56,9 +56,10 @@ unaware.
 ## Ownership
 
 Returned sub-geometries (e.g. polygon rings or geometries in a collection) and
-coordinate sequences are owned by the geometry and are only valid for as long as
-the original geometry exists. If you need to persist a sub-geometry for longer
-than the original geometry you must clone it.
+coordinate sequences are owned by the geometry and will keep the geometry alive
+with a reference to it. Collections take ownership of all their geometries:
+directly if the geometry is unowned, or via cloning for an already-owned
+geometry.
 
 ## Errors, exceptions, and panics
 

@@ -16,13 +16,16 @@ type Geom struct {
 	context          *Context
 	cGeom            *C.struct_GEOSGeom_t
 	owner            *Geom
+	cleanup          runtime.Cleanup
 	typeID           TypeID
 	numGeometries    int
 	numInteriorRings int
 	numPoints        int
 }
 
-// NewCollection returns a new collection.
+// NewCollection returns a new collection which owns all the supplied
+// geometries; either directly if they were un-owned, or via clones if they
+// were owned already.
 func (c *Context) NewCollection(typeID TypeID, geoms []*Geom) *Geom {
 	if len(geoms) == 0 {
 		return c.NewEmptyCollection(typeID)
@@ -30,12 +33,20 @@ func (c *Context) NewCollection(typeID TypeID, geoms []*Geom) *Geom {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
 	cGeoms := make([]*C.GEOSGeometry, len(geoms))
-	for i, geom := range geoms {
-		cGeoms[i] = C.GEOSGeom_clone_r(c.cHandle, geom.cGeom)
+	for i, g := range geoms {
+		if g.owner == nil {
+			cGeoms[i] = g.cGeom
+		} else {
+			cGeoms[i] = C.GEOSGeom_clone_r(c.cHandle, g.cGeom)
+		}
 	}
 	geom := c.newNonNilGeom(C.GEOSGeom_createCollection_r(c.cHandle, C.int(typeID), &cGeoms[0], C.uint(len(geoms))), nil)
-	for _, childGeom := range geoms {
-		childGeom.owner = geom
+	for _, g := range geoms {
+		if g.owner == nil {
+			g.owner = geom
+			g.cleanup.Stop()
+			c.unref()
+		}
 	}
 	return geom
 }
@@ -212,8 +223,8 @@ func (g *Geom) ClipByBox2D(box2d *Box2D) *Geom {
 	return g.ClipByRect(box2d.MinX, box2d.MinY, box2d.MaxX, box2d.MaxY)
 }
 
-// CoordSeq returns g's coordinate sequence. The returned CoordSeq is owned by g
-// and is only valid for as long as g exists.
+// CoordSeq returns g's coordinate sequence. The returned CoordSeq is owned by
+// g and will keep it alive.
 func (g *Geom) CoordSeq() *CoordSeq {
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
@@ -224,20 +235,19 @@ func (g *Geom) CoordSeq() *CoordSeq {
 	if coordSeq == nil {
 		return nil
 	}
-	coordSeq.owner = g
 	return coordSeq
 }
 
-// ExteriorRing returns the exterior ring. The returned geometry is owned by g
-// and is only valid for as long as g exists.
+// ExteriorRing returns the exterior ring. The returned geometry is a
+// sub-geometry of g and will keep it alive.
 func (g *Geom) ExteriorRing() *Geom {
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	return g.context.newNonNilGeom(C.GEOSGetExteriorRing_r(g.context.cHandle, g.cGeom), g)
 }
 
-// Geometry returns the nth geometry of g. The returned geometry is owned by g
-// and is only valid for as long as g exists.
+// Geometry returns the nth geometry of g. The returned geometry is a
+// sub-geometry of g and will keep it alive.
 func (g *Geom) Geometry(n int) *Geom {
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
@@ -247,8 +257,8 @@ func (g *Geom) Geometry(n int) *Geom {
 	return g.context.newNonNilGeom(C.GEOSGetGeometryN_r(g.context.cHandle, g.cGeom, C.int(n)), g)
 }
 
-// InteriorRing returns the nth interior ring. The returned geometry is owned by
-// g and is only valid for as long as g exists.
+// InteriorRing returns the nth interior ring. The returned geometry is a
+// sub-geometry of g and will keep it alive.
 func (g *Geom) InteriorRing(n int) *Geom {
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
@@ -318,8 +328,7 @@ func (g *Geom) NumPoints() int {
 	return g.numPoints
 }
 
-// Point returns the g's nth point. The returned geometry is owned by g and is
-// only valid for as long as g exists.
+// Point returns the g's nth point.
 func (g *Geom) Point(n int) *Geom {
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
@@ -466,7 +475,7 @@ func (c *Context) newGeom(cGeom *C.struct_GEOSGeom_t, owner *Geom) *Geom {
 	}
 	if owner == nil {
 		c.ref()
-		runtime.AddCleanup(geom, c.destroyGeom, cGeom)
+		geom.cleanup = runtime.AddCleanup(geom, c.destroyGeom, cGeom)
 	}
 	return geom
 }

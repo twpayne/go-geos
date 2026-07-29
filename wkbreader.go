@@ -32,10 +32,12 @@ func (c *Context) NewWKBReader() *WKBReader {
 func (r *WKBReader) Read(wkb []byte) (*Geom, error) {
 	r.context.mutex.Lock()
 	defer r.context.mutex.Unlock()
-	wkbCBuf := C.CBytes(wkb)
-	defer C.free(wkbCBuf)
+	var pWkb *byte
+	if len(wkb) > 0 {
+		pWkb = &wkb[0]
+	}
 	r.context.err = nil
-	return r.context.newGeom(C.GEOSWKBReader_read_r(r.context.cHandle, r.cWKBReader, (*C.uchar)(wkbCBuf), C.size_t(len(wkb))), nil), r.context.err
+	return r.context.newGeom(C.GEOSWKBReader_read_r(r.context.cHandle, r.cWKBReader, (*C.uchar)(pWkb), C.size_t(len(wkb))), nil), r.context.err
 }
 
 func (c *Context) destroyWKBReader(cWKBReader *C.struct_GEOSWKBReader_t) {

@@ -1,6 +1,7 @@
 package geojson_test
 
 import (
+	"runtime"
 	"strconv"
 	"testing"
 
@@ -87,7 +88,7 @@ func TestFeatureCollection(t *testing.T) {
 
 			var featureCollection geojson.FeatureCollection
 			assert.NoError(t, featureCollection.UnmarshalJSON([]byte(tc.geoJSONStr)))
-			assert.Equal(t, tc.featureCollection, featureCollection)
+			assert.Equal(t, tc.featureCollection, featureCollection, assert.Exclude[runtime.Cleanup]())
 		})
 	}
 }

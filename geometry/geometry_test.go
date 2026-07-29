@@ -194,17 +194,17 @@ func TestNewGeometry(t *testing.T) {
 
 	actual, err := geometry.NewGeometryFromGeoJSON([]byte(`{"type":"Point","coordinates":[1,2]}`))
 	assert.NoError(t, err)
-	assert.Equal(t, expected, actual, assert.Exclude[*geos.Context]())
+	assert.Equal(t, expected, actual, assert.Exclude[*geos.Context](), assert.Exclude[runtime.Cleanup]())
 
 	wkb, err := hex.DecodeString("0101000000000000000000f03f0000000000000040")
 	assert.NoError(t, err)
 	actual, err = geometry.NewGeometryFromWKB(wkb)
 	assert.NoError(t, err)
-	assert.Equal(t, expected, actual)
+	assert.Equal(t, expected, actual, assert.Exclude[runtime.Cleanup]())
 
 	actual, err = geometry.NewGeometryFromWKT("POINT (1 2)")
 	assert.NoError(t, err)
-	assert.Equal(t, expected, actual)
+	assert.Equal(t, expected, actual, assert.Exclude[runtime.Cleanup]())
 }
 
 func TestIssue200(t *testing.T) {
