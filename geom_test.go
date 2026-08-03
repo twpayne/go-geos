@@ -632,3 +632,39 @@ func TestMakeValid(t *testing.T) {
 		})
 	}
 }
+
+func TestReleaseCollection(t *testing.T) {
+	defer runtime.GC()
+	c := geos.NewContext()
+	g1 := mustNewGeomFromWKT(t, c, "POINT (0 1)")
+	g2 := mustNewGeomFromWKT(t, c, "LINESTRING (0 0,1 0,1 1)")
+	g3 := mustNewGeomFromWKT(t, c, "POLYGON ((0 0, 2 0, 2 2, 0 2, 0 0))")
+	c1 := c.NewCollection(geos.TypeIDGeometryCollection, []*geos.Geom{g1, g1, g2, g3})
+	c2 := c.NewCollection(geos.TypeIDGeometryCollection, []*geos.Geom{c1, g1, g2, g3})
+
+	r2 := c2.ReleaseCollection()
+	assert.Equal(t, 0, c2.NumGeometries())
+	assert.Equal(t, 4, len(r2))
+	assert.Equal(t, c1.Type(), r2[0].Type())
+	assert.Equal(t, g1.Type(), r2[1].Type())
+	assert.Equal(t, g2.Type(), r2[2].Type())
+	assert.Equal(t, g3.Type(), r2[3].Type())
+
+	r1 := c1.ReleaseCollection()
+	assert.Equal(t, 0, c1.NumGeometries())
+	assert.Equal(t, 4, len(r1))
+	assert.Equal(t, g1.Type(), r1[0].Type())
+	assert.Equal(t, g1.Type(), r1[1].Type())
+	assert.Equal(t, g2.Type(), r1[2].Type())
+	assert.Equal(t, g3.Type(), r1[3].Type())
+
+	// releasing an empty collection is ok
+	r1 = c1.ReleaseCollection()
+	assert.Equal(t, 0, len(r1))
+
+	// releasing a non-collection should panic (geos <3.12.3 crashes)
+	if geos.VersionCompare(3, 12, 3) >= 0 {
+		assert.Panics(t, func() { g1.ReleaseCollection() })
+		assert.Equal(t, 1, g1.NumGeometries())
+	}
+}

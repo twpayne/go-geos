@@ -32,21 +32,25 @@ func (c *Context) NewCollection(typeID TypeID, geoms []*Geom) *Geom {
 	}
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+	adopted := make(map[*Geom]struct{}, len(geoms))
+	adoptedAlready := func(g *Geom) bool {
+		_, exists := adopted[g]
+		return exists
+	}
 	cGeoms := make([]*C.GEOSGeometry, len(geoms))
 	for i, g := range geoms {
-		if g.owner == nil {
+		if g.owner == nil && !adoptedAlready(g) {
 			cGeoms[i] = g.cGeom
+			adopted[g] = struct{}{}
 		} else {
 			cGeoms[i] = C.GEOSGeom_clone_r(c.cHandle, g.cGeom)
 		}
 	}
 	geom := c.newNonNilGeom(C.GEOSGeom_createCollection_r(c.cHandle, C.int(typeID), &cGeoms[0], C.uint(len(geoms))), nil)
-	for _, g := range geoms {
-		if g.owner == nil {
-			g.owner = geom
-			g.cleanup.Stop()
-			c.unref()
-		}
+	for g := range adopted {
+		g.owner = geom
+		g.cleanup.Stop()
+		c.unref()
 	}
 	return geom
 }
@@ -229,13 +233,7 @@ func (g *Geom) CoordSeq() *CoordSeq {
 	g.context.mutex.Lock()
 	defer g.context.mutex.Unlock()
 	cCoordSeq := C.GEOSGeom_getCoordSeq_r(g.context.cHandle, g.cGeom)
-	// Don't add a cleanup function as coordSeq is owned by g and will be
-	// cleaned up when g is cleaned up.
-	coordSeq := g.context.newCoordSeqInternal(cCoordSeq, g)
-	if coordSeq == nil {
-		return nil
-	}
-	return coordSeq
+	return g.context.newCoordSeqInternal(cCoordSeq, g)
 }
 
 // ExteriorRing returns the exterior ring. The returned geometry is a
@@ -255,6 +253,29 @@ func (g *Geom) Geometry(n int) *Geom {
 		panic(errIndexOutOfRange)
 	}
 	return g.context.newNonNilGeom(C.GEOSGetGeometryN_r(g.context.cHandle, g.cGeom, C.int(n)), g)
+}
+
+// ReleaseCollection removes and returns all the geometries from the collection
+// g.
+func (g *Geom) ReleaseCollection() []*Geom {
+	if g.NumGeometries() == 0 {
+		return nil
+	}
+	g.context.mutex.Lock()
+	defer g.context.mutex.Unlock()
+	var ngeoms C.uint
+	pcGeoms := C.GEOSGeom_releaseCollection_r(g.context.cHandle, g.cGeom, &ngeoms)
+	if pcGeoms == nil {
+		panic(g.context.err)
+	}
+	defer C.GEOSFree_r(g.context.cHandle, unsafe.Pointer(pcGeoms))
+	cGeoms := unsafe.Slice(pcGeoms, ngeoms)
+	g.numGeometries = 0
+	result := make([]*Geom, ngeoms)
+	for i := range ngeoms {
+		result[i] = g.context.newNonNilGeom(cGeoms[i], nil)
+	}
+	return result
 }
 
 // InteriorRing returns the nth interior ring. The returned geometry is a
