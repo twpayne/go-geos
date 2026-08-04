@@ -1,8 +1,8 @@
-//go:build go1.21
-
+// Demonstrate integration with PostgreSQL/PostGIS.
 package main
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
 	"flag"
@@ -10,7 +10,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/lib/pq"
+	_ "github.com/lib/pq" // Add PostgreSQL to database/sql.
 
 	"github.com/twpayne/go-geos"
 	"github.com/twpayne/go-geos/geometry"
@@ -34,8 +34,8 @@ type Waypoint struct {
 
 // createDB demonstrates create a PostgreSQL/PostGIS database with a table with
 // a geometry column.
-func createDB(db *sql.DB) error {
-	_, err := db.Exec(`
+func createDB(ctx context.Context, db *sql.DB) error {
+	_, err := db.ExecContext(ctx, `
 		CREATE EXTENSION IF NOT EXISTS postgis;
 		CREATE TABLE IF NOT EXISTS waypoints (
 			id SERIAL PRIMARY KEY,
@@ -48,16 +48,19 @@ func createDB(db *sql.DB) error {
 
 // populateDB demonstrates populating a PostgreSQL/PostGIS database using
 // pq.CopyIn for fast imports.
-func populateDB(db *sql.DB) error {
-	tx, err := db.Begin()
+func populateDB(ctx context.Context, db *sql.DB) error {
+	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
-	stmt, err := tx.Prepare(pq.CopyIn("waypoints", "name", "geom"))
+	defer func() {
+		_ = tx.Rollback()
+	}()
+	stmt, err := tx.PrepareContext(ctx, "COPY waypoints (name, geom) FROM stdin")
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 	for _, waypoint := range []Waypoint{
 		{
 			Name:     "London",
@@ -68,11 +71,11 @@ func populateDB(db *sql.DB) error {
 			Geometry: geometry.NewGeometry(geos.NewPoint([]float64{13.405, 52.52}).SetSRID(4326)),
 		},
 	} {
-		if _, err := stmt.Exec(waypoint.Name, waypoint.Geometry); err != nil {
+		if _, err := stmt.ExecContext(ctx, waypoint.Name, waypoint.Geometry); err != nil {
 			return err
 		}
 	}
-	if _, err := stmt.Exec(); err != nil {
+	if _, err := stmt.ExecContext(ctx); err != nil {
 		return err
 	}
 	return tx.Commit()
@@ -80,12 +83,13 @@ func populateDB(db *sql.DB) error {
 
 // readGeoJSON demonstrates reading GeoJSON data and inserting it into a
 // database with INSERT.
-func readGeoJSON(db *sql.DB, r io.Reader) error {
+func readGeoJSON(ctx context.Context, db *sql.DB, r io.Reader) error {
 	var waypoint Waypoint
 	if err := json.NewDecoder(r).Decode(&waypoint); err != nil {
 		return err
 	}
-	_, err := db.Exec(`
+	waypoint.Geometry.SetSRID(4326)
+	_, err := db.ExecContext(ctx, `
 		INSERT INTO waypoints(name, geom) VALUES ($1, $2);
 	`, waypoint.Name, waypoint.Geometry)
 	return err
@@ -93,8 +97,8 @@ func readGeoJSON(db *sql.DB, r io.Reader) error {
 
 // writeGeoJSON demonstrates reading data from a database with SELECT and
 // writing it as GeoJSON.
-func writeGeoJSON(db *sql.DB, w io.Writer) error {
-	rows, err := db.Query(`
+func writeGeoJSON(ctx context.Context, db *sql.DB, w io.Writer) error {
+	rows, err := db.QueryContext(ctx, `
 		SELECT id, name, ST_AsEWKB(geom) FROM waypoints ORDER BY id ASC;
 	`)
 	if err != nil {
@@ -114,32 +118,34 @@ func writeGeoJSON(db *sql.DB, w io.Writer) error {
 }
 
 func run() error {
+	ctx := context.Background()
+
 	flag.Parse()
 	db, err := sql.Open("postgres", *dsn)
 	if err != nil {
 		return err
 	}
 	defer db.Close()
-	if err := db.Ping(); err != nil {
+	if err := db.PingContext(ctx); err != nil {
 		return err
 	}
 	if *create {
-		if err := createDB(db); err != nil {
+		if err := createDB(ctx, db); err != nil {
 			return err
 		}
 	}
 	if *populate {
-		if err := populateDB(db); err != nil {
+		if err := populateDB(ctx, db); err != nil {
 			return err
 		}
 	}
 	if *read {
-		if err := readGeoJSON(db, os.Stdin); err != nil {
+		if err := readGeoJSON(ctx, db, os.Stdin); err != nil {
 			return err
 		}
 	}
 	if *write {
-		if err := writeGeoJSON(db, os.Stdout); err != nil {
+		if err := writeGeoJSON(ctx, db, os.Stdout); err != nil {
 			return err
 		}
 	}
@@ -148,7 +154,7 @@ func run() error {
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Println(err)
+		_, _ = fmt.Println(err)
 		os.Exit(1)
 	}
 }
