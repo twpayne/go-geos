@@ -16,8 +16,8 @@ jobs:
     - name: install-dependencies
       run: |
         sudo apt-get install -y libgeos-dev
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0   # v7.0.0
-    - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16   # v6.5.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1
+    - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e   # v7.0.0
       with:
         go-version: stable
     - name: generate
@@ -36,8 +36,8 @@ jobs:
     - name: install-dependencies
       run: |
         sudo apt-get install -y libgeos-dev
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0   # v7.0.0
-    - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16   # v6.5.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1
+    - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e   # v7.0.0
       with:
         go-version: stable
     - uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a   # v9.3.0
@@ -74,10 +74,10 @@ jobs:
       run: |
         cd ~/work/geos-${{ matrix.geos-version }}/_build
         sudo make install
-    - uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16   # v6.5.0
+    - uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e   # v7.0.0
       with:
         go-version: stable
-    - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0   # v7.0.0
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1   # v7.0.1
     - name: test
       run: |
         sudo ldconfig
