@@ -1,29 +1,20 @@
-//go:build go1.21
-
 package main
 
 import (
 	"bytes"
 	"context"
 	"database/sql"
-	"os/exec"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/alecthomas/assert/v2"
 	_ "github.com/lib/pq"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
-	"github.com/testcontainers/testcontainers-go/wait"
 )
 
 func TestIntegration(t *testing.T) {
 	ctx := context.Background()
-
-	if _, err := exec.LookPath("docker"); err != nil {
-		t.Skip("docker not found in $PATH")
-	}
 
 	var (
 		database = "testdb"
@@ -31,24 +22,19 @@ func TestIntegration(t *testing.T) {
 		password = "testpassword"
 	)
 
-	pgContainer, err := postgres.RunContainer(ctx,
-		testcontainers.WithImage("docker.io/postgis/postgis:16-3.4"),
+	pgContainer, err := postgres.Run(ctx,
+		"postgis/postgis:12-3.0",
 		postgres.WithDatabase(database),
 		postgres.WithUsername(user),
 		postgres.WithPassword(password),
-		testcontainers.WithWaitStrategy(
-			wait.ForLog("database system is ready to accept connections").
-				WithOccurrence(2).
-				WithStartupTimeout(5*time.Second),
-		),
+		postgres.BasicWaitStrategies(),
 	)
+	t.Cleanup(func() {
+		assert.NoError(t, testcontainers.TerminateContainer(pgContainer))
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	t.Cleanup(func() {
-		assert.NoError(t, pgContainer.Terminate(ctx))
-	})
 
 	connStr, err := pgContainer.ConnectionString(ctx, "sslmode=disable")
 	assert.NoError(t, err)
@@ -59,15 +45,15 @@ func TestIntegration(t *testing.T) {
 		assert.NoError(t, db.Close())
 	}()
 
-	assert.NoError(t, createDB(db))
+	assert.NoError(t, createDB(ctx, db))
 
-	assert.NoError(t, populateDB(db))
+	assert.NoError(t, populateDB(ctx, db))
 
 	r := bytes.NewBufferString(`{"name":"Paris","geometry":{"type":"Point","coordinates":[2.3508,48.8567]}}`)
-	assert.NoError(t, readGeoJSON(db, r))
+	assert.NoError(t, readGeoJSON(ctx, db, r))
 
 	w := &strings.Builder{}
-	assert.NoError(t, writeGeoJSON(db, w))
+	assert.NoError(t, writeGeoJSON(ctx, db, w))
 	assert.Equal(t, strings.Join([]string{
 		`{"id":1,"name":"London","geometry":{"type":"Point","coordinates":[0.1275,51.50722]}}`,
 		`{"id":2,"name":"Berlin","geometry":{"type":"Point","coordinates":[13.405,52.52]}}`,
