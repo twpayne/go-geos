@@ -85,20 +85,10 @@ func (c *Context) NewEmptyPolygon() *Geom {
 
 // NewGeomFromBounds returns a new polygon constructed from bounds.
 func (c *Context) NewGeomFromBounds(minX, minY, maxX, maxY float64) *Geom {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	var typeID C.int
-	cGeom := C.c_newGEOSGeomFromBounds_r(c.cHandle, &typeID, C.double(minX), C.double(minY), C.double(maxX), C.double(maxY))
-	if cGeom == nil {
-		panic(c.err)
-	}
-	geom := &Geom{
-		context:       c,
-		cGeom:         cGeom,
-		typeID:        TypeID(typeID),
-		numGeometries: 1,
-	}
-	c.ref()
-	runtime.AddCleanup(geom, c.destroyGeom, cGeom)
-	return geom
+	return c.newNonNilGeom(C.c_newGEOSGeomFromBounds_r(c.cHandle, &typeID, C.double(minX), C.double(minY), C.double(maxX), C.double(maxY)), nil)
 }
 
 // NewLinearRing returns a new linear ring populated with coords.
