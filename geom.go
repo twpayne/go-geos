@@ -110,22 +110,29 @@ func (c *Context) NewLineString(coords [][]float64) *Geom {
 // NewPoint returns a new point populated with coord.
 func (c *Context) NewPoint(coord []float64) *Geom {
 	cCoordSeq := c.newGEOSCoordSeqFromCoords([][]float64{coord})
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilGeom(C.GEOSGeom_createPoint_r(c.cHandle, cCoordSeq), nil)
 }
 
 // NewPointFromXY returns a new point with a x and y.
 func (c *Context) NewPointFromXY(x, y float64) *Geom {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	return c.newNonNilGeom(C.GEOSGeom_createPointFromXY_r(c.cHandle, C.double(x), C.double(y)), nil)
 }
 
 // NewPoints returns a new slice of points populated from coords.
 func (c *Context) NewPoints(coords [][]float64) []*Geom {
-	if coords == nil {
+	if len(coords) == 0 {
 		return nil
 	}
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	geoms := make([]*Geom, len(coords))
 	for i := range geoms {
-		geoms[i] = c.NewPoint(coords[i])
+		cCoordSeq := c.newGEOSCoordSeqFromCoords([][]float64{coords[i]})
+		geoms[i] = c.newNonNilGeom(C.GEOSGeom_createPoint_r(c.cHandle, cCoordSeq), nil)
 	}
 	return geoms
 }
@@ -135,6 +142,8 @@ func (c *Context) NewPolygon(coordss [][][]float64) *Geom {
 	if len(coordss) == 0 {
 		return c.NewEmptyPolygon()
 	}
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
 	var (
 		cShellGeom *C.struct_GEOSGeom_t
 		holeCGeoms []*C.struct_GEOSGeom_t
