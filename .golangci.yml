@@ -88,6 +88,7 @@ linters:
   - dupl
   - exhaustive
   - exhaustruct
+  - exhaustruct_v5
   - funlen
   - gochecknoglobals
   - gochecknoinits
@@ -212,7 +213,10 @@ formatters:
       - prefix(github.com/twpayne/go-geos)
     gofumpt:
       module-path: github.com/twpayne/go-geos
-      extra-rules: true
+      extra:
+        balance-calls: true
+        clothe-returns: true
+        group-params: true
     goimports:
       local-prefixes:
       - github.com/twpayne/go-geos
