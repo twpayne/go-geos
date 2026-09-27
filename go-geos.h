@@ -44,4 +44,19 @@ GEOSGeometry *c_GEOSMakeValidWithParams_r(GEOSContextHandle_t handle,
                                           enum GEOSMakeValidMethods method,
                                           int keepCollapsed);
 
+int goGEOSInterrupt(void *userdata);
+
+static inline int
+c_GEOSContext_setInterruptCallback_r(GEOSContextHandle_t handle,
+                                     void *userdata) {
+#if GEOS_VERSION_MAJOR > 3 ||                                                  \
+    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR >= 14)
+  GEOSContext_setInterruptCallback_r(handle, userdata ? goGEOSInterrupt : NULL,
+                                     userdata);
+  return 1;
+#else
+  return 0;
+#endif
+}
+
 #endif
