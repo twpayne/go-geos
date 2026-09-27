@@ -254,6 +254,17 @@ func (g *Geom) Geometry(n int) *Geom {
 	return g.context.newNonNilGeom(C.GEOSGetGeometryN_r(g.context.cHandle, g.cGeom, C.int(n)), g)
 }
 
+// Destroy frees g immediately instead of waiting for the garbage collector. It
+// is a no-op if g is owned by another geometry. g must not be used afterwards.
+func (g *Geom) Destroy() {
+	if g == nil || g.cGeom == nil || g.owner != nil {
+		return
+	}
+	g.cleanup.Stop()
+	g.context.destroyGeom(g.cGeom)
+	g.cGeom = nil
+}
+
 // ReleaseCollection removes and returns all the geometries from the collection
 // g.
 func (g *Geom) ReleaseCollection() []*Geom {
