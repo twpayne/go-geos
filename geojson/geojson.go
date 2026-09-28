@@ -36,7 +36,7 @@ type featureCollection struct {
 }
 
 // MarshalJSON implements json.Marshaler.
-func (f *Feature) MarshalJSON() ([]byte, error) {
+func (f Feature) MarshalJSON() ([]byte, error) {
 	return json.Marshal(feature{
 		ID:         f.ID,
 		Type:       featureType,

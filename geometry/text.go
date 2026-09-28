@@ -17,7 +17,7 @@ func (g *Geometry) AppendText(b []byte) ([]byte, error) {
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (g *Geometry) MarshalText() ([]byte, error) {
+func (g Geometry) MarshalText() ([]byte, error) {
 	return []byte(g.ToWKT()), nil
 }
 

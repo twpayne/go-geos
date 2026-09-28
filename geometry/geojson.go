@@ -39,7 +39,7 @@ func (g *Geometry) AsGeoJSON() ([]byte, error) {
 }
 
 // MarshalJSON implements encoding/json.Marshaler.
-func (g *Geometry) MarshalJSON() ([]byte, error) {
+func (g Geometry) MarshalJSON() ([]byte, error) {
 	sb := &strings.Builder{}
 	sb.Grow(initialStringBufferSize)
 	if err := geojsonWriteGeom(sb, g.Geom); err != nil {
