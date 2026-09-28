@@ -1,7 +1,6 @@
 package geos_test
 
 import (
-	"errors"
 	"math"
 	"testing"
 	"time"
@@ -24,29 +23,14 @@ func denseSelfCrossingLine(n int) [][]float64 {
 	return coords
 }
 
-func skipIfNoInterruptCallback(t *testing.T) {
-	t.Helper()
-	if geos.VersionCompare(3, 14, 0) < 0 {
-		t.Skip("GEOS < 3.14 does not support interrupt callbacks")
-	}
-}
-
-func TestSetInterruptCallbackUnsupported(t *testing.T) {
-	if geos.VersionCompare(3, 14, 0) >= 0 {
-		t.Skip("GEOS >= 3.14 supports interrupt callbacks")
-	}
-	_, err := geos.NewContext().SetInterruptCallback(func() bool { return true })
-	assert.IsError(t, err, errors.ErrUnsupported)
-}
-
 func TestSetInterruptCallbackStopsBuffer(t *testing.T) {
-	skipIfNoInterruptCallback(t)
+	requireVersion(t, 3, 14, 0)
+
 	c := geos.NewContext()
 	line := c.NewLineString(denseSelfCrossingLine(20000))
 
 	deadline := time.Now().Add(100 * time.Millisecond)
-	clearInterrupt, err := c.SetInterruptCallback(func() bool { return time.Now().After(deadline) })
-	assert.NoError(t, err)
+	clearInterrupt := c.SetInterruptCallback(func() bool { return time.Now().After(deadline) })
 	defer clearInterrupt()
 
 	// go-geos panics when a GEOS operation fails, including when interrupted.
@@ -63,11 +47,11 @@ func TestSetInterruptCallbackStopsBuffer(t *testing.T) {
 }
 
 func TestSetInterruptCallbackClear(t *testing.T) {
-	skipIfNoInterruptCallback(t)
+	requireVersion(t, 3, 14, 0)
+
 	c := geos.NewContext()
 	line := c.NewLineString([][]float64{{0, 0}, {10, 0}, {10, 10}})
-	clearInterrupt, err := c.SetInterruptCallback(func() bool { return true })
-	assert.NoError(t, err)
+	clearInterrupt := c.SetInterruptCallback(func() bool { return true })
 	clearInterrupt()
 	assert.NotZero(t, line.Buffer(1, 8))
 }

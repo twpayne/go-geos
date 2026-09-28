@@ -6,6 +6,11 @@
 
 enum { bounds_MinX, bounds_MinY, bounds_MaxX, bounds_MaxY };
 
+int c_contextInterruptCallback(void *userdata) {
+  int go_contextInterruptCallback(void *);
+  return go_contextInterruptCallback(userdata);
+}
+
 uintptr_t c_GEOSGeom_getUserData_r(GEOSContextHandle_t handle,
                                    const GEOSGeometry *g) {
   void *userdata = GEOSGeom_getUserData_r(handle, g);
@@ -206,3 +211,13 @@ GEOSGeometry *c_GEOSMakeValidWithParams_r(GEOSContextHandle_t handle,
 
   return res;
 }
+
+#if GEOS_VERSION_MAJOR < 3 ||                                                  \
+    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 14)
+GEOSContextInterruptCallback *
+GEOSContext_setInterruptCallback_r(GEOSContextHandle_t extHandle,
+                                   GEOSContextInterruptCallback *cb,
+                                   void *userData) {
+  return NULL;
+}
+#endif

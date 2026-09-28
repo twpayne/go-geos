@@ -19,6 +19,7 @@ enum GEOSVoronoiFlags {
 };
 #endif
 
+int c_contextInterruptCallback(void *userdata);
 uintptr_t c_GEOSGeom_getUserData_r(GEOSContextHandle_t handle,
                                    const GEOSGeometry *g);
 void c_GEOSGeom_setUserData_r(GEOSContextHandle_t handle, GEOSGeometry *g,
@@ -46,17 +47,13 @@ GEOSGeometry *c_GEOSMakeValidWithParams_r(GEOSContextHandle_t handle,
 
 int goGEOSInterrupt(void *userdata);
 
-static inline int
-c_GEOSContext_setInterruptCallback_r(GEOSContextHandle_t handle,
-                                     void *userdata) {
-#if GEOS_VERSION_MAJOR > 3 ||                                                  \
-    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR >= 14)
-  GEOSContext_setInterruptCallback_r(handle, userdata ? goGEOSInterrupt : NULL,
-                                     userdata);
-  return 1;
-#else
-  return 0;
+#if GEOS_VERSION_MAJOR < 3 ||                                                  \
+    (GEOS_VERSION_MAJOR == 3 && GEOS_VERSION_MINOR < 14)
+typedef int(GEOSContextInterruptCallback)(void *);
+GEOSContextInterruptCallback *
+GEOSContext_setInterruptCallback_r(GEOSContextHandle_t extHandle,
+                                   GEOSContextInterruptCallback *cb,
+                                   void *userData);
 #endif
-}
 
 #endif
