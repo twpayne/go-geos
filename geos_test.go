@@ -30,3 +30,10 @@ func newInvalidGeomFromWKT(t *testing.T, c *geos.Context, wkt string) *geos.Geom
 	assert.False(t, geom.IsValid())
 	return geom
 }
+
+func requireVersion(t *testing.T, major, minor, patch int) {
+	t.Helper()
+	if geos.VersionCompare(major, minor, patch) < 0 {
+		t.Skipf("test requires GEOS version %d.%d.%d or later", major, minor, patch)
+	}
+}
