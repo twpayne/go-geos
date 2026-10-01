@@ -30,7 +30,11 @@ func TestSetInterruptCallbackStopsBuffer(t *testing.T) {
 	line := c.NewLineString(denseSelfCrossingLine(20000))
 
 	deadline := time.Now().Add(100 * time.Millisecond)
-	clearInterrupt := c.SetInterruptCallback(func() bool { return time.Now().After(deadline) })
+	callCount := 0
+	clearInterrupt := c.SetInterruptCallback(func() bool {
+		callCount++
+		return time.Now().After(deadline)
+	})
 	defer clearInterrupt()
 
 	// go-geos panics when a GEOS operation fails, including when interrupted.
@@ -44,6 +48,7 @@ func TestSetInterruptCallbackStopsBuffer(t *testing.T) {
 
 	assert.True(t, interrupted)
 	assert.True(t, elapsed < 5*time.Second)
+	assert.NotZero(t, callCount)
 }
 
 func TestSetInterruptCallbackClear(t *testing.T) {
